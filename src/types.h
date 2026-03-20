@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef uint8_t PC;
 typedef int8_t Register;
@@ -24,7 +25,7 @@ typedef struct {
 
 // 2^8 = 256
 typedef struct {
-    Instruction instructions[256];
+    char instructions[256][16];
     uint8_t size;
 } MemInstruction;
 
@@ -35,9 +36,19 @@ typedef struct {
 
 // Estado (útil para a função de back)
 typedef struct {
-    Instruction instruction;
     PC pc;
     Register registers[8];
     MemInstruction memInstruction;
     MemData memData;
 } State;
+
+typedef struct {
+    bool jump;
+    bool branch;
+    int regDst;
+    int ulaSource;
+    bool memToReg;
+    bool wrtReg;
+    bool wrtMem;
+    int ulaControl;
+} Control;
