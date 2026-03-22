@@ -1,5 +1,9 @@
 #pragma once
 
+#include <stdbool.h>
+
+extern bool debug;
+
 void println(char *msg, ...);
 
 void charsToString(char *buffer, int size, ...);

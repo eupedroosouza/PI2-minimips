@@ -16,27 +16,27 @@ Instruction decodeInstruction(const char *serializedBinary) {
     charsToString(opcodeBuffer, 4, serializedBinary[0], serializedBinary[1], serializedBinary[2], serializedBinary[3]);
     instruction.opcode = binaryToUnsignedInt(opcodeBuffer, 4);
 
-    if (instruction.opcode == 0) {
+    if (instruction.opcode == R_TYPE_OPCODE) {
         instruction.type = R;
-    } else if (instruction.opcode == 4 || instruction.opcode == 11 ||
-               instruction.opcode == 15 || instruction.opcode == 8) {
+    } else if (instruction.opcode == ADDI_OPCODE || instruction.opcode == LW_OPCODE ||
+               instruction.opcode == SW_OPCODE || instruction.opcode == BEQ_OPCODE) {
         instruction.type = I;
-    } else if (instruction.opcode == 2) {
+    } else if (instruction.opcode == J_OPCODE) {
         instruction.type = J;
     } else {
         instruction.type = OTHER;
     }
 
     char registerAndFunctBuffer[4];
-    //rd
-    charsToString(registerAndFunctBuffer, 3, serializedBinary[4], serializedBinary[5], serializedBinary[6]);
-    instruction.rd = binaryToUnsignedInt(registerAndFunctBuffer, 3);
     //rs
-    charsToString(registerAndFunctBuffer, 3, serializedBinary[7], serializedBinary[8], serializedBinary[9]);
+    charsToString(registerAndFunctBuffer, 3, serializedBinary[4], serializedBinary[5], serializedBinary[6]);
     instruction.rs = binaryToUnsignedInt(registerAndFunctBuffer, 3);
     //rt
-    charsToString(registerAndFunctBuffer, 3, serializedBinary[10], serializedBinary[11], serializedBinary[12]);
+    charsToString(registerAndFunctBuffer, 3, serializedBinary[7], serializedBinary[8], serializedBinary[9]);
     instruction.rt = binaryToUnsignedInt(registerAndFunctBuffer, 3);
+    //rd
+    charsToString(registerAndFunctBuffer, 3, serializedBinary[10], serializedBinary[11], serializedBinary[12]);
+    instruction.rd = binaryToUnsignedInt(registerAndFunctBuffer, 3);
     // funct
     charsToString(registerAndFunctBuffer, 3, serializedBinary[13], serializedBinary[14], serializedBinary[15]);
     instruction.funct = binaryToUnsignedInt(registerAndFunctBuffer, 3);

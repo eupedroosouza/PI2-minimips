@@ -5,6 +5,7 @@
 #include <windows.h>
 #endif
 
+#include "control.h"
 #include  "types.h"
 #include  "utils.h"
 
@@ -28,4 +29,22 @@ int main() {
 
 
     return 0;
+}
+
+
+void clock() {
+    if (debug) {
+        println("PC: %d", pc);
+    }
+
+    // Busca
+    Instruction *instruction = &memInstruction.instructions[pc];
+    if (debug) {
+        println("Instrução: %d | %s | %s", pc, instruction->stringedInstruction, instruction->asmInstruction);
+    }
+
+    Control control = makeControl(instruction);
+    if (debug) {
+        debugControl(&control, instruction, registers);
+    }
 }

@@ -1,0 +1,117 @@
+#include "control.h"
+
+#include "utils.h"
+
+Control makeControl(const Instruction *instruction) {
+    Control control;
+    control.ulaControl = 0; // dummy
+
+    bool ulaControlWasDefined = false;
+
+    // Se for um beq (branch equal)
+    if (instruction->opcode == BEQ_OPCODE) {
+        control.ulaControl = 6;
+        ulaControlWasDefined = true;
+        control.branch = true;
+    } else {
+        control.branch = false;
+    }
+
+    // Se for um j (jump)
+    if (instruction->opcode == J_OPCODE) {
+        control.jump = true;
+    } else {
+        control.jump = false;
+    }
+
+    // Se for uma instrução do tipo R pegar o registrador $rd (11-13)
+    if (instruction->type == R) {
+        control.regDst = 1;
+    } else {
+        // Se não, pegar o $rt (8-10)
+        control.regDst = 0;
+    }
+
+    // Se for uma instrução do tipo I a fonte da ula deve ser o immediato.
+    if (instruction->type == I) {
+        control.ulaSource = 1;
+    } else {
+        // Se não, deve ser o valor do segundo registrador lido ($rt)
+        control.ulaSource = 0;
+    }
+
+    // Se for um (lw) -> memToReg = true
+    if (instruction->opcode == LW_OPCODE) {
+        control.ulaControl = 3;
+        ulaControlWasDefined = true;
+        control.memToReg = true;
+    } else {
+        control.memToReg = false;
+    }
+
+    // Se for uma operação que escreve em registradores
+    if (instruction->type == R || instruction->opcode == ADDI_OPCODE || instruction->opcode == LW_OPCODE) {
+        control.wrtReg = true;
+    } else {
+        control.wrtReg = false;
+    }
+
+    // Set for um (sw) -> wrtMem = true
+    if (instruction->opcode == SW_OPCODE) {
+        control.ulaControl = 7;
+        ulaControlWasDefined = true;
+        control.wrtMem = true;
+    } else {
+        control.wrtMem = false;
+    }
+
+    // Se é um addi -> ulaControl = 1
+    if (instruction->opcode == ADDI_OPCODE) {
+        control.ulaControl = 1;
+        ulaControlWasDefined = true;
+    }
+
+    if (!ulaControlWasDefined) {
+        switch (instruction->funct) {
+            case ADD_FUNCT: {
+                control.ulaControl = 0;
+                break;
+            }
+            case SUB_FUNCT: {
+                control.ulaControl = 2;
+                break;
+            }
+            case AND_FUNCT: {
+                control.ulaControl = 4;
+                break;
+            }
+            case OR_FUNCT: {
+                control.ulaControl = 5;
+                break;
+            }
+            default: {
+                control.ulaControl = 0;
+            };
+        }
+        ulaControlWasDefined = true;
+    }
+
+    return control;
+}
+
+void debugControl(const Control *control, const Instruction *instruction, const Register *registers) {
+    println("Branch: %b", control->branch);
+    println("Jump: %b", control->jump);
+    println("Registrador de destino: %d", control->regDst);
+    int8_t ulaSourceValue;
+    if (control->ulaSource == 0) {
+        ulaSourceValue = registers[instruction->rt];
+    } else {
+        ulaSourceValue = instruction->imm;
+    }
+    println("Fonte da ULA (registrador ou imediato): %d (%d)", control->ulaSource, ulaSourceValue);
+    println("Memória -> Registrador: %b", control->memToReg);
+    println("Escrever no registrador: %b", control->wrtReg);
+    println("Escrever na memória: %b", control->wrtMem);
+    println("Controle da ULA: %b", control->ulaControl);
+}

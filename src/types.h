@@ -3,6 +3,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define R_TYPE_OPCODE 0
+#define ADD_FUNCT     0
+#define SUB_FUNCT     2
+#define AND_FUNCT     4
+#define OR_FUNCT      5
+#define ADDI_OPCODE   4
+#define LW_OPCODE    11
+#define SW_OPCODE    15
+#define BEQ_OPCODE    8
+#define J_OPCODE      2
+
 typedef uint8_t PC;
 typedef int8_t Register;
 
