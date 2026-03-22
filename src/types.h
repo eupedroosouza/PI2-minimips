@@ -6,21 +6,21 @@
 typedef uint8_t PC;
 typedef int8_t Register;
 
-enum InstructionType {
+typedef enum {
     I, J, R, OTHER
-};
+} InstructionType;
 
 typedef struct {
     char stringedInstruction[17]; // Bits carregados do .mem transformados em string
-    char *asmInstruction; // Instrução em assembly (mnemônicos) para salvar no .asm
-    enum InstructionType type;
-    int opcode;
-    int rs;
-    int rt;
-    int rd;
-    int funct;
-    int8_t imm; // 8-bits com sinal
-    int addr;
+    char asmInstruction[255]; // Instrução em assembly (mnemônicos) para salvar no .asm
+    InstructionType type;
+    unsigned int opcode;
+    unsigned int rs;
+    unsigned int rt;
+    unsigned int rd;
+    unsigned int funct;
+    int8_t imm;
+    uint8_t addr;
 } Instruction;
 
 // 2^8 = 256

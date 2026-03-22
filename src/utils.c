@@ -16,10 +16,10 @@ void println(char *msg, ...) {
 void charsToString(char *buffer, const int size, ...) {
     va_list args;
     va_start(args, size);
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i <= size; i++) {
         buffer[i] = (char) va_arg(args, int);
     }
-    buffer[size] = '\0';
+    buffer[size + 1] = '\0';
     va_end(args);
 }
 
