@@ -24,7 +24,8 @@ int main() {
 
     // header
     println(
-        "         Simulador Mini-MIPS 8 bits monociclo - Versão 0.0.1\n            Autores:  Pedro S. Moreira, Willian A. Correa\n\n                  Engenharia de Computação\n      Universidade Federal do Pampa (Unipampa) - Campus Bagé");
+        "                    Simulador Mini-MIPS 8 bits monociclo - Versão 0.0.1\n            Autores:  Pedro S. Moreira, Willian A. Correa, William N. A. Paiva\n\n                             Engenharia de Computação\n               Universidade Federal do Pampa (Unipampa) - Campus Bagé");
+
 
     return 0;
 }
