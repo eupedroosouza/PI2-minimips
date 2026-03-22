@@ -25,7 +25,7 @@ typedef struct {
 
 // 2^8 = 256
 typedef struct {
-    char instructions[256][16];
+    Instruction instructions[16];
     uint8_t size;
 } MemInstruction;
 
