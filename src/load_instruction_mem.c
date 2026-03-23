@@ -34,8 +34,8 @@ printf ("\nErro ao ler arquivo!");
  else{
 
 
-char string [17];   // conjunto de 16 bits
-char linha [100];
+char string [17];   // Conjunto de 16 bits
+char linha [100];   // Char que armazena temporariamente a linha lida. Logo depois o conteúdo é levado para "char string [17]"
 
 printf ("\nInstruções em binário da memória: \n");
 
