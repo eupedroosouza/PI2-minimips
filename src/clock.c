@@ -1,11 +1,12 @@
 #include "clock.h"
 
 #include "control.h"
+#include "instruction.h"
 #include "main.h"
 #include "types.h"
 #include "utils.h"
 
-void clock() {
+int clock() {
     debugLn("PC: %d", pc);
 
     if (pc > (memInstruction.size - 1)) {
@@ -13,15 +14,19 @@ void clock() {
         if (memInstruction.size == 0) {
             println("Você carregou o programa? Use a opção [1] para carregar a memória de instrução do simulador.");
         }
-        return;
+        return -1;
     }
 
     // Busca
     Instruction *instruction = &memInstruction.instructions[pc];
-    debugLn("Instrução: %d | %s | %s", pc, instruction->stringedInstruction, instruction->asmInstruction);
+    debugInstruction(instruction);
 
     const Control control = makeControl(instruction);
     if (debug) {
         debugControl(&control, instruction, registers);
     }
+
+    pc++;
+
+    return  0;
 }

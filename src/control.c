@@ -100,18 +100,20 @@ Control makeControl(const Instruction *instruction) {
 }
 
 void debugControl(const Control *control, const Instruction *instruction, const Register *registers) {
-    println("Branch: %b", control->branch);
-    println("Jump: %b", control->jump);
-    println("Registrador de destino: %d", control->regDst);
+    debugLn("<== Controle ==>");
+    debugLn("Branch: %d", control->branch);
+    debugLn("Jump: %d", control->jump);
+    debugLn("Registrador de destino: %d", control->regDst);
     int8_t ulaSourceValue;
     if (control->ulaSource == 0) {
         ulaSourceValue = registers[instruction->rt];
     } else {
         ulaSourceValue = instruction->imm;
     }
-    println("Fonte da ULA (registrador ou imediato): %d (%d)", control->ulaSource, ulaSourceValue);
-    println("Memória -> Registrador: %b", control->memToReg);
-    println("Escrever no registrador: %b", control->wrtReg);
-    println("Escrever na memória: %b", control->wrtMem);
-    println("Controle da ULA: %b", control->ulaControl);
+    debugLn("Fonte da ULA: %d (%d)", control->ulaSource, ulaSourceValue);
+    debugLn("Memória -> Registrador: %d", control->memToReg);
+    debugLn("Escrever no registrador: %d", control->wrtReg);
+    debugLn("Escrever na memória: %d", control->wrtMem);
+    debugLn("Controle da ULA: %d", control->ulaControl);
+    debugLn("<==============>");
 }

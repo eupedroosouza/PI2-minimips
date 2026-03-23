@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 #include "clock.h"
+#include "instruction.h"
+#include "main.h"
 #include "utils.h"
 
 void menu() {
@@ -27,6 +29,7 @@ void menu() {
         const int opcao = readIntInStdinSafely();
         switch (opcao) {
             case 1: {
+                loadInstructionsOnMem();
                 break;
             }
             case 2: {
@@ -48,6 +51,15 @@ void menu() {
                 break;
             }
             case 8: {
+                int execs = 0;
+                int status;
+                do {
+                    status = clock();
+                    if (status == 0) {
+                        execs++;
+                    }
+                } while (status == 0);
+                println("\nExecutadas %d instruções.", execs);
                 break;
             }
             case 9: {
