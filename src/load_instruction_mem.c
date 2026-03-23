@@ -26,7 +26,7 @@ fgets (caminho_arquivo_mem, sizeof (caminho_arquivo_mem), stdin);
 caminho_arquivo_mem[strcspn(caminho_arquivo_mem, "\n")] = 0;    // Remove o \n no final, para fopen encontrar o endereço correto
 
 FILE *arquivo;      // Cria variável de arquivo
-arquivo = fopen (caminho_arquivo_mem, "r");     // Lê arquivo .mem
+arquivo = fopen (caminho_arquivo_mem, "r");     // Abre arquivo .mem para leitura
 
 if (arquivo == NULL){
 printf ("\nErro ao ler arquivo!");
