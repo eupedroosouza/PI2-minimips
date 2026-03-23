@@ -17,7 +17,7 @@ int tamanho;
 
 } mem;
 
-void loadInstructionsOnMem(){  // Carrega arquivo de instrução .mem (binário)
+void loadInstructionsOnMem(){  // Função que carrega arquivo de instrução .mem (binário)
 
 char caminho_arquivo_mem[1000];
 
