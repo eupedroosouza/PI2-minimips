@@ -91,7 +91,7 @@ int readIntInStdinSafely() {
 
     errno = 0;
     const long value = strtol(buffer, &endptr, 10);
-    if (errno == ERANGE || endptr == buffer || value > INT_MAX) {
+    if (errno == ERANGE || endptr == buffer || value > __INT_MAX__) {
         return -1;
     }
 
