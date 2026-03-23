@@ -7,12 +7,12 @@ typedef enum {
 } Signal;
 
 // Use somente para valores sem sinal (registradores rs, rt e rd, etc)
-unsigned int binaryToUnsignedInt(char *serializedBinary, size_t size);
+unsigned int binaryToUnsignedInt(const char *serializedBinary);
 
 // Se o valor binário estiver em complemento de dois, desfazer antes de chamar essa função.
 // Use para valores que foram desfeitos no complemento de dois e passe o sinal como parâmetro.
-inline int binaryToInt(char *serializedBinary, const size_t size, const Signal signal) {
-    return (int) signal * (int) binaryToUnsignedInt(serializedBinary, size);
+inline int binaryToInt(const char *serializedBinary, const Signal signal) {
+    return (int) signal * (int) binaryToUnsignedInt(serializedBinary);
 }
 
 

@@ -14,7 +14,7 @@ Instruction decodeInstruction(const char *serializedBinary) {
 
     char opcodeBuffer[5];
     charsToString(opcodeBuffer, 4, serializedBinary[0], serializedBinary[1], serializedBinary[2], serializedBinary[3]);
-    instruction.opcode = binaryToUnsignedInt(opcodeBuffer, 4);
+    instruction.opcode = binaryToUnsignedInt(opcodeBuffer);
 
     if (instruction.opcode == R_TYPE_OPCODE) {
         instruction.type = R;
@@ -30,16 +30,16 @@ Instruction decodeInstruction(const char *serializedBinary) {
     char registerAndFunctBuffer[4];
     //rs
     charsToString(registerAndFunctBuffer, 3, serializedBinary[4], serializedBinary[5], serializedBinary[6]);
-    instruction.rs = binaryToUnsignedInt(registerAndFunctBuffer, 3);
+    instruction.rs = binaryToUnsignedInt(registerAndFunctBuffer);
     //rt
     charsToString(registerAndFunctBuffer, 3, serializedBinary[7], serializedBinary[8], serializedBinary[9]);
-    instruction.rt = binaryToUnsignedInt(registerAndFunctBuffer, 3);
+    instruction.rt = binaryToUnsignedInt(registerAndFunctBuffer);
     //rd
     charsToString(registerAndFunctBuffer, 3, serializedBinary[10], serializedBinary[11], serializedBinary[12]);
-    instruction.rd = binaryToUnsignedInt(registerAndFunctBuffer, 3);
+    instruction.rd = binaryToUnsignedInt(registerAndFunctBuffer);
     // funct
     charsToString(registerAndFunctBuffer, 3, serializedBinary[13], serializedBinary[14], serializedBinary[15]);
-    instruction.funct = binaryToUnsignedInt(registerAndFunctBuffer, 3);
+    instruction.funct = binaryToUnsignedInt(registerAndFunctBuffer);
 
     // imm
     char immediateBuffer[7];
@@ -55,7 +55,7 @@ Instruction decodeInstruction(const char *serializedBinary) {
     charsToString(addressBuffer, 8, serializedBinary[8], serializedBinary[9], serializedBinary[10],
                   serializedBinary[11], serializedBinary[12],
                   serializedBinary[13], serializedBinary[14], serializedBinary[15]);
-    instruction.addr = binaryToUnsignedInt(addressBuffer, 8);
+    instruction.addr = binaryToUnsignedInt(addressBuffer);
 
     return instruction;
 }

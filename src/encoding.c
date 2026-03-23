@@ -5,6 +5,19 @@
 
 #include "utils.h"
 
+
+unsigned int binaryToUnsignedInt(const char *serializedBinary) {
+    unsigned int decimal = 0;
+    const size_t tamanho = strlen(serializedBinary);
+
+    for (int i = 0; i < tamanho; i++) {
+        if (serializedBinary[i] == '1') {
+            decimal |= (1 << (tamanho - 1 - i));
+        }
+    }
+    return decimal;
+}
+
 void extendSignal(char *baseSerializedBinary, char *buffer, const int size) {
     const size_t originalBinarySize = strlen(baseSerializedBinary);
     if (originalBinarySize > size) {
@@ -27,17 +40,17 @@ int complementOfTwoToInt(char *serializedBinary) {
     const char firstCharacter = serializedBinary[0];
     switch (firstCharacter) {
         case '0': {
-            return binaryToInt(serializedBinary, size, POSITIVE);
+            return binaryToInt(serializedBinary, POSITIVE);
         }
         case '1': {
             char binary[size + 1];
-            subtractOneOnBinary(serializedBinary, binary, size);
+            subtractOneOnBinary(serializedBinary, binary);
 
 
             char invertedBinary[size + 1];
-            invertBinary(binary, invertedBinary, size);
+            invertBinary(binary, invertedBinary);
 
-            return binaryToInt(invertedBinary, size, NEGATIVE);
+            return binaryToInt(invertedBinary, NEGATIVE);
         }
 
         default: {

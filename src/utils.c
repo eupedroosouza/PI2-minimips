@@ -3,7 +3,11 @@
 
 #include "utils.h"
 
+#include <errno.h>
+#include <stdlib.h>
 #include <string.h>
+
+bool debug = false;
 
 void println(char *msg, ...) {
     va_list args;
@@ -11,6 +15,17 @@ void println(char *msg, ...) {
     vprintf(msg, args);
     va_end(args);
     printf("\n");
+}
+
+void debugLn(char *msg, ...) {
+    if (debug) {
+        printf("DEBUG: ");
+        va_list args;
+        va_start(args, msg);
+        vprintf(msg, args);
+        va_end(args);
+        printf("\n");
+    }
 }
 
 void charsToString(char *buffer, const int size, ...) {
@@ -35,7 +50,8 @@ int binaryToInt(const char binary) {
 }
 
 
-void invertBinary(const char *originBinary, char *buffer, const size_t size) {
+void invertBinary(const char *originBinary, char *buffer) {
+    const size_t size = strlen(originBinary);
     for (int i = 0; i < size; i++) {
         char replacementCharacter;
         const char character = originBinary[i];
@@ -51,7 +67,8 @@ void invertBinary(const char *originBinary, char *buffer, const size_t size) {
     buffer[size] = '\0';
 }
 
-void subtractOneOnBinary(const char *originBinary, char *buffer, const size_t size) {
+void subtractOneOnBinary(const char *originBinary, char *buffer) {
+    const size_t size = strlen(originBinary);
     strcpy(buffer, originBinary); // Clean the buffer
     for (int i = (int) (size - 1); i > 0; i--) {
         if (buffer[i] == '1') {
@@ -60,4 +77,23 @@ void subtractOneOnBinary(const char *originBinary, char *buffer, const size_t si
         }
         buffer[i] = '1';
     }
+}
+
+
+int readIntInStdinSafely() {
+    char buffer[12];
+    char *endptr;
+
+    setbuf(stdin, NULL);
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+        return -1;
+    }
+
+    errno = 0;
+    const long value = strtol(buffer, &endptr, 10);
+    if (errno == ERANGE || endptr == buffer || value > INT_MAX) {
+        return -1;
+    }
+
+    return (int) value;
 }
