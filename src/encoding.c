@@ -34,13 +34,13 @@ void extendSignal(char *baseSerializedBinary, char *buffer, const int size) {
     strcat(buffer, baseSerializedBinary);
 }
 
-int complementOfTwoToInt(char *serializedBinary) {
+int complementOfTwoToInt(const char *serializedBinary) {
     const size_t size = strlen(serializedBinary);
 
     const char firstCharacter = serializedBinary[0];
     switch (firstCharacter) {
         case '0': {
-            return binaryToInt(serializedBinary, POSITIVE);
+            return (int) binaryToUnsignedInt(serializedBinary);
         }
         case '1': {
             char binary[size + 1];
@@ -50,11 +50,11 @@ int complementOfTwoToInt(char *serializedBinary) {
             char invertedBinary[size + 1];
             invertBinary(binary, invertedBinary);
 
-            return binaryToInt(invertedBinary, NEGATIVE);
+            const unsigned int value = binaryToUnsignedInt(invertedBinary);
+            return (-1) * (int) value;
         }
 
         default: {
-            println("Erro ao tentar converter complemento de dois para int, binário inválido: %s", serializedBinary);
             return -1;
         }
     }
