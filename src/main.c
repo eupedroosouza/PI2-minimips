@@ -6,6 +6,7 @@
 #include <windows.h>
 #endif
 
+#include "debugger.h"
 #include "menu.h"
 #include  "types.h"
 #include  "utils.h"
@@ -18,7 +19,15 @@ Register registers[8];
 
 State lastState;
 
-int main() {
+int main(const int argCount, char *args[]) {
+    if (argCount >= 1) {
+        for (int i = 0; i < argCount; i++) {
+            if (strcmp(args[i], "--debug") == 0) {
+                debug = true;
+            }
+        }
+    }
+
     // Configura o terminal para usar UTF-8  no Windows (corrige os ascentos).
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool debug = false;
+#include "debugger.h"
 
 void println(char *msg, ...) {
     va_list args;
@@ -96,4 +96,29 @@ int readIntInStdinSafely() {
     }
 
     return (int) value;
+}
+
+void printOnCenter(const char *msg, const int width) {
+    const int len = (int) strlen(msg);
+    const int padding = (width - len) / 2;
+    for (int i = 0; i < padding; i++) {
+        printf(" ");
+    }
+    printf("%s", msg);
+    for (int i = 0; i < (width - len - padding); i++) {
+        printf(" ");
+    }
+}
+
+void centerString(const char *str, char *buffer, const int width) {
+    const int len = (int) strlen(str);
+    strcpy(buffer, "");
+    const int padding = (width - len) / 2;
+    for (int i = 0; i < padding; i++) {
+        strcat(buffer, " ");
+    }
+    strcat(buffer, str);
+    for (int i = 0; i < (width - len - padding); i++) {
+        strcat(buffer, " ");
+    }
 }

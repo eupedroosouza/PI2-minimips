@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "clock.h"
+#include "debugger.h"
 #include "instruction.h"
 #include "main.h"
 #include "utils.h"

@@ -1,7 +1,7 @@
 #include "clock.h"
 
 #include "control.h"
-#include "instruction.h"
+#include "debugger.h"
 #include "main.h"
 #include "types.h"
 #include "utils.h"
@@ -19,12 +19,10 @@ int clock() {
 
     // Busca
     Instruction *instruction = &memInstruction.instructions[pc];
-    debugInstruction(instruction);
+    debugInstructionWithIndex(instruction, pc);
 
     const Control control = makeControl(instruction);
-    if (debug) {
-        debugControl(&control, instruction, registers);
-    }
+    debugControl(&control, instruction, registers);
 
     pc++;
 

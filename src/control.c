@@ -98,22 +98,3 @@ Control makeControl(const Instruction *instruction) {
 
     return control;
 }
-
-void debugControl(const Control *control, const Instruction *instruction, const Register *registers) {
-    debugLn("<== Controle ==>");
-    debugLn("Branch: %d", control->branch);
-    debugLn("Jump: %d", control->jump);
-    debugLn("Registrador de destino: %d", control->regDst);
-    int8_t ulaSourceValue;
-    if (control->ulaSource == 0) {
-        ulaSourceValue = registers[instruction->rt];
-    } else {
-        ulaSourceValue = instruction->imm;
-    }
-    debugLn("Fonte da ULA: %d (%d)", control->ulaSource, ulaSourceValue);
-    debugLn("Memória -> Registrador: %d", control->memToReg);
-    debugLn("Escrever no registrador: %d", control->wrtReg);
-    debugLn("Escrever na memória: %d", control->wrtMem);
-    debugLn("Controle da ULA: %d", control->ulaControl);
-    debugLn("<==============>");
-}

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "debugger.h"
 #include "encoding.h"
 #include "main.h"
 #include "utils.h"
@@ -63,7 +64,8 @@ Instruction decodeInstruction(const char *serializedBinary) {
 }
 
 
-void loadInstructionsOnMem() {  // Função que carrega arquivo de instrução .mem (binário)
+void loadInstructionsOnMem() {
+    // Função que carrega arquivo de instrução .mem (binário)
     // Carrega arquivo de instrução .mem (binário)
 
     char caminho_arquivo_mem[1000];
@@ -83,7 +85,6 @@ void loadInstructionsOnMem() {  // Função que carrega arquivo de instrução .
         char linha[100];
         // Char que armazena temporariamente a linha lida. Logo depois o conteúdo é levado para "char string [17]"
 
-        debugLn("Instruções em binário da memória:");
         int i = 0;
         // Contador de linha. While não para de se repetir até chegar no fim do arquivo, a cada loop o contador "i" irá soma
         while (fgets(linha, sizeof (linha), arquivo) != NULL) {
@@ -99,14 +100,8 @@ void loadInstructionsOnMem() {  // Função que carrega arquivo de instrução .
         fclose(arquivo); // Fecha arquivo
 
         // Imprime os dados da instrução que foram armazenados na matriz. Feito para conferir se esta armazenado corretamente
-        for (int j = 0; j < i; j++) {
-            debugInstruction(&memInstruction.instructions[j]);
-        }
+        debugInstructions(memInstruction.instructions, memInstruction.size);
 
         println("Foram carregadas %d instruções na memória de instrução.", memInstruction.size);
     } //fim do else
-}
-
-void debugInstruction(Instruction *instruction) {
-    debugLn("Instrução: %s | %s", instruction->stringedInstruction, instruction->asmInstruction);
 }

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
-
-extern bool debug;
 
 void println(char *msg, ...);
 
@@ -21,3 +18,7 @@ void subtractOneOnBinary(const char *originBinary, char *buffer);
 // Le um inteiro positivo com segurança
 // Retorna -1 se houver algum erro
 int readIntInStdinSafely();
+
+void printOnCenter(const char *msg, int width);
+
+void centerString(const char *str, char *buffer, int width);
