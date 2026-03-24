@@ -40,13 +40,13 @@ Control makeControl(const Instruction *instruction) {
         control.ulaSource = 0;
     }
 
-    // Se for um (lw) -> memToReg = true
+    // Se for um (lw) -> memToReg = 0
     if (instruction->opcode == LW_OPCODE) {
         control.ulaControl = 3;
         ulaControlWasDefined = true;
-        control.memToReg = true;
+        control.memToReg = 0;
     } else {
-        control.memToReg = false;
+        control.memToReg = 1;
     }
 
     // Se for uma operação que escreve em registradores

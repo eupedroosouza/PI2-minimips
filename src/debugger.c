@@ -7,6 +7,7 @@
 
 const char *typeStr[4] = {"I", "J", "R", "O"};
 const char *boolStr[2] = {"F", "T"};
+const char *memToRegStr[2] = {"mem", "ula"};
 const char *ulaSourceStr[2] = {"register", "immediate"};
 
 bool debug = false;
@@ -106,6 +107,12 @@ void debugControl(const Control *control, const Instruction *instruction, const 
     if (!debug) {
         return;
     }
+
+    char memToRegBuffer[14];
+    snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
+    char memToReg[14];
+    centerString(memToRegBuffer, memToReg, 13);
+
     const int8_t ulaSourceValue = (control->ulaSource == 0) ? registers[instruction->rt] : instruction->imm;
     char ulaSourceBuffer[39];
     snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (source: %d, value: %04d)", ulaSourceStr[control->ulaSource], control->ulaSource, ulaSourceValue);
@@ -116,11 +123,11 @@ void debugControl(const Control *control, const Instruction *instruction, const 
     println("┌──────┬────────┬─────────┬─────────────┬──────────────────────────────────────┬──────────┬─────────┬──────────┐");
     println("│ Jump │ Branch │ Reg Dst │  Mem to Reg │               Ula Source             │ Ula Ctrl │ Wrt Reg │  Wrt Mem │");
     println("├──────┼────────┼─────────┼─────────────┼──────────────────────────────────────┼──────────┼─────────┼──────────┤");
-    println("│  %s   │   %s    │   %2d    │      %s      │%-38s│    %2d    │    %s    │     %s    │",
+    printf("│  %s   │   %s    │   %2d    │%-13s│%-38s│    %2d    │    %s    │     %s    │\n",
             boolStr[control->jump ? 1 : 0],
             boolStr[control->branch ? 1 : 0],
             control->regDst,
-            boolStr[control->memToReg ? 1 : 0],
+            memToReg,
             ulaSource,
             control->ulaControl,
             boolStr[control->wrtReg ? 1 : 0],

@@ -58,7 +58,7 @@ typedef struct {
     bool branch;
     int regDst;
     int ulaSource;
-    bool memToReg;
+    int memToReg;
     bool wrtReg;
     bool wrtMem;
     int ulaControl;
