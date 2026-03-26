@@ -9,12 +9,14 @@ Control makeControl(const Instruction *instruction) {
     bool ulaControlWasDefined = false;
 
     // Se for um beq (branch equal)
+    control.branch = false;
     if (instruction->opcode == BEQ_OPCODE) {
         control.ulaControl = 6;
         ulaControlWasDefined = true;
-        control.branch = true;
-    } else {
-        control.branch = false;
+        // TODO: waiting ULA feat to take ZeroUla to make a AND to check if do branch or no
+        if (true) {
+            control.branch = true;
+        }
     }
 
     // Se for um j (jump)
@@ -33,7 +35,7 @@ Control makeControl(const Instruction *instruction) {
     }
 
     // Se for uma instrução do tipo I a fonte da ula deve ser o immediato.
-    if (instruction->type == I) {
+    if (instruction->type == I && instruction->opcode != BEQ_OPCODE) {
         control.ulaSource = 1;
     } else {
         // Se não, deve ser o valor do segundo registrador lido ($rt)
@@ -41,9 +43,11 @@ Control makeControl(const Instruction *instruction) {
     }
 
     // Se for um (lw) -> memToReg = 0
-    if (instruction->opcode == LW_OPCODE) {
-        control.ulaControl = 3;
-        ulaControlWasDefined = true;
+    if (instruction->opcode == LW_OPCODE || instruction->opcode == BEQ_OPCODE) {
+        if (instruction->opcode == LW_OPCODE ) {
+            control.ulaControl = 3;
+            ulaControlWasDefined = true;
+        }
         control.memToReg = 0;
     } else {
         control.memToReg = 1;
