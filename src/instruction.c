@@ -12,8 +12,6 @@ Instruction decodeInstruction(const char *serializedBinary) {
     Instruction instruction;
 
     strcpy(instruction.stringedInstruction, serializedBinary);
-    //TODO: please, when do asm codec, replace this with valid content
-    strcpy(instruction.asmInstruction, "undefined - waiting asm codec/saver");
 
     char opcodeBuffer[5];
     charsToString(opcodeBuffer, 4, serializedBinary[0], serializedBinary[1], serializedBinary[2], serializedBinary[3]);
@@ -60,8 +58,8 @@ Instruction decodeInstruction(const char *serializedBinary) {
                   serializedBinary[13], serializedBinary[14], serializedBinary[15]);
     instruction.addr = binaryToUnsignedInt(addressBuffer);
 
-    ConvertToAssemblyInstruction (instruction, instruction.asmInstruction);
-    
+    convertToAssemblyInstruction(instruction, instruction.asmInstruction);
+
     return instruction;
 }
 
@@ -95,9 +93,9 @@ void loadInstructionsOnMem() {
             memInstruction.instructions[i] = decodeInstruction(string);
             // Pega os dados da variável string e coloca na estrutura memInstruction
 
-            memInstruction.size++;
             i++;
         }
+        memInstruction.size = i;
 
         fclose(arquivo); // Fecha arquivo
 
@@ -108,44 +106,42 @@ void loadInstructionsOnMem() {
     } //fim do else
 }
 
-void convertToAssemblyInstruction(Instruction instruction, char *buffer){ // Converte para mnemônio
+void convertToAssemblyInstruction(const Instruction instruction, char *buffer) {
+    // Converte para mnemônio
 
-    switch (instruction.opcode){
+    switch (instruction.opcode) {
         case R_TYPE_OPCODE:
-        // switch interno para determinar qual instruções R-TYPE
-            switch (instruction.funct){
-
+            // switch interno para determinar qual instruções R-TYPE
+            switch (instruction.funct) {
                 case ADD_FUNCT:
-                    snprintf (buffer, 255, "add $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
-                break;
+                    snprintf(buffer, 255, "add $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    break;
                 case SUB_FUNCT:
-                    snprintf (buffer, 255, "sub $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
-                break;
+                    snprintf(buffer, 255, "sub $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    break;
                 case AND_FUNCT:
-                    snprintf (buffer, 255, "and $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
-                break;
+                    snprintf(buffer, 255, "and $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    break;
                 case OR_FUNCT:
-                    snprintf (buffer, 255, "or $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
-
+                    snprintf(buffer, 255, "or $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
             }
 
-        break; // fim do R_TYPE_OPCODE
+            break; // fim do R_TYPE_OPCODE
         case ADDI_OPCODE:
-            snprintf (buffer, 255, "addi $%d, $%d, $%d", instruction.rt, instruction.rs, instruction.imm);
-        break;
+            snprintf(buffer, 255, "addi $%d, $%d, $%d", instruction.rt, instruction.rs, instruction.imm);
+            break;
         case LW_OPCODE:
-            snprintf (buffer, 255, "lw $%d, $%d($%d)", instruction.rt, instruction.imm, instruction.rs);
-        break;
+            snprintf(buffer, 255, "lw $%d, %d($%d)", instruction.rt, instruction.imm, instruction.rs);
+            break;
         case SW_OPCODE:
-            snprintf (buffer, 255, "sw $%d, $%d($%d)", instruction.rt, instruction.imm, instruction.rs);
-        break;
+            snprintf(buffer, 255, "sw $%d, %d($%d)", instruction.rt, instruction.imm, instruction.rs);
+            break;
         case BEQ_OPCODE:
-            snprintf (buffer, 255, "beq $%d, $%d, %d", instruction.rs, instruction.rt, instruction.imm);
-        break;
+            snprintf(buffer, 255, "beq $%d, $%d, %d", instruction.rs, instruction.rt, instruction.imm);
+            break;
         case J_OPCODE:
-            snprintf (buffer, 255, "j %d", instruction.addr);
-        break;
+            snprintf(buffer, 255, "j %d", instruction.addr);
+            break;
+        default: ;
     }
-    
-
 }

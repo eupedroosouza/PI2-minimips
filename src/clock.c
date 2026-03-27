@@ -22,7 +22,7 @@ int clock() {
     debugInstructionWithIndex(instruction, pc);
 
     const Control control = makeControl(instruction);
-    debugControl(&control, instruction, registers);
+    debugControl(&control, instruction);
 
     pc++;
 

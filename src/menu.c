@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 #include "clock.h"
+#include "data.h"
 #include "debugger.h"
 #include "instruction.h"
-#include "main.h"
 #include "utils.h"
 
 void menu() {
@@ -34,6 +34,7 @@ void menu() {
                 break;
             }
             case 2: {
+                loadDataOnMem();
                 break;
             }
             case 3: {

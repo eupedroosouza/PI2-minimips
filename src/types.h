@@ -42,7 +42,7 @@ typedef struct {
 
 typedef struct {
     int8_t data[256];
-    uint8_t size;
+    int size;
 } MemData;
 
 // Estado (útil para a função de back)

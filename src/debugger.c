@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "main.h"
 #include "utils.h"
 
 const char *typeStr[4] = {"I", "J", "R", "O"};
@@ -103,7 +104,7 @@ void debugInstructions(Instruction *instructions, const int size) {
     instructionsDebuggerFooter();
 }
 
-void debugControl(const Control *control, const Instruction *instruction, const Register *registers) {
+void debugControl(const Control *control, const Instruction *instruction) {
     if (!debug) {
         return;
     }
@@ -134,4 +135,14 @@ void debugControl(const Control *control, const Instruction *instruction, const 
             boolStr[control->wrtMem ? 1 : 0]);
 
     println("└──────┴────────┴─────────┴─────────────┴──────────────────────────────────────┴──────────┴─────────┴──────────┘");
+}
+
+void debugDataMem() {
+    println("┌─────┬───────┐" );
+    println("│  #  │ Value │");
+    println("├─────┼───────┤");
+    for (int i = 0; i < 256; i++) {
+        println("│ %03d │  %03d  │", i, memData.data[i]);
+    }
+    println("└─────┴───────┘");
 }

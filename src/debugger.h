@@ -11,4 +11,6 @@ void debugInstructionWithIndex(Instruction *instruction, int idx);
 
 void debugInstructions(Instruction *instructions, int size);
 
-void debugControl(const Control *control, const Instruction *instruction, const Register *registers);
+void debugControl(const Control *control, const Instruction *instruction);
+
+void debugDataMem();
