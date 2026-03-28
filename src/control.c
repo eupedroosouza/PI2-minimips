@@ -13,17 +13,13 @@ Control makeControl(const Instruction *instruction) {
     if (instruction->opcode == BEQ_OPCODE) {
         control.ulaControl = 6;
         ulaControlWasDefined = true;
-        // TODO: waiting ULA feat to take ZeroUla to make a AND to check if do branch or no
-        if (true) {
-            control.branch = true;
-        }
+        control.branch = true;
     }
 
     // Se for um j (jump)
+    control.jump = false;
     if (instruction->opcode == J_OPCODE) {
         control.jump = true;
-    } else {
-        control.jump = false;
     }
 
     // Se for uma instrução do tipo R pegar o registrador $rd (11-13)

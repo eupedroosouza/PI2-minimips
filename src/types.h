@@ -63,3 +63,8 @@ typedef struct {
     bool wrtMem;
     int ulaControl;
 } Control;
+
+typedef struct {
+    bool zeroUla;
+    int8_t value;
+} ULAOut;
