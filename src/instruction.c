@@ -8,39 +8,37 @@
 #include "main.h"
 #include "utils.h"
 
-Instruction decodeInstruction(const char *serializedBinary) {
-    Instruction instruction;
-
-    strcpy(instruction.stringedInstruction, serializedBinary);
+void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
+    strcpy(instruction->stringedInstruction, serializedBinary);
 
     char opcodeBuffer[5];
     charsToString(opcodeBuffer, 4, serializedBinary[0], serializedBinary[1], serializedBinary[2], serializedBinary[3]);
-    instruction.opcode = binaryToUnsignedInt(opcodeBuffer);
+    instruction->opcode = binaryToUnsignedInt(opcodeBuffer);
 
-    if (instruction.opcode == R_TYPE_OPCODE) {
-        instruction.type = R;
-    } else if (instruction.opcode == ADDI_OPCODE || instruction.opcode == LW_OPCODE ||
-               instruction.opcode == SW_OPCODE || instruction.opcode == BEQ_OPCODE) {
-        instruction.type = I;
-    } else if (instruction.opcode == J_OPCODE) {
-        instruction.type = J;
+    if (instruction->opcode == R_TYPE_OPCODE) {
+        instruction->type = R;
+    } else if (instruction->opcode == ADDI_OPCODE || instruction->opcode == LW_OPCODE ||
+               instruction->opcode == SW_OPCODE || instruction->opcode == BEQ_OPCODE) {
+        instruction->type = I;
+    } else if (instruction->opcode == J_OPCODE) {
+        instruction->type = J;
     } else {
-        instruction.type = OTHER;
+        instruction->type = OTHER;
     }
 
     char registerAndFunctBuffer[4];
     //rs
     charsToString(registerAndFunctBuffer, 3, serializedBinary[4], serializedBinary[5], serializedBinary[6]);
-    instruction.rs = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->rs = binaryToUnsignedInt(registerAndFunctBuffer);
     //rt
     charsToString(registerAndFunctBuffer, 3, serializedBinary[7], serializedBinary[8], serializedBinary[9]);
-    instruction.rt = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->rt = binaryToUnsignedInt(registerAndFunctBuffer);
     //rd
     charsToString(registerAndFunctBuffer, 3, serializedBinary[10], serializedBinary[11], serializedBinary[12]);
-    instruction.rd = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->rd = binaryToUnsignedInt(registerAndFunctBuffer);
     // funct
     charsToString(registerAndFunctBuffer, 3, serializedBinary[13], serializedBinary[14], serializedBinary[15]);
-    instruction.funct = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->funct = binaryToUnsignedInt(registerAndFunctBuffer);
 
     // imm
     char immediateBuffer[7];
@@ -49,18 +47,16 @@ Instruction decodeInstruction(const char *serializedBinary) {
     // imm extended 6 -> 8
     char extendedImmediateBuffer[9];
     extendSignal(immediateBuffer, extendedImmediateBuffer, 8);
-    instruction.imm = (int8_t) complementOfTwoToInt(extendedImmediateBuffer);
+    instruction->imm = (int8_t) complementOfTwoToInt(extendedImmediateBuffer);
 
     // addr
     char addressBuffer[9];
     charsToString(addressBuffer, 8, serializedBinary[8], serializedBinary[9], serializedBinary[10],
                   serializedBinary[11], serializedBinary[12],
                   serializedBinary[13], serializedBinary[14], serializedBinary[15]);
-    instruction.addr = binaryToUnsignedInt(addressBuffer);
+    instruction->addr = binaryToUnsignedInt(addressBuffer);
 
-    convertToAssemblyInstruction(instruction, instruction.asmInstruction);
-
-    return instruction;
+    convertToAssemblyInstruction(instruction, instruction->asmInstruction);
 }
 
 
@@ -90,7 +86,7 @@ void loadInstructionsOnMem() {
         while (fgets(linha, sizeof (linha), arquivo) != NULL) {
             sscanf(linha, "%16[^\n]\n", string); // Lê os primeiros 16 dígitos do .mem e armazena na variável string
 
-            memInstruction.instructions[i] = decodeInstruction(string);
+            decodeInstruction(&memInstruction.instructions[i], string);
             // Pega os dados da variável string e coloca na estrutura memInstruction
 
             i++;
@@ -106,41 +102,41 @@ void loadInstructionsOnMem() {
     } //fim do else
 }
 
-void convertToAssemblyInstruction(const Instruction instruction, char *buffer) {
+void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) {
     // Converte para mnemônio
 
-    switch (instruction.opcode) {
+    switch (instruction->opcode) {
         case R_TYPE_OPCODE:
             // switch interno para determinar qual instruções R-TYPE
-            switch (instruction.funct) {
+            switch (instruction->funct) {
                 case ADD_FUNCT:
-                    snprintf(buffer, 255, "add $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    snprintf(buffer, 255, "add $%d, $%d, $%d", instruction->rd, instruction->rs, instruction->rt);
                     break;
                 case SUB_FUNCT:
-                    snprintf(buffer, 255, "sub $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    snprintf(buffer, 255, "sub $%d, $%d, $%d", instruction->rd, instruction->rs, instruction->rt);
                     break;
                 case AND_FUNCT:
-                    snprintf(buffer, 255, "and $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    snprintf(buffer, 255, "and $%d, $%d, $%d", instruction->rd, instruction->rs, instruction->rt);
                     break;
                 case OR_FUNCT:
-                    snprintf(buffer, 255, "or $%d, $%d, $%d", instruction.rd, instruction.rs, instruction.rt);
+                    snprintf(buffer, 255, "or $%d, $%d, $%d", instruction->rd, instruction->rs, instruction->rt);
             }
 
             break; // fim do R_TYPE_OPCODE
         case ADDI_OPCODE:
-            snprintf(buffer, 255, "addi $%d, $%d, $%d", instruction.rt, instruction.rs, instruction.imm);
+            snprintf(buffer, 255, "addi $%d, $%d, $%d", instruction->rt, instruction->rs, instruction->imm);
             break;
         case LW_OPCODE:
-            snprintf(buffer, 255, "lw $%d, %d($%d)", instruction.rt, instruction.imm, instruction.rs);
+            snprintf(buffer, 255, "lw $%d, %d($%d)", instruction->rt, instruction->imm, instruction->rs);
             break;
         case SW_OPCODE:
-            snprintf(buffer, 255, "sw $%d, %d($%d)", instruction.rt, instruction.imm, instruction.rs);
+            snprintf(buffer, 255, "sw $%d, %d($%d)", instruction->rt, instruction->imm, instruction->rs);
             break;
         case BEQ_OPCODE:
-            snprintf(buffer, 255, "beq $%d, $%d, %d", instruction.rs, instruction.rt, instruction.imm);
+            snprintf(buffer, 255, "beq $%d, $%d, %d", instruction->rs, instruction->rt, instruction->imm);
             break;
         case J_OPCODE:
-            snprintf(buffer, 255, "j %d", instruction.addr);
+            snprintf(buffer, 255, "j %d", instruction->addr);
             break;
         default: ;
     }

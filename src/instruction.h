@@ -2,8 +2,8 @@
 
 #include "types.h"
 
-Instruction decodeInstruction(const char *serializedBinary);
+void decodeInstruction(Instruction * instruction, const char *serializedBinary);
 
 void loadInstructionsOnMem();
 
-void convertToAssemblyInstruction(Instruction instruction, char *buffer);
+void convertToAssemblyInstruction(const Instruction * instruction, char *buffer);
