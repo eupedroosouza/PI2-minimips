@@ -8,6 +8,7 @@
 #include "debugger.h"
 #include "instruction.h"
 #include "utils.h"
+#include "view.h"
 
 void menu() {
     while (1) {
@@ -41,6 +42,7 @@ void menu() {
                 break;
             }
             case 4: {
+                showRegisters();
                 break;
             }
             case 5: {
