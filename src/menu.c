@@ -53,6 +53,7 @@ void menu() {
                 break;
             }
             case 7: {
+                saveMemData();
                 break;
             }
             case 8: {
