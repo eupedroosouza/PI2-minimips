@@ -9,6 +9,8 @@
 
 #include "debugger.h"
 
+const char *boolStr[2] = {"F", "T"};
+
 void println(char *msg, ...) {
     va_list args;
     va_start(args, msg);

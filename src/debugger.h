@@ -2,17 +2,18 @@
 #include "types.h"
 #include <stdbool.h>
 
-
 extern bool debug;
 
-void debugInstruction(Instruction *instruction);
+void debugInstruction(const Instruction *instruction, int idx, char * buffer);
 
-void debugInstructionWithIndex(Instruction *instruction, int idx);
+void debugInstructionWithIndex(const Instruction *instruction, int idx);
 
-void debugInstructions(Instruction *instructions, int size);
+void debugInstructions(const Instruction *instructions, int size);
 
 void debugControl(const Control *control, const Instruction *instruction);
 
+void createControlTable(char table[5][255], const Control *control, const Instruction *instruction);
+
 void debugDataMem();
 
-void debugDataMemTable(char table[260][255]);
+void createDataMemTable(char table[260][255]);

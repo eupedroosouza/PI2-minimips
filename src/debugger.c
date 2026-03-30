@@ -7,46 +7,19 @@
 #include "utils.h"
 
 const char *typeStr[4] = {"I", "J", "R", "O"};
-const char *boolStr[2] = {"F", "T"};
-const char *memToRegStr[2] = {"mem", "ula"};
-const char *ulaSourceStr[2] = {"register", "immediate"};
 
 bool debug = false;
 
 void instructionsDebuggerHeader() {
-    // Topo da tabela
     println(
-        "┌─────┬──────────────────┬────────────────────────────────┬───────┬────┬─────┬─────┬─────┬─────┬──────┬─────┐");
-    printf("│");
-    printOnCenter("#", 5);
-    printf("|");
-    printOnCenter("Binary", 18);
-    printf("│");
-    printOnCenter("Assembly", 32);
-    printf("│");
-    printOnCenter("Type", 7);
-    printf("│");
-    printOnCenter("OP", 4);
-    printf("│");
-    printOnCenter("RS", 5);
-    printf("│");
-    printOnCenter("RT", 5);
-    printf("│");
-    printOnCenter("RD", 5);
-    printf("│");
-    printOnCenter("Funct", 5);
-    printf("│");
-    printOnCenter("Imm", 6);
-    printf("│");
-    printOnCenter("Addr", 5);
-    printf("│\n");
+        "┌─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┐");
     println(
-        "├─────┼──────────────────┼────────────────────────────────┼───────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
-    // println(
-    //     "├─────┼──────────────────┼────────────────────────────────┼───────┼────┼────┼────┼─────┼─────┼─────┼─────┤");
+        "│  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
+    println(
+        "├─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
 }
 
-void internalDebugInstruction(Instruction *instruction, const int idx) {
+void debugInstruction(const Instruction *instruction, const int idx, char *buffer) {
     char strIdx[4];
     if (idx == -1) {
         strcpy(strIdx, " - ");
@@ -54,110 +27,61 @@ void internalDebugInstruction(Instruction *instruction, const int idx) {
         snprintf(strIdx, sizeof(strIdx), "%03d", idx);
     }
 
-    printf("│ %-3s │ %-16s │ %-30.30s │", strIdx, instruction->stringedInstruction, instruction->asmInstruction);
-
-    printf("   %-1s   │ %02d │  %1d  │  %1d  │  %1d  │  %1d  │ %04d │ %03d │\n",
-           typeStr[instruction->type],
-           instruction->opcode,
-           instruction->rs,
-           instruction->rt,
-           instruction->rd,
-           instruction->funct,
-           instruction->imm,
-           instruction->addr);
+    sprintf(buffer,
+            "│ %-3s │ %-16s │ %-30.30s │    %-1s   │ %02d │  %1d  │  %1d  │  %1d  │  %1d  │ %04d │ %03d │",
+            strIdx,
+            instruction->stringedInstruction,
+            instruction->asmInstruction,
+            typeStr[instruction->type],
+            instruction->opcode,
+            instruction->rs,
+            instruction->rt,
+            instruction->rd,
+            instruction->funct,
+            instruction->imm,
+            instruction->addr);
 }
 
 void instructionsDebuggerFooter() {
     println(
-        "└─────┴──────────────────┴────────────────────────────────┴───────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
+        "└─────┴──────────────────┴────────────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
 }
 
-void debugInstruction(Instruction *instruction) {
-    if (!debug) {
-        return;
-    }
-    println(" Instruction debug:");
-    instructionsDebuggerHeader();
-    internalDebugInstruction(instruction, -1);
-    instructionsDebuggerFooter();
-}
-
-void debugInstructionWithIndex(Instruction *instruction, const int idx) {
+void debugInstructionWithIndex(const Instruction *instruction, const int idx) {
     if (!debug) {
         return;
     }
     println(" Instruction #%d debug:", idx);
     instructionsDebuggerHeader();
-    internalDebugInstruction(instruction, idx);
+    char buffer[256];
+    debugInstruction(instruction, idx, buffer);
+    println(buffer);
     instructionsDebuggerFooter();
 }
 
-void debugInstructions(Instruction *instructions, const int size) {
+void debugInstructions(const Instruction *instructions, const int size) {
     if (!debug) {
         return;
     }
     println(" Instructions debug:");
     instructionsDebuggerHeader();
     for (int i = 0; i < size; i++) {
-        internalDebugInstruction(&instructions[i], i);
+        char buffer[256];
+        debugInstruction(&instructions[i], i, buffer);
+        println(buffer);
     }
     instructionsDebuggerFooter();
 }
 
-void debugControl(const Control *control, const Instruction *instruction) {
-    if (!debug) {
-        return;
-    }
-
-    char memToRegBuffer[14];
-    snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
-    char memToReg[14];
-    centerString(memToRegBuffer, memToReg, 13);
-
-    const int8_t ulaSourceValue = (control->ulaSource == 0) ? registers[instruction->rt] : instruction->imm;
-    char ulaSourceBuffer[39];
-    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (source: %d, value: %04d)", ulaSourceStr[control->ulaSource],
-             control->ulaSource, ulaSourceValue);
-    char ulaSource[39];
-    centerString(ulaSourceBuffer, ulaSource, 38);
-
-    println(" Control debug:");
-    println(
-        "┌──────┬────────┬─────────┬─────────────┬──────────────────────────────────────┬──────────┬─────────┬──────────┐");
-    println(
-        "│ Jump │ Branch │ Reg Dst │  Mem to Reg │               Ula Source             │ Ula Ctrl │ Wrt Reg │  Wrt Mem │");
-    println(
-        "├──────┼────────┼─────────┼─────────────┼──────────────────────────────────────┼──────────┼─────────┼──────────┤");
-    printf("│  %s   │   %s    │   %2d    │%-13s│%-38s│    %2d    │    %s    │     %s    │\n",
-           boolStr[control->jump ? 1 : 0],
-           boolStr[control->branch ? 1 : 0],
-           control->regDst,
-           memToReg,
-           ulaSource,
-           control->ulaControl,
-           boolStr[control->wrtReg ? 1 : 0],
-           boolStr[control->wrtMem ? 1 : 0]);
-
-    println(
-        "└──────┴────────┴─────────┴─────────────┴──────────────────────────────────────┴──────────┴─────────┴──────────┘");
-}
-
 void debugDataMem() {
     char table[260][255];
-    debugDataMemTable(table);
+    createDataMemTable(table);
     for (int i = 0; i < 260; i++) {
         println(table[i]);
     }
-    // println("┌─────┬───────┐");
-    // println("│  #  │ Value │");
-    // println("├─────┼───────┤");
-    // for (int i = 0; i < 256; i++) {
-    //     println("│ %03d │  %03d  │", i, memData.data[i]);
-    // }
-    // println("└─────┴───────┘");
 }
 
-void debugDataMemTable(char table[260][255]) {
+void createDataMemTable(char table[260][255]) {
     sprintf(table[0], "┌─────┬───────┐");
     sprintf(table[1], "│  #  │ Value │");
     sprintf(table[2], "├─────┼───────┤");

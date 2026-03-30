@@ -38,7 +38,7 @@ void showLastState() {
     char registerTable[13][255];
     createRegisterTable(registerTable);
     char memDataTable[260][255];
-    debugDataMemTable(memDataTable);
+    createDataMemTable(memDataTable);
     for (int i = 0; i < 260; i++) {
         if (i < 13) {
             printf("│ %-17s │", registerTable[i]);

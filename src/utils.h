@@ -1,5 +1,6 @@
 #pragma once
 
+extern const char *boolStr[2];
 
 void println(char *msg, ...);
 
