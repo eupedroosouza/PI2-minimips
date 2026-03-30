@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "back.h"
 #include "clock.h"
 #include "data.h"
 #include "debugger.h"
@@ -71,6 +72,7 @@ void menu() {
                 break;
             }
             case 10: {
+                back();
                 break;
             }
             case 11: {

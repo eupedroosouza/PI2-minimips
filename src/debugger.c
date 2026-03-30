@@ -116,33 +116,53 @@ void debugControl(const Control *control, const Instruction *instruction) {
 
     const int8_t ulaSourceValue = (control->ulaSource == 0) ? registers[instruction->rt] : instruction->imm;
     char ulaSourceBuffer[39];
-    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (source: %d, value: %04d)", ulaSourceStr[control->ulaSource], control->ulaSource, ulaSourceValue);
+    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (source: %d, value: %04d)", ulaSourceStr[control->ulaSource],
+             control->ulaSource, ulaSourceValue);
     char ulaSource[39];
     centerString(ulaSourceBuffer, ulaSource, 38);
 
     println(" Control debug:");
-    println("┌──────┬────────┬─────────┬─────────────┬──────────────────────────────────────┬──────────┬─────────┬──────────┐");
-    println("│ Jump │ Branch │ Reg Dst │  Mem to Reg │               Ula Source             │ Ula Ctrl │ Wrt Reg │  Wrt Mem │");
-    println("├──────┼────────┼─────────┼─────────────┼──────────────────────────────────────┼──────────┼─────────┼──────────┤");
+    println(
+        "┌──────┬────────┬─────────┬─────────────┬──────────────────────────────────────┬──────────┬─────────┬──────────┐");
+    println(
+        "│ Jump │ Branch │ Reg Dst │  Mem to Reg │               Ula Source             │ Ula Ctrl │ Wrt Reg │  Wrt Mem │");
+    println(
+        "├──────┼────────┼─────────┼─────────────┼──────────────────────────────────────┼──────────┼─────────┼──────────┤");
     printf("│  %s   │   %s    │   %2d    │%-13s│%-38s│    %2d    │    %s    │     %s    │\n",
-            boolStr[control->jump ? 1 : 0],
-            boolStr[control->branch ? 1 : 0],
-            control->regDst,
-            memToReg,
-            ulaSource,
-            control->ulaControl,
-            boolStr[control->wrtReg ? 1 : 0],
-            boolStr[control->wrtMem ? 1 : 0]);
+           boolStr[control->jump ? 1 : 0],
+           boolStr[control->branch ? 1 : 0],
+           control->regDst,
+           memToReg,
+           ulaSource,
+           control->ulaControl,
+           boolStr[control->wrtReg ? 1 : 0],
+           boolStr[control->wrtMem ? 1 : 0]);
 
-    println("└──────┴────────┴─────────┴─────────────┴──────────────────────────────────────┴──────────┴─────────┴──────────┘");
+    println(
+        "└──────┴────────┴─────────┴─────────────┴──────────────────────────────────────┴──────────┴─────────┴──────────┘");
 }
 
 void debugDataMem() {
-    println("┌─────┬───────┐" );
-    println("│  #  │ Value │");
-    println("├─────┼───────┤");
-    for (int i = 0; i < 256; i++) {
-        println("│ %03d │  %03d  │", i, memData.data[i]);
+    char table[260][255];
+    debugDataMemTable(table);
+    for (int i = 0; i < 260; i++) {
+        println(table[i]);
     }
-    println("└─────┴───────┘");
+    // println("┌─────┬───────┐");
+    // println("│  #  │ Value │");
+    // println("├─────┼───────┤");
+    // for (int i = 0; i < 256; i++) {
+    //     println("│ %03d │  %03d  │", i, memData.data[i]);
+    // }
+    // println("└─────┴───────┘");
+}
+
+void debugDataMemTable(char table[260][255]) {
+    sprintf(table[0], "┌─────┬───────┐");
+    sprintf(table[1], "│  #  │ Value │");
+    sprintf(table[2], "├─────┼───────┤");
+    for (int i = 0; i < 256; i++) {
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memData.data[i]);
+    }
+    sprintf(table[259], "└─────┴───────┘");
 }

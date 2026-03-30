@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "back.h"
 #include "debugger.h"
 #include "encoding.h"
 #include "main.h"
@@ -99,6 +100,7 @@ void loadInstructionsOnMem() {
         debugInstructions(memInstruction.instructions, memInstruction.size);
 
         println("Foram carregadas %d instruções na memória de instrução.", memInstruction.size);
+        invalidateLastState();
     } //fim do else
 }
 

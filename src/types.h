@@ -49,7 +49,6 @@ typedef struct {
 typedef struct {
     PC pc;
     Register registers[8];
-    MemInstruction memInstruction;
     MemData memData;
 } State;
 

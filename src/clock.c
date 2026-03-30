@@ -1,5 +1,6 @@
 #include "clock.h"
 
+#include "back.h"
 #include "control.h"
 #include "debugger.h"
 #include "main.h"
@@ -8,6 +9,9 @@
 #include "utils.h"
 
 int clock() {
+
+    saveLastState();
+
     debugLn("PC: %d", pc);
 
     if (pc > (memInstruction.size - 1)) {

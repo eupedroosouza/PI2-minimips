@@ -17,8 +17,6 @@ MemData memData;
 PC pc;
 Register registers[8];
 
-State lastState;
-
 int main(const int argCount, char *args[]) {
     if (argCount >= 1) {
         for (int i = 0; i < argCount; i++) {

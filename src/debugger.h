@@ -14,3 +14,5 @@ void debugInstructions(Instruction *instructions, int size);
 void debugControl(const Control *control, const Instruction *instruction);
 
 void debugDataMem();
+
+void debugDataMemTable(char table[260][255]);
