@@ -143,3 +143,28 @@ void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) 
         default: ;
     }
 }
+
+// salva as instruções assembly em um arquivo .asm
+void SaveAssemblyMem (){
+
+FILE *arquivoDestino;
+char caminho_salvar_asm [100];
+
+printf ("\nDigite o diretório para salvar o arquivo .asm: ");
+fgets (caminho_salvar_asm, sizeof (caminho_salvar_asm), stdin);
+caminho_salvar_asm[strcspn(caminho_salvar_asm, "\n")] = 0;
+
+arquivoDestino = fopen (caminho_salvar_asm, "w");
+
+if (arquivoDestino == NULL){
+
+    printf ("\nErro");
+} else {
+
+    for (int i = 0 ; i < memInstruction.size ; i ++){
+       fprintf (arquivoDestino, "%s\n", memInstruction.instructions[i].asmInstruction);
+    }
+}
+fclose (arquivoDestino);
+
+}
