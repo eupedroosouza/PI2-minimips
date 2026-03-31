@@ -54,7 +54,7 @@ void menu() {
                 break;
             }
             case 6: {
-                SaveAssemblyMem ();
+                saveInstructionOnAssembly();
                 break;
             }
             case 7: {

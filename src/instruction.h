@@ -8,4 +8,4 @@ void loadInstructionsOnMem();
 
 void convertToAssemblyInstruction(const Instruction * instruction, char *buffer);
 
-void SaveAssemblyMem ();
+void saveInstructionOnAssembly();
