@@ -50,6 +50,7 @@ void menu() {
                 break;
             }
             case 6: {
+                SaveAssemblyMem ();
                 break;
             }
             case 7: {
