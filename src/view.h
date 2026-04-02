@@ -16,3 +16,5 @@ void showClockUla(int input1, int input2, int ulaControl, const ULAOut *out);
 void showStatistics();
 
 void showMems();
+
+void PrintAllProgramData();
