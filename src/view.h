@@ -12,3 +12,7 @@ void showClockInformation(char *msg);
 void showClockRegisters(unsigned int reg1, int value1, unsigned int reg2, int value2);
 
 void showClockUla(int input1, int input2, int ulaControl, const ULAOut *out);
+
+void showStatistics();
+
+void showMems();
