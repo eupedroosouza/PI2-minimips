@@ -5,6 +5,7 @@
 
 #include "back.h"
 #include "clock.h"
+#include "colors.h"
 #include "data.h"
 #include "debugger.h"
 #include "instruction.h"
@@ -84,9 +85,9 @@ void menu() {
             case 11: {
                 debug = !debug;
                 if (debug) {
-                    println("Depuração ativada.");
+                    println(GREEN"Depuração ativada."RESET);
                 } else {
-                    println("Depuração desativada.");
+                    println(RED"Depuração desativada."RESET);
                 }
                 break;
             }
