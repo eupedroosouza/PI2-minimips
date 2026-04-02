@@ -224,6 +224,7 @@ void showMems() {
     println("└──────┴────────────┘");
 }
 
+// Função que escreve todos os dados do programa na tela
 void PrintAllProgramData() {
     char registerTable[13][255];
     createRegisterTable(registerTable); // Função que printa os registradores
