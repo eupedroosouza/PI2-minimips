@@ -138,3 +138,88 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
     println(
         "├───────────────────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
 }
+
+void showStatistics() {
+    const int CYCLE_TIME_NS = 4; // 4ns por ciclo
+    
+    int totalTime = stats.executedInstructions * CYCLE_TIME_NS;
+
+    println("┌─────────────────────────────────────────────────────────────┐");
+    println("│                 Estatísticas de Desempenho                  │");
+    println("├─────────────────────────────────────────────────────────────┤");
+    println("│ Total de Instruções Executadas: %-27d │", stats.executedInstructions);
+    println("│ Tempo Total de Programa:        %-24d ns │", totalTime);
+    println("├─────────────────────────────────────────────────────────────┤");
+    println("│                      Por Tipo (Formato)                     │");
+    println("├────────┬─────────────────────────┬──────────────────────────┤");
+    println("│  Tipo  │       Quantidade        │        Tempo Gasto       │");
+    println("├────────┼─────────────────────────┼──────────────────────────┤");
+    println("│ R      │ %-23d │ %-20d ns │", stats.executedInstructionsPerType.r, stats.executedInstructionsPerType.r * CYCLE_TIME_NS);
+    println("│ I      │ %-23d │ %-20d ns │", stats.executedInstructionsPerType.i, stats.executedInstructionsPerType.i * CYCLE_TIME_NS);
+    println("│ J      │ %-23d │ %-20d ns │", stats.executedInstructionsPerType.j, stats.executedInstructionsPerType.j * CYCLE_TIME_NS);
+    println("├────────┴─────────────────────────┴──────────────────────────┤");
+    println("│                     Por Classe (Opcode)                     │");
+    println("├────────┬─────────────────────────┬──────────────────────────┤");
+    println("│ Classe │       Quantidade        │        Tempo Gasto       │");
+    println("├────────┼─────────────────────────┼──────────────────────────┤");
+    println("│ ADD    │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.add, stats.executedInstructionsPerClass.add * CYCLE_TIME_NS);
+    println("│ SUB    │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.sub, stats.executedInstructionsPerClass.sub * CYCLE_TIME_NS);
+    println("│ AND    │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.and_inst, stats.executedInstructionsPerClass.and_inst * CYCLE_TIME_NS);
+    println("│ OR     │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.or_inst, stats.executedInstructionsPerClass.or_inst * CYCLE_TIME_NS);
+    println("│ ADDI   │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.addi, stats.executedInstructionsPerClass.addi * CYCLE_TIME_NS);
+    println("│ LW     │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.lw, stats.executedInstructionsPerClass.lw * CYCLE_TIME_NS);
+    println("│ SW     │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.sw, stats.executedInstructionsPerClass.sw * CYCLE_TIME_NS);
+    println("│ BEQ    │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.beq, stats.executedInstructionsPerClass.beq * CYCLE_TIME_NS);
+    println("│ J      │ %-23d │ %-20d ns │", stats.executedInstructionsPerClass.j, stats.executedInstructionsPerClass.j * CYCLE_TIME_NS);
+    println("└────────┴─────────────────────────┴──────────────────────────┘");
+}
+
+
+void showMems() {
+
+    println("┌─────────────────────────────────────────────────────────────────────┐");
+    println("│                        Memória de Instruções                        │");
+    println("├─────┬──────────────────┬────────────────────────────────────────────┤");
+    println("│  #  │      Binário     │                  Assembly                  │");
+    println("├─────┼──────────────────┼────────────────────────────────────────────┤");
+
+    if (memInstruction.size == 0) {
+        println("│                 (Memória de instruções vazia)                       │");
+    } else {
+        for (int i = 0; i < memInstruction.size; i++) {
+            char asmStr[255];
+            
+            // Verifica se a string de assembly não está vazia.
+            // Se estiver vazia, coloca o valor mockado
+            if (memInstruction.instructions[i].asmInstruction[0] != '\0') {
+                sprintf(asmStr, "%s", memInstruction.instructions[i].asmInstruction);
+            } else {
+                sprintf(asmStr, "mock_instruction_%02d", i); // Valor mockado
+            }
+
+            println("│ %03d │ %-16s │ %-42s │", 
+                    i, 
+                    memInstruction.instructions[i].stringedInstruction, 
+                    asmStr);
+        }
+    }
+    println("└─────┴──────────────────┴────────────────────────────────────────────┘");
+
+    println(""); 
+
+    
+    println("┌───────────────────┐");
+    println("│ Memória de Dados  │");
+    println("├──────┬────────────┤");
+    println("│  #   │   Valor    │");
+    println("├──────┼────────────┤");
+
+    if (memData.size == 0) {
+        println("│   (Mem. vazia)    │");
+    } else {
+        for (int i = 0; i < memData.size; i++) {
+            println("│ %03d  │    %-04d    │", i, memData.data[i]);
+        }
+    }
+    println("└──────┴────────────┘");
+}
