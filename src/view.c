@@ -223,3 +223,42 @@ void showMems() {
     }
     println("└──────┴────────────┘");
 }
+
+void PrintAllProgramData() {
+    char registerTable[13][255];
+    createRegisterTable(registerTable); // Função que printa os registradores
+    char memDataTable[260][255];
+    createDataMemTable(memDataTable); // Função que printa a memória de dados
+
+    // Cabeçalho
+    println("┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
+    println("│                                                                   All Program Data                                                              │");
+    println("├──────────────────┬─────────────────┬─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
+    println("│    Registers     │     MemData     │  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│ Imm  │ Addr│");
+    println("├──────────────────┼─────────────────┼─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
+
+    int maxLinhas = 260; // MemData é a maior
+    for (int i = 0; i < maxLinhas; i++) {
+        // Registradores
+        if (i < 13) {
+            printf("│ %-16s│", registerTable[i]);
+        } else {
+            printf("│                  │");
+        }
+
+        // MemData
+        printf(" %-16s │", memDataTable[i]);
+
+
+        // MemInstruction
+        if (i < memInstruction.size) {
+            char buffer[256];
+            debugInstruction(&memInstruction.instructions[i], i, buffer);
+            // debugInstruction já formata com │ no início e fim
+            printf("%s\n", buffer + 3); // +1 pra pular o │ inicial que já foi impresso
+        } else {
+            printf("     │                  │                                │        │    │     │     │     │     │      │     │\n");
+        }
+    }
+    println("└──────────────────┴─────────────────┴─────┴──────────────────┴────────────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
+}
