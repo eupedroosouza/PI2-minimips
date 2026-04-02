@@ -67,3 +67,32 @@ typedef struct {
     bool zeroUla;
     int8_t value;
 } ULAOut;
+
+// Estrutura para contar quantas vezes CADA INSTRUÇÃO ESPECÍFICA foi executada.
+typedef struct {
+    int lw;
+    int sw;
+    int add;
+    int addi;
+    int sub;
+    int and_inst; 
+    int or_inst;
+    int beq;
+    int j;
+    int other; 
+} StatisticsPerClass;
+
+// Estrutura para contar quantas instruções de CADA FORMATO (Tipo) rodaram.
+typedef struct {
+    int i; // lw, sw, beq, addi
+    int j; // Jump
+    int r; // add, sub, and, or
+    int other;
+} StatisticsPerType;
+
+
+typedef struct {
+    int executedInstructions; // Contador global de ciclos (1 ciclo = 1 instrução)
+    StatisticsPerClass executedInstructionsPerClass;
+    StatisticsPerType executedInstructionsPerType;
+} Statistics;
