@@ -25,6 +25,7 @@ void menu() {
         println("9. Executa uma instrução (step)");
         println("10. Voltar uma instrução (back)");
         println("11. Ativar/desativar depuração (debug)");
+        println("12. Exibir estatísticas de desempenho ");
         println("0. Sair do Simulador");
 
         printf("\nDigite uma opção: ");
@@ -40,6 +41,9 @@ void menu() {
                 break;
             }
             case 3: {
+                
+                showMems();
+                
                 break;
             }
             case 4: {
@@ -86,6 +90,12 @@ void menu() {
                 }
                 break;
             }
+
+            case 12: {
+                showStatistics();
+                break;
+            }
+
             case 0: {
                 println("Encerrando o simulador!");
                 exit(0);
