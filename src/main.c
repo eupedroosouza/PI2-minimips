@@ -17,6 +17,8 @@ MemData memData;
 PC pc;
 Register registers[8];
 
+Statistics stats = {0};
+
 int main(const int argCount, char *args[]) {
     if (argCount >= 1) {
         for (int i = 0; i < argCount; i++) {
@@ -39,3 +41,4 @@ int main(const int argCount, char *args[]) {
 
     return 0;
 }
+
