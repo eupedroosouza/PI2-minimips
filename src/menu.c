@@ -54,6 +54,7 @@ void menu() {
                 break;
             }
             case 5: {
+                PrintAllProgramData();
                 break;
             }
             case 6: {
