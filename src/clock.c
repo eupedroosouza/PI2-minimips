@@ -26,6 +26,41 @@ int clock() {
     const Instruction *instruction = &memInstruction.instructions[pc];
     const Control control = makeControl(instruction);
 
+    // --- Início da Coleta de Estatísticas ---
+    stats.executedInstructions++;
+
+    // Incrementa por Tipo
+    if (instruction->type == R) {
+        stats.executedInstructionsPerType.r++;
+    } else if (instruction->type == I) {
+        stats.executedInstructionsPerType.i++;
+    } else if (instruction->type == J) {
+        stats.executedInstructionsPerType.j++;
+    } else {
+        stats.executedInstructionsPerType.other++;
+    }
+
+    // Incrementa por Classe (Opcode/Funct)
+    if (instruction->opcode == R_TYPE_OPCODE) {
+        switch (instruction->funct) {
+            case ADD_FUNCT: stats.executedInstructionsPerClass.add++; break;
+            case SUB_FUNCT: stats.executedInstructionsPerClass.sub++; break;
+            case AND_FUNCT: stats.executedInstructionsPerClass.and_inst++; break;
+            case OR_FUNCT:  stats.executedInstructionsPerClass.or_inst++; break;
+            default: stats.executedInstructionsPerClass.other++; break;
+        }
+    } else {
+        switch (instruction->opcode) {
+            case ADDI_OPCODE: stats.executedInstructionsPerClass.addi++; break;
+            case LW_OPCODE:   stats.executedInstructionsPerClass.lw++; break;
+            case SW_OPCODE:   stats.executedInstructionsPerClass.sw++; break;
+            case BEQ_OPCODE:  stats.executedInstructionsPerClass.beq++; break;
+            case J_OPCODE:    stats.executedInstructionsPerClass.j++; break;
+            default: stats.executedInstructionsPerClass.other++; break;
+        }
+    }
+   
+
     showClock(instruction, &control);
 
     // Jump!
