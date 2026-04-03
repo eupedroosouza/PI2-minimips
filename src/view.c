@@ -141,7 +141,7 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
 
 void showStatistics() {
     const int CYCLE_TIME_NS = 4; // 4ns por ciclo
-    
+
     int totalTime = stats.executedInstructions * CYCLE_TIME_NS;
 
     println("┌─────────────────────────────────────────────────────────────┐");
@@ -188,7 +188,7 @@ void showMems() {
     } else {
         for (int i = 0; i < memInstruction.size; i++) {
             char asmStr[255];
-            
+
             // Verifica se a string de assembly não está vazia.
             // Se estiver vazia, coloca o valor mockado
             if (memInstruction.instructions[i].asmInstruction[0] != '\0') {
@@ -197,17 +197,17 @@ void showMems() {
                 sprintf(asmStr, "mock_instruction_%02d", i); // Valor mockado
             }
 
-            println("│ %03d │ %-16s │ %-42s │", 
-                    i, 
-                    memInstruction.instructions[i].stringedInstruction, 
+            println("│ %03d │ %-16s │ %-42s │",
+                    i,
+                    memInstruction.instructions[i].stringedInstruction,
                     asmStr);
         }
     }
     println("└─────┴──────────────────┴────────────────────────────────────────────┘");
 
-    println(""); 
+    println("");
 
-    
+
     println("┌───────────────────┐");
     println("│ Memória de Dados  │");
     println("├──────┬────────────┤");
@@ -234,9 +234,9 @@ void PrintAllProgramData() {
     // Cabeçalho
     println("┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println("│                                                                   All Program Data                                                              │");
-    println("├──────────────────┬─────────────────┬─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
-    println("│    Registers     │     MemData     │  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│ Imm  │ Addr│");
-    println("├──────────────────┼─────────────────┼─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
+    println("├──────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│    Registers     │     MemData     │                                               MemInstruction                                               │");
+    println("├──────────────────┼─────────────────┼─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
 
     int maxLinhas = 260; // MemData é a maior
     for (int i = 0; i < maxLinhas; i++) {
@@ -248,18 +248,38 @@ void PrintAllProgramData() {
         }
 
         // MemData
-        printf(" %-16s │", memDataTable[i]);
+        if (i != 1) {
+            printf(" %-16s │", memDataTable[i]);
+        } else {
+
+            printf(" %-16s ├", memDataTable[i]);
+        }
 
 
         // MemInstruction
-        if (i < memInstruction.size) {
-            char buffer[256];
-            debugInstruction(&memInstruction.instructions[i], i, buffer);
-            // debugInstruction já formata com │ no início e fim
-            printf("%s\n", buffer + 3); // +1 pra pular o │ inicial que já foi impresso
+        if (i < 2) {
+            switch (i) {
+                case 0:
+                    printf("  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│ Imm  │ Addr│\n");
+                    break;
+                case 1:
+                    printf("─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤\n");
+                    break;
+                default:
+                    break;
+            }
         } else {
-            printf("     │                  │                                │        │    │     │     │     │     │      │     │\n");
+            const int idx = i - 2;
+            if (idx < memInstruction.size) {
+                char buffer[256];
+                debugInstruction(&memInstruction.instructions[idx], idx, buffer);
+                // debugInstruction já formata com │ no início e fim
+                printf("%s\n", buffer + 3); // +1 pra pular o │ inicial que já foi impresso
+            } else {
+                printf("     │                  │                                │        │    │     │     │     │     │      │     │\n");
+            }
         }
+
     }
     println("└──────────────────┴─────────────────┴─────┴──────────────────┴────────────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
 }
