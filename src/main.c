@@ -8,6 +8,8 @@
 
 #include "colors.h"
 #include "debugger.h"
+#include "encoding.h"
+#include "instruction.h"
 #include "menu.h"
 #include  "types.h"
 #include  "utils.h"
@@ -49,6 +51,15 @@ int main(const int argCount, char *args[]) {
     // header
     println(
         "                    "BOLD_WHITE"Simulador Mini-MIPS 8 bits monociclo - Versão 0.0.1"RESET"\n            Autores:  Pedro S. Moreira, Willian A. Correa, William N. A. Paiva\n\n                             Engenharia de Computação\n               Universidade Federal do Pampa (Unipampa) - Campus Bagé");
+
+    // Create empty Instruction
+    decodeInstruction(&emptyInstruction, "0000000000000000");
+
+    // Reset
+    for (int i = 0; i < 8; i++) { // Reset registers
+        registers[i] = 0;
+    }
+    // End-reset
 
     menu();
 

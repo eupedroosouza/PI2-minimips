@@ -4,26 +4,20 @@
 
 #include "back.h"
 #include "control.h"
+#include "encoding.h"
 #include "main.h"
 #include "types.h"
 #include "ula.h"
 #include "utils.h"
 #include "view.h"
 
-int clock() {
+void clock() {
 
     saveLastState();
 
-    if (pc > (memInstruction.size - 1)) {
-        println("Não há instruções para executar.");
-        if (memInstruction.size == 0) {
-            println("Você carregou o programa? Use a opção [1] para carregar a memória de instrução do simulador.");
-        }
-        return -1;
-    }
-
     // Busca
-    const Instruction *instruction = &memInstruction.instructions[pc];
+    // Prevents incorrect access of the memory
+    const Instruction *instruction = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
     const Control control = makeControl(instruction);
 
     // --- Início da Coleta de Estatísticas ---
@@ -69,7 +63,7 @@ int clock() {
         char buffer[255];
         sprintf(buffer, " Executed jump to address: %d.", pc);
         showClockInformation(buffer);
-        return 0;
+        return;
     }
 
     const Register input1 = registers[instruction->rs];
@@ -86,7 +80,7 @@ int clock() {
         char buffer[255];
         sprintf(buffer, " Executed branch to address: %d (input 1 %d equal input 2 %d).", pc, input1, input2);
         showClockInformation(buffer);
-        return 0;
+        return;
     }
 
     // Save Word
@@ -110,6 +104,4 @@ int clock() {
     }
 
     pc++;
-
-    return 0;
 }

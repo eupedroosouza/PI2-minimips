@@ -9,6 +9,8 @@
 #include "main.h"
 #include "utils.h"
 
+Instruction emptyInstruction;
+
 void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
     strcpy(instruction->stringedInstruction, serializedBinary);
 

@@ -67,15 +67,12 @@ void menu() {
             }
             case 8: {
                 int execs = 0;
-                int status;
                 println("Pressione 'P' para parar a execução do programa quando quiser.");
                 println("A execução do programa vai iniciar em 3 segundos... Aguarde!");
                 SLEEP_MS(3000);
-                do {
-                    status = clock();
-                    if (status == 0) {
-                        execs++;
-                    }
+                while (1) {
+                    clock();
+                    execs++;
                     if (_kbhit()) {
                         const char usedKey = (char) _getch();
                         if (usedKey == 'p' || usedKey == 'P') {
@@ -83,7 +80,7 @@ void menu() {
                             break;
                         }
                     }
-                } while (status == 0);
+                }
                 println("\nForam executadas %d instruções.", execs);
                 break;
             }
