@@ -14,6 +14,8 @@
 #define BEQ_OPCODE    8
 #define J_OPCODE      2
 
+#define MEM_SIZE 256
+
 typedef uint8_t PC;
 typedef int8_t Register;
 

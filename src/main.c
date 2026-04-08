@@ -56,9 +56,16 @@ int main(const int argCount, char *args[]) {
     // Create empty Instruction
     decodeInstruction(&emptyInstruction, "0000000000000000");
 
-    // Reset
-    for (int i = 0; i < 8; i++) { // Reset registers
+    // Reset (do that to prevents incorrect data (trash data) on not loaded data)
+    pc = 0; //Reset PC
+    for (int i = 0; i < 8; i++) { // Reset registers with 0
         registers[i] = 0;
+    }
+    for (int i = 0; i < MEM_SIZE; i++) { // Reset memData with 0
+        memData.data[i] = 0;
+    }
+    for (int i = 0; i < MEM_SIZE; i++) { // Reset memInstruction with empty instruction
+        memInstruction.instructions[i] = emptyInstruction;
     }
     // End-reset
 
