@@ -74,10 +74,16 @@ void clock() {
     showClockUla(input1, input2, control.ulaControl, &ulaOut);
 
     // Branch!
-    if (ulaOut.zeroUla && control.branch) {
-        pc = pc + instruction->imm + 1;
+    if (control.branch) {
         char buffer[255];
-        sprintf(buffer, " Executed branch to address: %d (input 1 %d equal input 2 %d).", pc, input1, input2);
+        if (ulaOut.zeroUla) {
+            pc = pc + instruction->imm + 1;
+            sprintf(buffer, " Executed branch to address: %d (input 1: %d equal input 2: %d).", pc, input1, input2);
+        } else {
+            sprintf(buffer, " Not executed branch to address: %d (input 1: %d not equal input 2: %d).", pc, input1,
+                    input2);
+            pc++;
+        }
         showClockInformation(buffer);
         return;
     }
@@ -98,7 +104,11 @@ void clock() {
         const unsigned int wrtReg = control.regDst == 0 ? instruction->rt : instruction->rd;
         registers[wrtReg] = value;
         char buffer[255];
-        sprintf(buffer, " Written in register: $%1d value: %04d.", wrtReg, value);
+        if (control.memToReg == 0) {
+            sprintf(buffer, " Load data memory on address: %03d and written in register: %1d value: %04d.", addr,wrtReg, value);
+        } else {
+            sprintf(buffer, " Written in register: $%1d value: %04d.", wrtReg, value);
+        }
         showClockInformation(buffer);
     }
 
