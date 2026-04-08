@@ -9,5 +9,3 @@ unsigned int binaryToUnsignedInt(const char *serializedBinary);
 void extendSignal(char *baseSerializedBinary, char *buffer, int size);
 
 int complementOfTwoToInt(const char *serializedBinary);
-
-void createEmptyInstruction(Instruction *instruction);
