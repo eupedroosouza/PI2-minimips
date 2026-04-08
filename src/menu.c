@@ -7,8 +7,8 @@
 #include "clock.h"
 #include "colors.h"
 #include "data.h"
-#include "debugger.h"
 #include "instruction.h"
+#include "main.h"
 #include "utils.h"
 #include "view.h"
 
@@ -44,9 +44,8 @@ void menu() {
                 break;
             }
             case 3: {
-                
                 showMems();
-                
+
                 break;
             }
             case 4: {
@@ -54,7 +53,7 @@ void menu() {
                 break;
             }
             case 5: {
-                PrintAllProgramData();
+                printAllProgramData();
                 break;
             }
             case 6: {

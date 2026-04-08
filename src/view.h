@@ -17,4 +17,16 @@ void showStatistics();
 
 void showMems();
 
-void PrintAllProgramData();
+void printAllProgramData();
+
+void showLastState();
+
+void viewInstruction(const Instruction *instruction, int idx, char * buffer);
+
+void viewInstructionWithIndex(const Instruction *instruction, int idx);
+
+void viewInstructions(const Instruction *instructions, int size);
+
+void viewDataMem();
+
+void createDataMemTable(char table[260][255]);

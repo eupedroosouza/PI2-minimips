@@ -1,6 +1,8 @@
 #pragma once
 #include "types.h"
 
+extern bool debug;
+
 extern MemInstruction memInstruction;
 extern MemData memData;
 

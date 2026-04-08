@@ -4,10 +4,10 @@
 #include <string.h>
 
 #include "back.h"
-#include "debugger.h"
 #include "encoding.h"
 #include "main.h"
 #include "utils.h"
+#include "view.h"
 
 Instruction emptyInstruction;
 
@@ -99,7 +99,7 @@ void loadInstructionsOnMem() {
         fclose(arquivo); // Fecha arquivo
 
         // Imprime os dados da instrução que foram armazenados na matriz. Feito para conferir se esta armazenado corretamente
-        debugInstructions(memInstruction.instructions, memInstruction.size);
+        viewInstructions(memInstruction.instructions, memInstruction.size);
 
         println("Foram carregadas %d instruções na memória de instrução.", memInstruction.size);
         invalidateLastState();

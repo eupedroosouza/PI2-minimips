@@ -8,7 +8,6 @@
 #include "main.h"
 #include "types.h"
 #include "ula.h"
-#include "utils.h"
 #include "view.h"
 
 void clock() {

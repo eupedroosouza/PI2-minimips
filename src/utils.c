@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "debugger.h"
+#include "main.h"
 
 const char *boolStr[2] = {"F", "T"};
 

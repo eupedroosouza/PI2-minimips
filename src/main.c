@@ -7,12 +7,13 @@
 #endif
 
 #include "colors.h"
-#include "debugger.h"
 #include "encoding.h"
 #include "instruction.h"
 #include "menu.h"
 #include  "types.h"
 #include  "utils.h"
+
+bool debug = false;
 
 MemInstruction memInstruction;
 MemData memData;

@@ -7,6 +7,4 @@ void saveLastState();
 
 void invalidateLastState();
 
-void showLastState();
-
 void back();

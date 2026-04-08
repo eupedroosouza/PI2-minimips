@@ -5,8 +5,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "debugger.h"
 #include "main.h"
+#include "view.h"
 
 void loadDataOnMem() {
     char caminho_arquivo_dat[1000];
@@ -43,7 +43,7 @@ void loadDataOnMem() {
 
     if (debug) {
         printf(" Conteudo da memoria:\n");
-        debugDataMem();
+        viewDataMem();
     }
 }
 
