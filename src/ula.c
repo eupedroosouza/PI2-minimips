@@ -5,7 +5,7 @@
 #include "main.h"
 
 
-ULAOut ula(int8_t input1, int8_t input2, int ulaControl) {
+ULAOut ula(int input1, int input2, int ulaControl) {
     ULAOut out;
     out.zeroUla = false; // Garante que zeroUla começa com valor limpo
     int valor = 0; // variavel out.value é int8_t (8 bits), por isso criamos uma variavel nova
@@ -18,9 +18,11 @@ ULAOut ula(int8_t input1, int8_t input2, int ulaControl) {
         case 3: // LW. Calcula endereço somando os regs
         case 7: // SW. Calcula endereço somando os regs
             valor = (int) input1 + input2; // input1 e input2 são promovidos à int, pois int8_t vai de -128 a 127
+            out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
             break;
         case 2: // SUB
             valor = (int) input1 - input2;
+            out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
             break;
         case 4: // AND
             out.value = (int8_t) (input1 & input2);
@@ -47,7 +49,7 @@ ULAOut ula(int8_t input1, int8_t input2, int ulaControl) {
         out.zeroUla = true;
     }
 
-    out.value = (int8_t) valor;
+    out.value = valor;
 
     return out;
 }
