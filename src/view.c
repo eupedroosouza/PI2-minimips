@@ -243,9 +243,9 @@ void printAllProgramData() {
 
     // Cabeçalho
     println("┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println("│                                                                   All Program Data                                                              │");
+    println("│                                                         Todos os dados do programa                                                              │");
     println("├──────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│    Registers     │     MemData     │                                               MemInstruction                                               │");
+    println("│  Registradores   │     MemData     │                                         Memória de instrução                                               │");
     println("├──────────────────┼─────────────────┼─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
 
     int maxLinhas = 260; // MemData é a maior
@@ -268,7 +268,7 @@ void printAllProgramData() {
         if (i < 2) {
             switch (i) {
                 case 0:
-                    printf("  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│ Imm  │ Addr│\n");
+                    printf("  #  │     Binario      │            Assembly            │  Tipo  │ OP │  RS │  RT │  RD │Funct│ Imm  │ Addr│\n");
                     break;
                 case 1:
                     printf("─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤\n");
