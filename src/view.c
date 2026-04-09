@@ -8,7 +8,7 @@
 #include "utils.h"
 
 const char *memToRegStr[2] = {"mem", "ula"};
-const char *ulaSourceStr[2] = {"register", "immediate"};
+const char *ulaSourceStr[2] = {"registrador", "imediato"};
 const char *typeStr[4] = {"I", "J", "R", "O"};
 
 void showRegisters() {
@@ -22,7 +22,7 @@ void showRegisters() {
 
 void createRegisterTable(char table[13][255]) {
     sprintf(table[0], "┌───────┬───────┐");
-    sprintf(table[1], "│   #   │ Value │");
+    sprintf(table[1], "│   "BOLD_WHITE"#"RESET"   │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├───────┼───────┤");
     for (int i = 0; i < 8; i++) {
         sprintf(table[i + 3], "│  $%01d   │  %03d  │", i, registers[i]);
@@ -52,7 +52,7 @@ void showClock(const Instruction *instruction, const Control *control) {
 
     const int8_t ulaSourceValue = (control->ulaSource == 0) ? registers[instruction->rt] : instruction->imm;
     char ulaSourceBuffer[37];
-    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (source: %d, value: %04d)", ulaSourceStr[control->ulaSource],
+    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (fonte: %d, valor: %04d)", ulaSourceStr[control->ulaSource],
              control->ulaSource, ulaSourceValue);
     char ulaSource[37];
     centerString(ulaSourceBuffer, ulaSource, 36);
@@ -289,11 +289,11 @@ void printAllProgramData() {
 
 void showLastState() {
     println("┌────────────────────────────────────────┐");
-    println("│               Last State               │ ");
+    println("│"BG_MAGENTA"              "BOLD_WHITE"Último Estado             "RESET"│ ");
     println("├────────────┬───────────────────────────┤");
-    println("│     PC     │            %03d            │", lastState.pc);
+    println("│     "BOLD_WHITE"PC"RESET"     │            %03d            │", lastState.pc);
     println("├────────────┴──────┬────────────────────┤");
-    println("│     Registers     │       MemData      │");
+    println("│   "BOLD_WHITE"Registradores"RESET"   │  "BOLD_WHITE"Memória de Dados"RESET"  │");
     println("├───────────────────┼────────────────────┤");
     char registerTable[13][255];
     createRegisterTable(registerTable);
@@ -425,7 +425,7 @@ void viewDataMem() {
 
 void createDataMemTable(char table[260][255]) {
     sprintf(table[0], "┌─────┬───────┐");
-    sprintf(table[1], "│  #  │ Value │");
+    sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
     for (int i = 0; i < 256; i++) {
         sprintf(table[i + 3], "│ %03d │  %03d  │", i, memData.data[i]);
