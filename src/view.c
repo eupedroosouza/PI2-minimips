@@ -338,45 +338,41 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
     }
 
     char rs[128];
-    if (instruction->type == J) {
-        strcpy(rs, "-");
-    } else {
-        sprintf(rs, "%1d", instruction->rs);
-    }
-
     char rt[128];
-    if (instruction->type == J) {
-        strcpy(rt, "-");
-    } else {
-        sprintf(rt, "%1d", instruction->rt);
-    }
-
     char rd[128];
-    if (instruction->type == J || instruction->type == I) {
-        strcpy(rd, "-");
-    } else {
-        sprintf(rd, "%1d", instruction->rd);
-    }
-
     char funct[128];
-    if (instruction->type != R) {
-        strcpy(funct, "-");
-    } else {
-        sprintf(funct, "%1d", instruction->funct);
-    }
-
     char imm[128];
-    if (instruction->type != I) {
-        strcpy(imm, "  - ");
-    } else {
-        sprintf(imm, "%04d", instruction->imm);
-    }
-
     char addr[128];
-    if (instruction->type != J) {
+
+    if (instruction->type == OTHER) {
+        strcpy(rs, "-");
+        strcpy(rt, "-");
+        strcpy(rd, "-");
+        strcpy(funct, "-");
+        strcpy(imm, "  - ");
         strcpy(addr, " - ");
     } else {
-        sprintf(addr, "%03d", instruction->addr);
+        if (instruction->type == J) {
+            strcpy(rs, "-");
+            strcpy(rt, "-");
+            sprintf(addr, "%03d", instruction->addr);
+        } else {
+            sprintf(rs, "%1d", instruction->rs);
+            sprintf(rt, "%1d", instruction->rt);
+            strcpy(addr, " - ");
+        }
+        if (instruction->type == R) {
+            sprintf(rd, "%1d", instruction->rd);
+            sprintf(funct, "%1d", instruction->funct);
+        } else {
+            strcpy(funct, "-");
+            strcpy(rd, "-");
+        }
+        if (instruction->type == I) {
+            sprintf(imm, "%04d", instruction->imm);
+        } else {
+            strcpy(imm, "  - ");
+        }
     }
 
     sprintf(buffer,
