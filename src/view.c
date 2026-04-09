@@ -287,7 +287,7 @@ void printAllProgramData() {
 
             } else if (idx < 256){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
                 char buffer[256];
-                sprintf(buffer,"│ %-3d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", idx);
+                sprintf(buffer,"│ %03d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", idx);
                 printf("%s\n", buffer + 3); // imprime resto das instruções NOP
             }
             else {
@@ -426,7 +426,7 @@ void viewInstructions(const Instruction *instructions, const int size) {
     }
     for (; i < 256; i++){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
         char buffer[256];
-        sprintf(buffer,"│ %-3d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", i);
+        sprintf(buffer,"│ %03d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", i);
         printf("%s\n", buffer); // imprime resto das instruções NOP
     }
     instructionsDebuggerFooter();
