@@ -14,6 +14,9 @@ Instruction emptyInstruction;
 void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
     strcpy(instruction->stringedInstruction, serializedBinary);
 
+    const unsigned int binaryAsANumber = binaryToUnsignedInt(serializedBinary);
+    sprintf(instruction->hexa, "%04x", binaryAsANumber);
+
     char opcodeBuffer[5];
     charsToString(opcodeBuffer, 4, serializedBinary[0], serializedBinary[1], serializedBinary[2], serializedBinary[3]);
     instruction->opcode = binaryToUnsignedInt(opcodeBuffer);

@@ -323,12 +323,9 @@ void showLastState() {
 
 
 void instructionsDebuggerHeader() {
-    println(
-        "┌─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┐");
-    println(
-        "│  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
-    println(
-        "├─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
+    println("┌─────┬──────────────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┐");
+    println("│  #  │      Binary      │ Hexa │         Assembly        │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
+    println("├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
 }
 
 void viewInstruction(const Instruction *instruction, const int idx, char *buffer) {
@@ -339,24 +336,67 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
         snprintf(strIdx, sizeof(strIdx), "%03d", idx);
     }
 
+    char rs[128];
+    if (instruction->type == J) {
+        strcpy(rs, "-");
+    } else {
+        sprintf(rs, "%1d", instruction->rs);
+    }
+
+    char rt[128];
+    if (instruction->type == J) {
+        strcpy(rt, "-");
+    } else {
+        sprintf(rt, "%1d", instruction->rt);
+    }
+
+    char rd[128];
+    if (instruction->type == J || instruction->type == I) {
+        strcpy(rd, "-");
+    } else {
+        sprintf(rd, "%1d", instruction->rd);
+    }
+
+    char funct[128];
+    if (instruction->type != R) {
+        strcpy(funct, "-");
+    } else {
+        sprintf(funct, "%1d", instruction->funct);
+    }
+
+    char imm[128];
+    if (instruction->type != I) {
+        strcpy(imm, "  - ");
+    } else {
+        sprintf(imm, "%04d", instruction->imm);
+    }
+
+    char addr[128];
+    if (instruction->type != J) {
+        strcpy(addr, " - ");
+    } else {
+        sprintf(addr, "%03d", instruction->addr);
+    }
+
     sprintf(buffer,
-            "│ %-3s │ %-16s │ %-30.30s │    %-1s   │ %02d │  %1d  │  %1d  │  %1d  │  %1d  │ %04d │ %03d │",
+            "│ %-3s │ %-16s │ %s │ %-23.23s │    %-1s   │ %02d │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
             strIdx,
             instruction->stringedInstruction,
+            instruction->hexa,
             instruction->asmInstruction,
             typeStr[instruction->type],
             instruction->opcode,
-            instruction->rs,
-            instruction->rt,
-            instruction->rd,
-            instruction->funct,
-            instruction->imm,
-            instruction->addr);
+            rs,
+            rt,
+            rd,
+            funct,
+            imm,
+            addr);
 }
 
 void instructionsDebuggerFooter() {
     println(
-        "└─────┴──────────────────┴────────────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
+        "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
 }
 
 void viewInstructionWithIndex(const Instruction *instruction, const int idx) {
