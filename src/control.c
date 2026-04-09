@@ -7,7 +7,7 @@ Control makeControl(const Instruction *instruction) {
     control.branch = false;
     control.regDst = 0;
     control.ulaSource = 0;
-    control.memToReg = 0;
+    control.memToReg = 1;
     control.wrtReg = false;
     control.wrtMem = false;
     control.ulaControl = 0;
@@ -15,7 +15,6 @@ Control makeControl(const Instruction *instruction) {
     switch (instruction->type) {
         case I: {
             control.ulaSource = 1;
-            control.memToReg = 1;
             switch (instruction->opcode) {
                 case BEQ_OPCODE: {
                     control.branch = true;
@@ -37,6 +36,7 @@ Control makeControl(const Instruction *instruction) {
                 }
                 case SW_OPCODE: {
                     control.ulaControl = 7;
+                    control.memToReg = 0;
                     control.wrtMem = true;
                     break;
                 }
