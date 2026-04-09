@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "back.h"
+#include "colors.h"
 #include "encoding.h"
 #include "main.h"
 #include "utils.h"
@@ -131,7 +132,7 @@ void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) 
 
             break; // fim do R_TYPE_OPCODE
         case ADDI_OPCODE:
-            snprintf(buffer, 255, "addi $%d, $%d, $%d", instruction->rt, instruction->rs, instruction->imm);
+            snprintf(buffer, 255, "addi $%d, $%d, %d", instruction->rt, instruction->rs, instruction->imm);
             break;
         case LW_OPCODE:
             snprintf(buffer, 255, "lw $%d, %d($%d)", instruction->rt, instruction->imm, instruction->rs);

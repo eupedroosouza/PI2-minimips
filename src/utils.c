@@ -7,9 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "colors.h"
 #include "main.h"
 
-const char *boolStr[2] = {"F", "T"};
+const char *boolStr[2] = {RED"F"RESET, GREEN"V"RESET};
 
 void println(char *msg, ...) {
     va_list args;

@@ -56,12 +56,14 @@ void clock() {
 
     showClock(instruction, &control);
 
+    char bufferInformation[255];
+
     // Jump!
     if (control.jump) {
         pc = instruction->addr;
-        char buffer[255];
-        sprintf(buffer, " Executed jump to address: %d.", pc);
-        showClockInformation(buffer);
+        sprintf(bufferInformation, " Jump executado para o endereço: %d.", pc);
+        showClockPc();
+        showClockInformation(bufferInformation);
         return;
     }
 
@@ -73,18 +75,20 @@ void clock() {
     const ULAOut ulaOut = ula(input1, input2, control.ulaControl);
     showClockUla(input1, input2, control.ulaControl, &ulaOut);
 
+
     // Branch!
     if (control.branch) {
-        char buffer[255];
+
         if (ulaOut.zeroUla) {
             pc = pc + instruction->imm + 1;
-            sprintf(buffer, " Executed branch to address: %d (input 1: %d equal input 2: %d).", pc, input1, input2);
+            sprintf(bufferInformation, " Branch executada para o endereco: %d (entrada 1: %d e igual entrada 2: %d).", pc, input1, input2);
         } else {
-            sprintf(buffer, " Not executed branch to address: %d (input 1: %d not equal input 2: %d).", pc, input1,
+            sprintf(bufferInformation, " Nao executado o branch para o endereco: %d (entrada 1: %d não e igual entrada 2: %d).", pc, input1,
                     input2);
             pc++;
         }
-        showClockInformation(buffer);
+        showClockPc();
+        showClockInformation(bufferInformation);
         return;
     }
 
@@ -92,9 +96,7 @@ void clock() {
     if (control.wrtMem) {
         const int8_t addr = ulaOut.value;
         memData.data[addr] = register2;
-        char buffer[255];
-        sprintf(buffer, " Written in data memory to address: %03d value: %04d.", addr, register2);
-        showClockInformation(buffer);
+        sprintf(bufferInformation, " Escrito dado na memoria de dados no endereco: %03d o valor: %04d.", addr, register2);
     }
 
     // Load World and anyone instruction what save on register
@@ -103,14 +105,14 @@ void clock() {
         const int8_t value = control.memToReg == 0 ? memData.data[addr] : ulaOut.value;
         const unsigned int wrtReg = control.regDst == 0 ? instruction->rt : instruction->rd;
         registers[wrtReg] = value;
-        char buffer[255];
         if (control.memToReg == 0) {
-            sprintf(buffer, " Load data memory on address: %03d and written in register: %1d value: %04d.", addr,wrtReg, value);
+            sprintf(bufferInformation, " Carregado dado da memoria de dados no endereco: %03d e escrito no registrador: %1d o valor: %04d.", addr,wrtReg, value);
         } else {
-            sprintf(buffer, " Written in register: $%1d value: %04d.", wrtReg, value);
+            sprintf(bufferInformation, " Executada operacao na ULA e escrito no registrador: $%1d o valor: %04d.", wrtReg, value);
         }
-        showClockInformation(buffer);
     }
 
     pc++;
+    showClockPc();
+    showClockInformation(bufferInformation);
 }

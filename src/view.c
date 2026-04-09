@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "colors.h"
 #include "main.h"
 #include "utils.h"
 
@@ -32,30 +33,17 @@ void createRegisterTable(char table[13][255]) {
 
 
 void showClock(const Instruction *instruction, const Control *control) {
-    println(
-        "┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println(
-        "│                                                 Clock                                                      │");
-    println(
-        "├────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println(
-        "│     PC     │                                            %03d                                                │",
-        pc);
-    println(
-        "├────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println(
-        "│                                              Instruction                                                   │");
-    println(
-        "├─────┬──────────────────┬────────────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
-    println(
-        "│  #  │      Binary      │            Assembly            │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
-    println(
-        "├─────┼──────────────────┼────────────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
+    println("┌""────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
+    println("│"BG_GREEN"                                                 "BOLD_WHITE"Clock                                                      "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│"BG_CYAN"                                               "BOLD_WHITE"Instrução                                                    "RESET"│");
+    println("├─────┬──────────────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
+    println("│  #  │      Binário     │ Hexa │         Assembly        │  Tipo  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
+    println("├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     char buffer[256];
     viewInstruction(instruction, pc, buffer);
     println(buffer);
-    println(
-        "├─────┴──────────────────┴────────────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
+    println("├─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
 
     char memToRegBuffer[14];
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
@@ -69,11 +57,11 @@ void showClock(const Instruction *instruction, const Control *control) {
     char ulaSource[37];
     centerString(ulaSourceBuffer, ulaSource, 36);
     println(
-        "│                                                Control                                                     │");
+        "│"BG_BLUE"                                               "BOLD_WHITE"Controle                                                     "RESET"│");
     println(
         "├──────┬────────┬─────────┬─────────────┬────────────────────────────────────┬──────────┬─────────┬──────────┤");
     println(
-        "│ Jump │ Branch │ Reg Dst │  Mem to Reg │             Ula Source             │ Ula Ctrl │ Wrt Reg │  Wrt Mem │");
+        "│ Jump │ Branch │ Reg Dst │ Mem para Reg│              Ula Fonte             │ Ula Ctrl │ Esc Reg │  Esc Mem │");
     println(
         "├──────┼────────┼─────────┼─────────────┼────────────────────────────────────┼──────────┼─────────┼──────────┤");
     printf("│  %s   │   %s    │   %2d    │%-13s│%-36s│    %2d    │    %s    │     %s    │\n",
@@ -89,20 +77,22 @@ void showClock(const Instruction *instruction, const Control *control) {
         "├──────┴────────┴─────────┴─────────────┴────────────────────────────────────┴──────────┴─────────┴──────────┤");
 }
 
+void showClockPc() {
+    println("│""     "BOLD_WHITE"PC     "RESET"│                                            %03d                                                │",pc);
+    println("├────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┤");
+}
+
 void showClockInformation(char *msg) {
-    println(
-        "│                                              Information                                                   │");
-    println(
-        "├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│%-108s│", msg);
-    println(
-        "└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
+    println("│"BG_YELLOW"                                              "BOLD_WHITE"Informações                                                   "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    printf("│%-108s│\n", msg);
+    println("└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 }
 
 
 void showClockRegisters(const unsigned int reg1, const int value1, const unsigned int reg2, const int value2) {
     println(
-        "│                                               Registers                                                    │");
+        "│"BG_RED"                                             "BOLD_WHITE"Registradores                                                  "RESET"│");
     println(
         "├──────────────┬─────────────────────────────────────────────────────────────────────────────────────────────┤");
     println(
@@ -119,28 +109,28 @@ void showClockRegisters(const unsigned int reg1, const int value1, const unsigne
 
 void showClockUla(const int input1, const int input2, const int ulaControl, const ULAOut *out) {
     println(
-        "│                                                  ULA                                                       │");
+        "│"BG_MAGENTA"                                                  "BOLD_WHITE"ULA                                                       "RESET"│");
     println(
         "├───────────────────────────────────────────────────┬────────────────────────────────────────────────────────┤");
     println(
-        "│                    Input                          │                         Output                         │");
+        "│                    Entrada                        │                          Saída                         │");
     println(
         "├───────────────────────┬───────────────────────────┼────────────────────────────┬───────────────────────────┤");
     println(
-        "│        Input 1        │           %04d            │            Value           │            %04d           │",
+        "│       Entrada 1       │           %04d            │          Resultado         │            %04d           │",
         input1, out->value);
     println(
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(
-        "│        Input 2        │           %04d            │           ZeroUla          │              %-1s            │",
+        "│       Entrada 2       │           %04d            │         Val. Iguais        │              %-1s            │",
         input2, boolStr[out->zeroUla == 0 ? 0 : 1]);
     println(
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(
-        "│      Ula Control      │           %04d            │              -             │              -            │",
+        "│     Controle ULA      │           %04d            │          Overflow          │              -            │",
         ulaControl);
     println(
-        "├───────────────────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
+        "├────────────┬──────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
 }
 
 void showStatistics() {
@@ -324,7 +314,7 @@ void showLastState() {
 
 void instructionsDebuggerHeader() {
     println("┌─────┬──────────────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┐");
-    println("│  #  │      Binary      │ Hexa │         Assembly        │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
+    println("│  #  │      Binário     │ Hexa │         Assembly        │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
     println("├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
 }
 
