@@ -69,6 +69,7 @@ typedef struct {
 typedef struct {
     bool zeroUla;
     int8_t value;
+    bool overflow;
 } ULAOut;
 
 // Estrutura para contar quantas vezes CADA INSTRUÇÃO ESPECÍFICA foi executada.
