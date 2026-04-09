@@ -2,6 +2,8 @@
 
 #include "types.h"
 
+extern Instruction nop;
+
 void decodeInstruction(Instruction * instruction, const char *serializedBinary);
 
 void loadInstructionsOnMem();

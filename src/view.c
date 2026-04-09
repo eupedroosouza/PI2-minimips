@@ -31,8 +31,7 @@ void createRegisterTable(char table[13][255]) {
     sprintf(table[12], "└───────┴───────┘");
 }
 
-
-void showClock(const Instruction *instruction, const Control *control) {
+void showClockInstruction(const Instruction *instruction) {
     println("┌""────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println("│"BG_GREEN"                                                 "BOLD_WHITE"Clock                                                      "RESET"│");
     println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
@@ -44,7 +43,9 @@ void showClock(const Instruction *instruction, const Control *control) {
     viewInstruction(instruction, pc, buffer);
     println(buffer);
     println("├─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
+}
 
+void showClockControl(const Instruction *instruction, const Control *control) {
     char memToRegBuffer[14];
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
     char memToReg[14];
@@ -337,6 +338,7 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
         snprintf(strIdx, sizeof(strIdx), "%03d", idx);
     }
 
+    char opcode[128];
     char rs[128];
     char rt[128];
     char rd[128];
@@ -345,6 +347,7 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
     char addr[128];
 
     if (instruction->type == OTHER) {
+        strcpy(opcode, " -");
         strcpy(rs, "-");
         strcpy(rt, "-");
         strcpy(rd, "-");
@@ -352,6 +355,7 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
         strcpy(imm, "  - ");
         strcpy(addr, " - ");
     } else {
+        sprintf(opcode, "%02d", instruction->opcode);
         if (instruction->type == J) {
             strcpy(rs, "-");
             strcpy(rt, "-");
@@ -376,13 +380,13 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
     }
 
     sprintf(buffer,
-            "│ %-3s │ %-16s │ %s │ %-23.23s │    %-1s   │ %02d │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
+            "│ %-3s │ %-16s │ %s │ %-23.23s │    %-1s   │ %s │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
             strIdx,
             instruction->stringedInstruction,
             instruction->hexa,
             instruction->asmInstruction,
             typeStr[instruction->type],
-            instruction->opcode,
+            opcode,
             rs,
             rt,
             rd,

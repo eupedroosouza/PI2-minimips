@@ -54,7 +54,9 @@ int main(const int argCount, char *args[]) {
         "                    "BOLD_WHITE"Simulador Mini-MIPS 8 bits monociclo - Versão 0.0.1"RESET"\n            Autores:  Pedro S. Moreira, Willian A. Correa, William N. A. Paiva\n\n                             Engenharia de Computação\n               Universidade Federal do Pampa (Unipampa) - Campus Bagé");
 
     // Create empty Instruction
-    decodeInstruction(&emptyInstruction, "0000000000000000");
+    decodeInstruction(&nop, "0000000000000000");
+    nop.type = OTHER;
+    strcpy(nop.asmInstruction, "nop");
 
     // Reset (do that to prevents incorrect data (trash data) on not loaded data)
     pc = 0; //Reset PC
@@ -65,7 +67,7 @@ int main(const int argCount, char *args[]) {
         memData.data[i] = 0;
     }
     for (int i = 0; i < MEM_SIZE; i++) { // Reset memInstruction with empty instruction
-        memInstruction.instructions[i] = emptyInstruction;
+        memInstruction.instructions[i] = nop;
     }
     // End-reset
 

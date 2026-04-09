@@ -15,9 +15,17 @@ void clock() {
     saveLastState();
 
     // Busca
-    // Prevents incorrect access of the memory
-    const Instruction *instruction = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
+    // Take the instruction even if the mem instruction size is exceeded, because a nop is expected.
+    const Instruction *instruction = &memInstruction.instructions[pc];
+    showClockInstruction(instruction);
+    if (instruction->type == OTHER) { // Other == NOP (because it is only that has OTHER as its type)
+        pc++;
+        showClockPc();
+        showClockInformation("Nada a executar!");
+        return;
+    }
     const Control control = makeControl(instruction);
+    showClockControl(instruction, &control);
 
     // --- Início da Coleta de Estatísticas ---
     stats.executedInstructions++;
@@ -52,9 +60,7 @@ void clock() {
             default: stats.executedInstructionsPerClass.other++; break;
         }
     }
-   
 
-    showClock(instruction, &control);
 
     char bufferInformation[255];
 

@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "view.h"
 
-Instruction emptyInstruction;
+Instruction nop;
 
 void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
     strcpy(instruction->stringedInstruction, serializedBinary);
