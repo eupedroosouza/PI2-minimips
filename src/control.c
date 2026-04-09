@@ -1,99 +1,78 @@
 #include "control.h"
 
-#include "utils.h"
-
 Control makeControl(const Instruction *instruction) {
     Control control;
-    control.ulaControl = 0; // dummy
-
-    bool ulaControlWasDefined = false;
-
-    // Se for um beq (branch equal)
-    control.branch = false;
-    if (instruction->opcode == BEQ_OPCODE) {
-        control.ulaControl = 6;
-        ulaControlWasDefined = true;
-        control.branch = true;
-    }
-
-    // Se for um j (jump)
+    // Initial values
     control.jump = false;
-    if (instruction->opcode == J_OPCODE) {
-        control.jump = true;
-    }
+    control.branch = false;
+    control.regDst = 0;
+    control.ulaSource = 0;
+    control.memToReg = 0;
+    control.wrtReg = false;
+    control.wrtMem = false;
+    control.ulaControl = 0;
 
-    // Se for uma instrução do tipo R pegar o registrador $rd (11-13)
-    if (instruction->type == R) {
-        control.regDst = 1;
-    } else {
-        // Se não, pegar o $rt (8-10)
-        control.regDst = 0;
-    }
-
-    // Se for uma instrução do tipo I a fonte da ula deve ser o immediato.
-    if (instruction->type == I && instruction->opcode != BEQ_OPCODE) {
-        control.ulaSource = 1;
-    } else {
-        // Se não, deve ser o valor do segundo registrador lido ($rt)
-        control.ulaSource = 0;
-    }
-
-    // Se for um (lw) -> memToReg = 0
-    if (instruction->opcode == LW_OPCODE || instruction->opcode == BEQ_OPCODE) {
-        if (instruction->opcode == LW_OPCODE ) {
-            control.ulaControl = 3;
-            ulaControlWasDefined = true;
+    switch (instruction->type) {
+        case I: {
+            control.ulaSource = 1;
+            control.memToReg = 1;
+            switch (instruction->opcode) {
+                case BEQ_OPCODE: {
+                    control.branch = true;
+                    control.ulaControl = 6;
+                    control.ulaSource = 0;
+                    control.memToReg = 0;
+                    break;
+                }
+                case LW_OPCODE: {
+                    control.wrtReg = true;
+                    control.memToReg = 0;
+                    control.ulaControl = 3;
+                    break;
+                }
+                case ADDI_OPCODE: {
+                    control.ulaControl = 1;
+                    control.wrtReg = true;
+                    break;
+                }
+                case SW_OPCODE: {
+                    control.ulaControl = 7;
+                    control.wrtMem = true;
+                    break;
+                }
+                default: break;
+            }
+            break;
         }
-        control.memToReg = 0;
-    } else {
-        control.memToReg = 1;
-    }
-
-    // Se for uma operação que escreve em registradores
-    if (instruction->type == R || instruction->opcode == ADDI_OPCODE || instruction->opcode == LW_OPCODE) {
-        control.wrtReg = true;
-    } else {
-        control.wrtReg = false;
-    }
-
-    // Set for um (sw) -> wrtMem = true
-    if (instruction->opcode == SW_OPCODE) {
-        control.ulaControl = 7;
-        ulaControlWasDefined = true;
-        control.wrtMem = true;
-    } else {
-        control.wrtMem = false;
-    }
-
-    // Se é um addi -> ulaControl = 1
-    if (instruction->opcode == ADDI_OPCODE) {
-        control.ulaControl = 1;
-        ulaControlWasDefined = true;
-    }
-
-    if (!ulaControlWasDefined) {
-        switch (instruction->funct) {
-            case ADD_FUNCT: {
-                control.ulaControl = 0;
-                break;
+        case R: {
+            control.regDst = 1;
+            control.wrtReg = true;
+            switch (instruction->funct) {
+                case ADD_FUNCT: {
+                    control.ulaControl = 0;
+                    break;
+                }
+                case SUB_FUNCT: {
+                    control.ulaControl = 2;
+                    break;
+                }
+                case AND_FUNCT: {
+                    control.ulaControl = 4;
+                    break;
+                }
+                case OR_FUNCT: {
+                    control.ulaControl = 5;
+                    break;
+                }
+                default: break;
             }
-            case SUB_FUNCT: {
-                control.ulaControl = 2;
-                break;
-            }
-            case AND_FUNCT: {
-                control.ulaControl = 4;
-                break;
-            }
-            case OR_FUNCT: {
-                control.ulaControl = 5;
-                break;
-            }
-            default: {
-                control.ulaControl = 0;
-            };
+            break;
         }
-        ulaControlWasDefined = true;
+        case J: {
+            control.jump = true;
+            break;
+        }
+        case OTHER: break;
     }
 
     return control;
