@@ -180,7 +180,7 @@ void showStatistics() {
     println("└────────┴─────────────────────────┴──────────────────────────┘");
 }
 
-
+// case 3 do menu
 void showMems() {
     println("┌─────────────────────────────────────────────────────────────────────┐");
     println("│                        Memória de Instruções                        │");
@@ -191,14 +191,15 @@ void showMems() {
     if (memInstruction.size == 0) {
         println("│                 (Memória de instruções vazia)                       │");
     } else {
-        for (int i = 0; i < memInstruction.size; i++) {
+        int i;
+        for (i = 0; i < memInstruction.size; i++) {
             char asmStr[255];
 
             // Verifica se a string de assembly não está vazia.
             // Se estiver vazia, coloca o valor mockado
             if (memInstruction.instructions[i].asmInstruction[0] != '\0') {
                 sprintf(asmStr, "%s", memInstruction.instructions[i].asmInstruction);
-            } else {
+            }else {
                 sprintf(asmStr, "mock_instruction_%02d", i); // Valor mockado
             }
 
@@ -206,12 +207,16 @@ void showMems() {
                     i,
                     memInstruction.instructions[i].stringedInstruction,
                     asmStr);
-        }
-    }
+
+        } for (; i < 256; i++){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
+                char buffer[256];
+                sprintf(buffer,"│ %03d │ 0000000000000000 │ NOP                                        │", i);
+                printf("%s\n", buffer); // imprime resto das instruções NOP
+            }
+    } 
     println("└─────┴──────────────────┴────────────────────────────────────────────┘");
 
     println("");
-
 
     println("┌───────────────────┐");
     println("│ Memória de Dados  │");
@@ -229,7 +234,7 @@ void showMems() {
     println("└──────┴────────────┘");
 }
 
-// Função que escreve todos os dados do programa na tela
+// Case 5 do menu. Função que escreve todos os dados do programa na tela
 void printAllProgramData() {
     char registerTable[13][255];
     createRegisterTable(registerTable); // Função que printa os registradores
@@ -259,7 +264,6 @@ void printAllProgramData() {
             printf(" %-16s ├", memDataTable[i]);
         }
 
-
         // MemInstruction
         if (i < 2) {
             switch (i) {
@@ -274,12 +278,19 @@ void printAllProgramData() {
             }
         } else {
             const int idx = i - 2;
-            if (idx < memInstruction.size) {
+            
+            if (idx < memInstruction.size) {    //if (idx < memInstruction.size)
                 char buffer[256];
                 viewInstruction(&memInstruction.instructions[idx], idx, buffer);
                 // debugInstruction já formata com │ no início e fim
-                printf("%s\n", buffer + 3); // +1 pra pular o │ inicial que já foi impresso
-            } else {
+                printf("%s\n", buffer + 3); // escreve a instrução. +3 pra pular o │ inicial que já foi impresso
+
+            } else if (idx < 256){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
+                char buffer[256];
+                sprintf(buffer,"│ %-3d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", idx);
+                printf("%s\n", buffer + 3); // imprime resto das instruções NOP
+            }
+            else {
                 printf("     │                  │                                │        │    │     │     │     │     │      │     │\n");
             }
         }
@@ -405,12 +416,18 @@ void viewInstructions(const Instruction *instructions, const int size) {
     if (!debug) {
         return;
     }
+    int i;
     println(" Instructions debug:");
     instructionsDebuggerHeader();
-    for (int i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
         char buffer[256];
         viewInstruction(&instructions[i], i, buffer);
         println(buffer);
+    }
+    for (; i < 256; i++){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
+        char buffer[256];
+        sprintf(buffer,"│ %-3d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", i);
+        printf("%s\n", buffer); // imprime resto das instruções NOP
     }
     instructionsDebuggerFooter();
 }
