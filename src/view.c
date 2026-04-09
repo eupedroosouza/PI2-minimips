@@ -127,8 +127,8 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
     println(
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(
-        "│     Controle ULA      │           %04d            │          Overflow          │              -            │",
-        ulaControl);
+        "│     Controle ULA      │           %04d            │          Overflow          │              %-1s            │",
+        ulaControl, boolStr[out->overflow == 0 ? 0 : 1]);
     println(
         "├────────────┬──────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
 }
