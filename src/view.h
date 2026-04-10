@@ -5,7 +5,9 @@ void createRegisterTable(char table[13][255]);
 
 void showRegisters();
 
-void showClock(const Instruction *instruction, const Control *control);
+void showClockInstruction(const Instruction *instruction);
+
+void showClockControl(const Instruction *instruction, const Control *control);
 
 void showClockInformation(char *msg);
 

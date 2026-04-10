@@ -32,8 +32,7 @@ void createRegisterTable(char table[13][255]) {
     sprintf(table[12], "└───────┴───────┘");
 }
 
-
-void showClock(const Instruction *instruction, const Control *control) {
+void showClockInstruction(const Instruction *instruction) {
     println("┌""────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println("│"BG_GREEN"                                                 "BOLD_WHITE"Clock                                                      "RESET"│");
     println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
@@ -45,7 +44,9 @@ void showClock(const Instruction *instruction, const Control *control) {
     viewInstruction(instruction, pc, buffer);
     println(buffer);
     println("├─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
+}
 
+void showClockControl(const Instruction *instruction, const Control *control) {
     char memToRegBuffer[14];
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
     char memToReg[14];
@@ -381,13 +382,13 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
     }
 
     sprintf(buffer,
-            "│ %-3s │ %-16s │ %s │ %-23.23s │    %-1s   │ %02d │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
+            "│ %-3s │ %-16s │ %s │ %-23.23s │    %-1s   │ %s │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
             strIdx,
             instruction->stringedInstruction,
             instruction->hexa,
             instruction->asmInstruction,
             typeStr[instruction->type],
-            instruction->opcode,
+            opcode,
             rs,
             rt,
             rd,
