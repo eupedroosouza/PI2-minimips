@@ -192,7 +192,7 @@ void showMems() {
         println("│                 (Memória de instruções vazia)                       │");
     } else {
         int i;
-        for (i = 0; i < memInstruction.size; i++) {
+        for (i = 0; i < 256; i++) {
             char asmStr[255];
 
             // Verifica se a string de assembly não está vazia.
@@ -208,11 +208,7 @@ void showMems() {
                     memInstruction.instructions[i].stringedInstruction,
                     asmStr);
 
-        } for (; i < 256; i++){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
-                char buffer[256];
-                sprintf(buffer,"│ %03d │ 0000000000000000 │ NOP                                        │", i);
-                printf("%s\n", buffer); // imprime resto das instruções NOP
-            }
+        } 
     } 
     println("└─────┴──────────────────┴────────────────────────────────────────────┘");
 
@@ -279,17 +275,13 @@ void printAllProgramData() {
         } else {
             const int idx = i - 2;
             
-            if (idx < memInstruction.size) {    //if (idx < memInstruction.size)
+            if (idx < 256) {    //if (idx < memInstruction.size)
                 char buffer[256];
                 viewInstruction(&memInstruction.instructions[idx], idx, buffer);
                 // debugInstruction já formata com │ no início e fim
                 printf("%s\n", buffer + 3); // escreve a instrução. +3 pra pular o │ inicial que já foi impresso
 
-            } else if (idx < 256){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
-                char buffer[256];
-                sprintf(buffer,"│ %03d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", idx);
-                printf("%s\n", buffer + 3); // imprime resto das instruções NOP
-            }
+            } 
             else {
                 printf("     │                  │                                │        │    │     │     │     │     │      │     │\n");
             }
@@ -338,41 +330,45 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
     }
 
     char rs[128];
-    char rt[128];
-    char rd[128];
-    char funct[128];
-    char imm[128];
-    char addr[128];
-
-    if (instruction->type == OTHER) {
+    if (instruction->type == J) {
         strcpy(rs, "-");
+    } else {
+        sprintf(rs, "%1d", instruction->rs);
+    }
+
+    char rt[128];
+    if (instruction->type == J) {
         strcpy(rt, "-");
+    } else {
+        sprintf(rt, "%1d", instruction->rt);
+    }
+
+    char rd[128];
+    if (instruction->type == J || instruction->type == I) {
         strcpy(rd, "-");
+    } else {
+        sprintf(rd, "%1d", instruction->rd);
+    }
+
+    char funct[128];
+    if (instruction->type != R) {
         strcpy(funct, "-");
+    } else {
+        sprintf(funct, "%1d", instruction->funct);
+    }
+
+    char imm[128];
+    if (instruction->type != I) {
         strcpy(imm, "  - ");
+    } else {
+        sprintf(imm, "%04d", instruction->imm);
+    }
+
+    char addr[128];
+    if (instruction->type != J) {
         strcpy(addr, " - ");
     } else {
-        if (instruction->type == J) {
-            strcpy(rs, "-");
-            strcpy(rt, "-");
-            sprintf(addr, "%03d", instruction->addr);
-        } else {
-            sprintf(rs, "%1d", instruction->rs);
-            sprintf(rt, "%1d", instruction->rt);
-            strcpy(addr, " - ");
-        }
-        if (instruction->type == R) {
-            sprintf(rd, "%1d", instruction->rd);
-            sprintf(funct, "%1d", instruction->funct);
-        } else {
-            strcpy(funct, "-");
-            strcpy(rd, "-");
-        }
-        if (instruction->type == I) {
-            sprintf(imm, "%04d", instruction->imm);
-        } else {
-            strcpy(imm, "  - ");
-        }
+        sprintf(addr, "%03d", instruction->addr);
     }
 
     sprintf(buffer,
@@ -415,16 +411,12 @@ void viewInstructions(const Instruction *instructions, const int size) {
     int i;
     println(" Instructions debug:");
     instructionsDebuggerHeader();
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < 256; i++) {
         char buffer[256];
         viewInstruction(&instructions[i], i, buffer);
         println(buffer);
     }
-    for (; i < 256; i++){ // caso seja menos que 256 instruções, o programa imprime NOP a partir do último assembly até chegar na posição 256
-        char buffer[256];
-        sprintf(buffer,"│ %03d │ 0000000000000000 │ NOP                            │    0   │ 00 │  0  │  0  │  0  │  0  │ 0000 │ 000 │", i);
-        printf("%s\n", buffer); // imprime resto das instruções NOP
-    }
+    
     instructionsDebuggerFooter();
 }
 
