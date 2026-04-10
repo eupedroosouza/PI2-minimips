@@ -17,7 +17,7 @@ ULAOut ula(int input1, int input2, int ulaControl) {
         case 1: // ADDI
         case 3: // LW. Calcula endereço somando os regs
         case 7: // SW. Calcula endereço somando os regs
-            valor = (int) input1 + input2; // input1 e input2 são promovidos à int, pois int8_t vai de -128 a 127
+            valor = input1 + input2; 
             out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
             break;
         case 2: // SUB
