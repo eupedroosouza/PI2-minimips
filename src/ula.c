@@ -21,32 +21,34 @@ ULAOut ula(int input1, int input2, int ulaControl) {
             out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
             break;
         case 2: // SUB
-            valor = (int) input1 - input2;
-            out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
+        case 6: // BEQ. Agora reutiliza a lógica de subtração para comparar se val1 - val2 == 0
+            valor = input1 - input2;
+            out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); 
             break;
-        case 4: // AND
-            out.value = (int8_t) (input1 & input2);
+        
+            case 4: // AND
+            out.value =  (input1 & input2);
             out.zeroUla = (out.value == 0);
             // Retorna 1 se o valor for 0. usado no clock.c para decidir se um BEQ deve ser executado
             return out;
         case 5: // OR
-            out.value = (int8_t) (input1 | input2);
+            out.value = (input1 | input2);
             out.zeroUla = (out.value == 0);
             return out;
-        case 6: // BEQ. Comparar se 2 valores são iguais
-            out.value = 0; // não deixa lixo de memória no campo
-            out.zeroUla = (input1 == input2);
-            return out;
+      
         default:
             break;
     }
 
     if (valor > 127) {
         valor = 127;
-        out.zeroUla = true;
+        out.zeroUla = true; 
     } else if (valor < -128) {
         valor = -128;
-        out.zeroUla = true;
+        out.zeroUla = true; 
+    } else {
+        //compara o valor
+        out.zeroUla = (valor == 0);
     }
 
     out.value = valor;
