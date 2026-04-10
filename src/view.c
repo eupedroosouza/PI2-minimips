@@ -5,6 +5,7 @@
 
 #include "colors.h"
 #include "main.h"
+#include "ula.h"
 #include "utils.h"
 
 const char *memToRegStr[2] = {"mem", "ula"};
@@ -108,6 +109,14 @@ void showClockRegisters(const unsigned int reg1, const int value1, const unsigne
 }
 
 void showClockUla(const int input1, const int input2, const int ulaControl, const ULAOut *out) {
+
+    char equalVal[128];
+    if (ulaControl == 6) {
+        sprintf(equalVal, "%s", boolStr[out->equal == 0 ? 0 : 1]);
+    } else {
+        strcpy(equalVal, "-");
+    }
+
     println(
         "│"BG_MAGENTA"                                                  "BOLD_WHITE"ULA                                                       "RESET"│");
     println(
@@ -123,7 +132,7 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(
         "│       Entrada 2       │           %04d            │         Val. Iguais        │              %-1s            │",
-        input2, boolStr[out->equal == 0 ? 0 : 1]);
+        input2, equalVal);
     println(
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(
