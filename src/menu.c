@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "reset.h"
 #include "back.h"
 #include "clock.h"
 #include "colors.h"
@@ -29,6 +29,9 @@ void menu() {
         println("10. Voltar uma instrução (back)");
         println("11. Ativar/desativar depuração (debug)");
         println("12. Exibir estatísticas de desempenho ");
+        println("13. reset de instruções ");
+        println("14.reset de registradores  ");
+        println("15. reset de dados ");
         println("0. Sair do Simulador");
 
         printf("\nDigite uma opção: ");
@@ -103,6 +106,21 @@ void menu() {
 
             case 12: {
                 showStatistics();
+                break;
+            }
+
+            case 13: {
+                resetinstruc();
+                break;
+            }
+
+            case 14: {
+                resetregist();
+                break;
+            }
+
+            case 15: {
+                resetdados();
                 break;
             }
 

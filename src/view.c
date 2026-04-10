@@ -182,52 +182,53 @@ void showStatistics() {
 
 // case 3 do menu
 void showMems() {
-    println("┌─────────────────────────────────────────────────────────────────────┐");
-    println("│                        Memória de Instruções                        │");
-    println("├─────┬──────────────────┬────────────────────────────────────────────┤");
-    println("│  #  │      Binário     │                  Assembly                  │");
-    println("├─────┼──────────────────┼────────────────────────────────────────────┤");
+    
+    printf("┌─────────────────┬─────────────────────────────────────────────────────────────────────┐\n");
+    printf("│     MemData     │                           MemInstruction                            │\n");
+    printf("├───────┬─────────┼───────┬──────────────────┬──────────────────────────────────────────┤\n");
+    printf("│   #   │  Value  │   #   │      binario     │                 Assembly                 │\n");
+    printf("├───────┼─────────┼───────┼──────────────────┼──────────────────────────────────────────┤\n");
 
-    if (memInstruction.size == 0) {
-        println("│                 (Memória de instruções vazia)                       │");
-    } else {
-        int i;
-        for (i = 0; i < 256; i++) {
-            char asmStr[255];
+   
+    for (int i = 0; i < 256; i++) {
+        
+        char dataStr_num[10] = "", dataStr_val[10] = "";
+        char instStr_num[10] = "", instStr_bin[35] = "", instStr_asm[50] = "";
 
-            // Verifica se a string de assembly não está vazia.
-            // Se estiver vazia, coloca o valor mockado
-            if (memInstruction.instructions[i].asmInstruction[0] != '\0') {
-                sprintf(asmStr, "%s", memInstruction.instructions[i].asmInstruction);
-            }else {
-                sprintf(asmStr, "mock_instruction_%02d", i); // Valor mockado
-            }
-
-            println("│ %03d │ %-16s │ %-42s │",
-                    i,
-                    memInstruction.instructions[i].stringedInstruction,
-                    asmStr);
-
-        } 
-    } 
-    println("└─────┴──────────────────┴────────────────────────────────────────────┘");
-
-    println("");
-
-    println("┌───────────────────┐");
-    println("│ Memória de Dados  │");
-    println("├──────┬────────────┤");
-    println("│  #   │   Valor    │");
-    println("├──────┼────────────┤");
-
-    if (memData.size == 0) {
-        println("│   (Mem. vazia)    │");
-    } else {
-        for (int i = 0; i < memData.size; i++) {
-            println("│ %03d  │    %-04d    │", i, memData.data[i]);
+      
+        sprintf(dataStr_num, "%03d", i); 
+        
+        if (i < memData.size) {
+        
+            sprintf(dataStr_val, "%+04d", memData.data[i]);
+        } else {
+          
+            sprintf(dataStr_val, "+000"); 
         }
+
+        sprintf(instStr_num, "%03d", i); 
+        
+        if (i < memInstruction.size) {
+            sprintf(instStr_bin, "%s", memInstruction.instructions[i].stringedInstruction);
+            
+            if (memInstruction.instructions[i].asmInstruction[0] != '\0') {
+                sprintf(instStr_asm, "%s", memInstruction.instructions[i].asmInstruction);
+            } else {
+                sprintf(instStr_asm, "mock_instruction_%02d", i);
+            }
+        } else {
+            sprintf(instStr_bin, ""); 
+            sprintf(instStr_asm, ""); 
+        }
+
+       
+        printf("│ %-5s │ %-7s │ %-5s │ %-16s │ %-40s │\n", 
+               dataStr_num, dataStr_val, 
+               instStr_num, instStr_bin, instStr_asm);
     }
-    println("└──────┴────────────┘");
+
+   
+    printf("└───────┴─────────┴───────┴──────────────────┴──────────────────────────────────────────┘\n");
 }
 
 // Case 5 do menu. Função que escreve todos os dados do programa na tela

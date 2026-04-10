@@ -4,7 +4,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
+#endif
+
 
 #include "colors.h"
 #include "encoding.h"
