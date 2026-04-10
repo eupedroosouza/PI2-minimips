@@ -14,7 +14,10 @@
 #define BEQ_OPCODE    8
 #define J_OPCODE      2
 
+// 2^8 = 256
 #define MEM_SIZE 256
+
+#define REG_SIZE 8
 
 typedef uint8_t PC;
 typedef int8_t Register;
@@ -37,7 +40,6 @@ typedef struct {
     uint8_t addr;
 } Instruction;
 
-// 2^8 = 256
 typedef struct {
     Instruction instructions[256];
     uint8_t size;
@@ -67,9 +69,9 @@ typedef struct {
 } Control;
 
 typedef struct {
-    bool zeroUla;
     int8_t value;
     bool overflow;
+    bool equal;
 } ULAOut;
 
 // Estrutura para contar quantas vezes CADA INSTRUÇÃO ESPECÍFICA foi executada.

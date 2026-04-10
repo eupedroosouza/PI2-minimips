@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "main.h"
+#include "reset.h"
 #include "view.h"
 
 void loadDataOnMem() {
@@ -25,6 +26,7 @@ void loadDataOnMem() {
         printf("\nErro: O arquivo '%s' nao foi encontrado!\n", caminho_arquivo_dat);
         return;
     }
+    resetData();
 
     char linha[100];
     int i = 0;

@@ -1,13 +1,11 @@
-#ifndef RESET_H
-#define RESET_H
+#pragma once
 
 
-void resetinstruc();
+
+void resetInstructions();
 
 
-void resetregist();
+void resetRegisters();
 
 
-void resetdados();
-
-#endif
+void resetData();

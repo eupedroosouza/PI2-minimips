@@ -27,11 +27,11 @@ void menu() {
         println("8. Executa programa (run)");
         println("9. Executa uma instrução (step)");
         println("10. Voltar uma instrução (back)");
-        println("11. Ativar/desativar depuração (debug)");
-        println("12. Exibir estatísticas de desempenho ");
-        println("13. reset de instruções ");
-        println("14.reset de registradores  ");
-        println("15. reset de dados ");
+        println("11. Exibir estatísticas de desempenho");
+        println("12. Resetar memória de instruções");
+        println("13. Resetar registradores  ");
+        println("14. Resetar memória de dados ");
+        println("15. Ativar/desativar depuração (debug)");
         println("0. Sair do Simulador");
 
         printf("\nDigite uma opção: ");
@@ -95,6 +95,24 @@ void menu() {
                 break;
             }
             case 11: {
+                showStatistics();
+                break;
+            }
+
+            case 12: {
+                resetInstructions();
+                break;
+            }
+
+            case 13: {
+                resetRegisters();
+                break;
+            }
+            case 14: {
+                resetData();
+                break;
+            }
+            case 15: {
                 debug = !debug;
                 if (debug) {
                     println(GREEN"Depuração ativada."RESET);
@@ -103,27 +121,6 @@ void menu() {
                 }
                 break;
             }
-
-            case 12: {
-                showStatistics();
-                break;
-            }
-
-            case 13: {
-                resetinstruc();
-                break;
-            }
-
-            case 14: {
-                resetregist();
-                break;
-            }
-
-            case 15: {
-                resetdados();
-                break;
-            }
-
             case 0: {
                 println("Encerrando o simulador!");
                 exit(0);

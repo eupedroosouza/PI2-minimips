@@ -123,7 +123,7 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(
         "│       Entrada 2       │           %04d            │         Val. Iguais        │              %-1s            │",
-        input2, boolStr[out->zeroUla == 0 ? 0 : 1]);
+        input2, boolStr[out->equal == 0 ? 0 : 1]);
     println(
         "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println(

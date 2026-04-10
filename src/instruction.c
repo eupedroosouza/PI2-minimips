@@ -7,6 +7,7 @@
 #include "colors.h"
 #include "encoding.h"
 #include "main.h"
+#include "reset.h"
 #include "utils.h"
 #include "view.h"
 
@@ -68,6 +69,7 @@ void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
 
 
 void loadInstructionsOnMem() {
+
     // Função que carrega arquivo de instrução .mem (binário)
     // Carrega arquivo de instrução .mem (binário)
 
@@ -84,6 +86,7 @@ void loadInstructionsOnMem() {
     if (arquivo == NULL) {
         printf("\nErro ao ler arquivo!");
     } else {
+        resetInstructions();
         char string[17]; // Conjunto de 16 bits
         char linha[100];
         // Char que armazena temporariamente a linha lida. Logo depois o conteúdo é levado para "char string [17]"

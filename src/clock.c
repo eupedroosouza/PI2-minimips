@@ -78,8 +78,7 @@ void clock() {
 
     // Branch!
     if (control.branch) {
-
-        if (ulaOut.zeroUla) {
+        if (ulaOut.equal) {
             pc = pc + instruction->imm + 1;
             sprintf(bufferInformation, " Branch executada para o endereco: %d (entrada 1: %d e igual entrada 2: %d).", pc, input1, input2);
         } else {
