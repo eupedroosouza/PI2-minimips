@@ -21,7 +21,7 @@ ULAOut ula(int input1, int input2, int ulaControl) {
             out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
             break;
         case 2: // SUB
-        case 6: // BEQ. Agora reutiliza a lógica de subtração para comparar se val1 - val2 == 0
+        case 6: //subtrai pra comparar
             valor = input1 - input2;
             out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); 
             break;
