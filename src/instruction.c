@@ -103,7 +103,9 @@ void loadInstructionsOnMem() {
         fclose(arquivo); // Fecha arquivo
 
         // Imprime os dados da instrução que foram armazenados na matriz. Feito para conferir se esta armazenado corretamente
-        viewInstructions(memInstruction.instructions, memInstruction.size);
+        if (debug) {
+            viewInstructions();
+        }
 
         println("Foram carregadas %d instruções na memória de instrução.", memInstruction.size);
         invalidateLastState();
