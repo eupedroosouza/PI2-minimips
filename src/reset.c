@@ -1,31 +1,28 @@
 #include <string.h>
 #include "reset.h"
-#include "main.h" 
 
-void resetinstruc() {
-  
-    memInstruction.size = 0; 
+#include "encoding.h"
+#include "main.h"
 
-
+void resetInstructions() {
     for (int i = 0; i < MEM_SIZE; i++) {
-        memInstruction.instructions[i].stringedInstruction[0] = '\0';
-        memInstruction.instructions[i].asmInstruction[0] = '\0';
-        memInstruction.instructions[i].hexa[0] = '\0';
+        memInstruction.instructions[i] = emptyInstruction;
     }
+    memInstruction.size = 0;
 }
 
-void resetregist() {
-    
-    memset(registers, 0, sizeof(registers));
+void resetRegisters() {
+    for (int i = 0; i < REG_SIZE; i++) {
+        registers[i] = 0;
+    }
 
-   
+    // PC Reset
     pc = 0;
 }
 
-void resetdados() {
- 
+void resetData() {
+    for (int i = 0; i < MEM_SIZE; i++) {
+        memData.data[i] = 0;
+    }
     memData.size = 0;
-
- 
-    memset(memData.data, 0, sizeof(memData.data));
 }

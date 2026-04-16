@@ -15,6 +15,7 @@
 #define J_OPCODE      2
 
 #define MEM_SIZE 256
+#define REG_SIZE 8
 
 typedef uint8_t PC;
 typedef int8_t Register;

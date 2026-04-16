@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "reset.h"
+
 #ifdef _WIN32
 #include <windows.h>
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
@@ -61,16 +63,9 @@ int main(const int argCount, char *args[]) {
     decodeInstruction(&emptyInstruction, "0000000000000000");
 
     // Reset (do that to prevents incorrect data (trash data) on not loaded data)
-    pc = 0; //Reset PC
-    for (int i = 0; i < 8; i++) { // Reset registers with 0
-        registers[i] = 0;
-    }
-    for (int i = 0; i < MEM_SIZE; i++) { // Reset memData with 0
-        memData.data[i] = 0;
-    }
-    for (int i = 0; i < MEM_SIZE; i++) { // Reset memInstruction with empty instruction
-        memInstruction.instructions[i] = emptyInstruction;
-    }
+    resetRegisters();
+    resetData();
+    resetInstructions();
     // End-reset
 
     menu();
