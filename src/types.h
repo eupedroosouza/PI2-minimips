@@ -28,6 +28,7 @@ typedef struct {
     char stringedInstruction[17]; // Bits carregados do .mem transformados em string
     char hexa[255]; // Hexadecimal em hexadecimal  (útil para comparação com outros simuladores com o Logisim)
     char asmInstruction[255]; // Instrução em assembly (mnemônicos) para salvar no .asm
+    char prettyAsmInstruction[512];
     InstructionType type;
     unsigned int opcode;
     unsigned int rs;

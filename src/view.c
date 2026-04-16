@@ -1,6 +1,7 @@
 #include "view.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "colors.h"
@@ -88,10 +89,15 @@ void showClockPc() {
     println("├────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┤");
 }
 
-void showClockInformation(char *msg) {
+void showClockInformation(char *msg, char *msg2) {
     println("│"BG_YELLOW"                                              "BOLD_WHITE"Informações                                                   "RESET"│");
     println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    printf("│%-108s│\n", msg);
+    completeWithSpace(msg, 108, 255);
+    printf("│%s│\n", msg);
+    if (strlen(msg2) > 0) {
+        completeWithSpace(msg2, 108, 255);
+        printf("│%s│\n", msg2);
+    }
     println("└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 }
 

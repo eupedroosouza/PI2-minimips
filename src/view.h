@@ -17,7 +17,7 @@ void showClock(const Instruction *instruction, const Control *control);
 
 void showClockPc();
 
-void showClockInformation(char *msg);
+void showClockInformation(char *msg, char *msg2);
 
 void showClockRegisters(unsigned int reg1, int value1, unsigned int reg2, int value2);
 

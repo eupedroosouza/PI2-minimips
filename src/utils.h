@@ -23,3 +23,7 @@ int readIntInStdinSafely();
 void printOnCenter(const char *msg, int width);
 
 void centerString(const char *str, char *buffer, int width);
+
+size_t countVisualCharacters(const char *str);
+
+void completeWithSpace(char *str, int limit, size_t bufferSize);

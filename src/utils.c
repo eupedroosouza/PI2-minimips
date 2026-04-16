@@ -125,3 +125,48 @@ void centerString(const char *str, char *buffer, const int width) {
         strcat(buffer, " ");
     }
 }
+
+size_t countVisualCharacters(const char *str) {
+    size_t size = 0;
+
+    for (int i = 0; str[i] != '\0'; ) { // O 'i' é controlado lá dentro
+        // 1. Skip ANSI
+        if (str[i] == '\033' && str[i + 1] == '[') {
+            i += 2;
+            while (str[i] != '\0' && (str[i] < 64 || str[i] > 126)) {
+                i++;
+            }
+            if (str[i] != '\0') {
+                i++;
+            }
+            continue;
+        }
+
+        // Skip UTF-8 1x byte
+        if ((str[i] & 0xC0) != 0x80) {
+            size++;
+        }
+
+        i++;
+    }
+
+    return size;
+}
+
+void completeWithSpace(char *str, const int limit, const size_t bufferSize) {
+    const size_t size = countVisualCharacters(str);
+    if (size == (size_t) -1 || size >= limit) {
+        return;
+    }
+    size_t remaining = limit - size;
+    const size_t originalSize = strlen(str);
+    if ((originalSize + remaining + 1) > bufferSize) {
+        return;
+    }
+
+    char *p = str + originalSize;
+    while (remaining--) {
+        *p++ = ' ';
+    }
+    *p = '\0';
+}
