@@ -67,8 +67,8 @@ typedef struct {
 } Control;
 
 typedef struct {
-    bool zeroUla;
     int8_t value;
+    bool equal;
     bool overflow;
 } ULAOut;
 

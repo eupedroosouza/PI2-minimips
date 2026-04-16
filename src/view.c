@@ -112,7 +112,7 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
 
     char equalVal[128];
     if (ulaControl == 6) {
-        sprintf(equalVal, "%s", boolStr[out->zeroUla == 0 ? 0 : 1]);
+        sprintf(equalVal, "%s", boolStr[out->equal == 0 ? 0 : 1]);
     } else {
         strcpy(equalVal, "-");
     }

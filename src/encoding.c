@@ -6,8 +6,8 @@
 #include "utils.h"
 
 
-unsigned int binaryToUnsignedInt(const char *serializedBinary) {
-    unsigned int decimal = 0;
+uint8_t binaryToUnsignedInt(const char *serializedBinary) {
+    uint8_t decimal = 0;
     const size_t tamanho = strlen(serializedBinary);
 
     for (int i = 0; i < tamanho; i++) {
@@ -34,13 +34,14 @@ void extendSignal(char *baseSerializedBinary, char *buffer, const int size) {
     strcat(buffer, baseSerializedBinary);
 }
 
-int complementOfTwoToInt(const char *serializedBinary) {
+int8_t complementOfTwoToInt(const char *serializedBinary) {
     const size_t size = strlen(serializedBinary);
 
     const char firstCharacter = serializedBinary[0];
     switch (firstCharacter) {
         case '0': {
-            return (int) binaryToUnsignedInt(serializedBinary);
+            // Convert to signed
+            return (int8_t) binaryToUnsignedInt(serializedBinary);
         }
         case '1': {
             char binary[size + 1];
@@ -50,10 +51,10 @@ int complementOfTwoToInt(const char *serializedBinary) {
             char invertedBinary[size + 1];
             invertBinary(binary, invertedBinary);
 
-            const unsigned int value = binaryToUnsignedInt(invertedBinary);
-            return (-1) * (int) value;
+            const uint8_t value = binaryToUnsignedInt(invertedBinary);
+            // Convert to signed
+            return (int8_t) (-1 * value);
         }
-
         default: {
             return -1;
         }

@@ -5,53 +5,41 @@
 #include "main.h"
 
 
-ULAOut ula(int input1, int input2, int ulaControl) {
+ULAOut ula(const int8_t input1, const int8_t input2, const int ulaControl) {
     ULAOut out;
-    out.zeroUla = false; // Garante que zeroUla começa com valor limpo
-    int valor = 0; // variavel out.value é int8_t (8 bits), por isso criamos uma variavel nova
+    // Garante que os valores de UlaOUT comecem com valor limpo
+    out.value = 0;
+    out.overflow = false;
+    out.equal = false;
 
+    // Casting on operations are mandatory because in the background, before the operation, the values are converted to int32.
+    // The int8_t is used to automatically treat overflows!
     switch (ulaControl) {
         // ulaControl ja indica qual operação deve ser feita, vinda de control.c
-
         case 0: // ADD
         case 1: // ADDI
         case 3: // LW. Calcula endereço somando os regs
         case 7: // SW. Calcula endereço somando os regs
-            valor = input1 + input2; 
-            out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); // se resultar em overflow, manda sinal para out.overflow
+            out.value = (int8_t) (input1 + input2);
+            // se resultar em overflow, manda sinal para out.overflow
             break;
-        case 2: // SUB
-        case 6: //subtrai pra comparar
-            valor = input1 - input2;
-            out.overflow = ((input1 > 0 && input2 > 0 && valor < 0) || (input1 < 0 && input2 < 0 && valor > 0)); 
+        case 2: // SUB/BEQ
+        case 6:
+            out.value = (int8_t) (input1 - input2);
+            // Util only for branch (ulaControl = 6), check if sub of inputs is 0 (two equal inputs subtracted is 0)
+            out.equal = (out.value == 0);
             break;
-        
-            case 4: // AND
-            out.value =  (input1 & input2);
-            out.zeroUla = (out.value == 0);
-            // Retorna 1 se o valor for 0. usado no clock.c para decidir se um BEQ deve ser executado
-            return out;
+        case 4: // AND
+            out.value = (int8_t) (input1 & input2);
+            break;
         case 5: // OR
-            out.value = (input1 | input2);
-            out.zeroUla = (out.value == 0);
-            return out;
-      
+            out.value = (int8_t) (input1 | input2);
+            break;
         default:
             break;
     }
 
-    if (valor > 127) {
-        valor = 127;
-        out.zeroUla = true; 
-    } else if (valor < -128) {
-        valor = -128;
-        out.zeroUla = true; 
-    } else {
-        //compara o valor
-        out.zeroUla = (valor == 0);
-    }
-
-    out.value = valor;
-
+    // Check if overflow was occurred
+    out.overflow = ((input1 > 0 && input2 > 0 && out.value < 0) || (input1 < 0 && input2 < 0 && out.value > 0));
     return out;
 }
