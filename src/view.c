@@ -258,12 +258,16 @@ void viewInstruction(const Instruction *instruction, const int idx, char *buffer
         }
     }
 
+    char prettyInstruction[512];
+    strcpy(prettyInstruction, instruction->prettyAsmInstruction);
+    completeWithSpace(prettyInstruction, 23, 512);
+
     sprintf(buffer,
-            "│ %-3s │ %-16s │ %s │ %-23.23s │    %-1s   │ %02d │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
+            "│ %-3s │ %-16s │ %s │ %s │    %-1s   │ %02d │  %s  │  %s  │  %s  │  %s  │ %s │ %s │",
             strIdx,
             instruction->stringedInstruction,
             instruction->hexa,
-            instruction->asmInstruction,
+            prettyInstruction,
             typeStr[instruction->type],
             instruction->opcode,
             rs,

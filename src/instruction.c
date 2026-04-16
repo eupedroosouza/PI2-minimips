@@ -64,6 +64,7 @@ void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
     instruction->addr = binaryToUnsignedInt(addressBuffer);
 
     convertToAssemblyInstruction(instruction, instruction->asmInstruction);
+    convertToPrettyAssemblyInstruction(instruction, instruction->prettyAsmInstruction);
 }
 
 
@@ -149,6 +150,105 @@ void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) 
             snprintf(buffer, 255, "j %d", instruction->addr);
             break;
         default: ;
+    }
+}
+
+void convertToPrettyAssemblyInstruction(const Instruction * instruction, char *buffer) {
+    strcpy(buffer, CYAN);
+    switch (instruction->opcode) {
+        case R_TYPE_OPCODE: {
+            switch (instruction->funct) {
+                case ADD_FUNCT: {
+                    strcat(buffer, "add");
+                    break;
+                }
+                case SUB_FUNCT: {
+                    strcat(buffer, "sub");
+                    break;
+                }
+                case AND_FUNCT: {
+                    strcat(buffer, "and");
+                    break;
+                }
+                case OR_FUNCT: {
+                    strcat(buffer, "or");
+                    break;
+                }
+                default: {
+                    strcat(buffer, "undefined");
+                }
+            }
+
+            break;
+        }
+        case ADDI_OPCODE: {
+            strcat(buffer, "addi");
+            break;
+        }
+        case LW_OPCODE: {
+            strcat(buffer, "lw");
+            break;
+        }
+        case SW_OPCODE: {
+            strcat(buffer, "sw");
+            break;
+        }
+        case BEQ_OPCODE: {
+            strcat(buffer, "beq");
+            break;
+        }
+        case J_OPCODE: {
+            strcat(buffer, "j");
+            break;
+        }
+        default: {
+            strcat(buffer, "undefined");
+        }
+    }
+    strcat(buffer, RESET" ");
+    switch (instruction->type) {
+        case I: {
+            switch (instruction->opcode) {
+                case ADDI_OPCODE: {
+                    char buf[255];
+                    snprintf(buf, sizeof(buf), HI_RED"$%d"RESET", "HI_RED"$%d"RESET", %d"RESET, instruction->rt, instruction->rs, instruction->imm);
+                    strcat(buffer, buf);
+                    break;
+                }
+                case BEQ_OPCODE: {
+                    char buf[255];
+                    snprintf(buf, sizeof(buf), HI_RED"$%d"RESET", "HI_RED"$%d"RESET", %d"RESET, instruction->rs, instruction->rt, instruction->imm);
+                    strcat(buffer, buf);
+                    break;
+                }
+                case LW_OPCODE:
+                case SW_OPCODE: {
+                    char buf[255];
+                    snprintf(buf, sizeof(buf), HI_RED"$%d"RESET", %d("HI_RED"$%d"RESET")", instruction->rt, instruction->imm, instruction->rs);
+                    strcat(buffer, buf);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            break;
+        }
+        case R: {
+            char buf[255];
+            snprintf(buf, sizeof(buf), HI_RED"$%d"RESET", "HI_RED"$%d"RESET", "HI_RED"$%d"RESET"", instruction->rd, instruction->rs, instruction->rt);
+            strcat(buffer, buf);
+            break;
+        }
+        case J: {
+            char buf[255];
+            snprintf(buf, sizeof(buf), "%d", instruction->addr);
+            strcat(buffer, buf);
+            break;
+        }
+        case OTHER: {
+            break;
+        }
     }
 }
 
