@@ -6,8 +6,9 @@
 #include "utils.h"
 
 
-uint8_t binaryToUnsignedInt(const char *serializedBinary) {
-    uint8_t decimal = 0;
+// Using int32 because is not used only for 8 bits values (e.g: convert all 16 bits in hexa)
+int binaryToUnsignedInt(const char *serializedBinary) {
+    int decimal = 0;
     const size_t tamanho = strlen(serializedBinary);
 
     for (int i = 0; i < tamanho; i++) {
