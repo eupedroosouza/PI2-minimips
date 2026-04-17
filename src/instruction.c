@@ -266,7 +266,7 @@ void saveInstructionOnAssembly() {
     if (arquivoDestino == NULL) {
         printf("\nErro");
     } else {
-        for (int i = 0; i < memInstruction.size; i++) {
+        for (int i = 0; i < 256; i++) {
             fprintf(arquivoDestino, "%s\n", memInstruction.instructions[i].asmInstruction);
         }
     }
