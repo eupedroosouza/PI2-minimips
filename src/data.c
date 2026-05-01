@@ -33,12 +33,12 @@ void loadDataOnMem() {
         linha[strcspn(linha, "\r\n")] = 0;
 
         if (strlen(linha) > 0) {
-            memData.data[i] = (int8_t) strtol(linha, NULL, 10);
+            MemInstruction.data[i] = (int8_t) strtol(linha, NULL, 10);
             i++;
         }
     }
 
-    memData.size =  i;
+    MemInstruction.size =  i;
     fclose(arquivo);
 
     if (debug) {
@@ -66,8 +66,8 @@ void saveMemData() {
     }
 
 
-    for (int i = 0; i < memData.size; i++) {
-        fprintf(arquivo, "%d\n", memData.data[i]);
+    for (int i = 0; i < MemInstruction.size; i++) {
+        fprintf(arquivo, "%d\n", MemInstruction.data[i]);
     }
 
     fclose(arquivo);
