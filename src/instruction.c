@@ -87,19 +87,37 @@ void loadInstructionsOnMem() {
     } else {
         char string[17]; // Conjunto de 16 bits
         char linha[100];
+        int readingDat = 0;
         // Char que armazena temporariamente a linha lida. Logo depois o conteúdo é levado para "char string [17]"
 
         int i = 0;
+        int j = 0;
         // Contador de linha. While não para de se repetir até chegar no fim do arquivo, a cada loop o contador "i" irá soma
         while (fgets(linha, sizeof (linha), arquivo) != NULL) {
-            sscanf(linha, "%16[^\n]\n", string); // Lê os primeiros 16 dígitos do .mem e armazena na variável string
 
-            decodeInstruction(&memInstruction.instructions[i], string);
+            // remove \n
+            linha[strcspn(linha, "\n")] = 0;
+
+            if (strcmp(linha, ".data") == 0){
+               readingDat = 1;
+               continue;
+            }
+            
+            if (!readingDat){ // instruções
+                sscanf(linha, "%16[^\n]\n", string); // Lê os primeiros 16 dígitos do .mem e armazena na variável string
+                decodeInstruction(&memInstruction.instructions[i], string);
             // Pega os dados da variável string e coloca na estrutura memInstruction
+                i ++;
 
-            i++;
+            } else { // dado
+                memInstruction.data[j]= (int8_t) atoi(linha);
+                j ++;
+            }
+            
+
         }
         memInstruction.size = i;
+        memInstruction.dataSize = j;
 
         fclose(arquivo); // Fecha arquivo
 
@@ -112,6 +130,7 @@ void loadInstructionsOnMem() {
         invalidateLastState();
     } //fim do else
 }
+
 
 void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) {
     // Converte para mnemônio
