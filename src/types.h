@@ -58,14 +58,19 @@ typedef struct {
 } State;
 
 typedef struct {
-    bool jump;
-    bool branch;
-    int regDst;
-    int ulaSource;
-    int memToReg;
+    int pcSource;
+    int ulaSourceB;
+    int ulaSourceA;
     bool wrtReg;
+    int regDst;
+    int memToReg;
+    bool wrtIr;
     bool wrtMem;
+    int immOrData;
+    bool branch;
+    bool wrtPc;
     int ulaControl;
+    int state;
 } Control;
 
 typedef struct {

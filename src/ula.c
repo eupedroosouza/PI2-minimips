@@ -1,6 +1,9 @@
 //Função representativa à ULA. Recebe 2 entradas em inteiro de 8 bits e o controle da ULA como parâmetro 
 //e retorna um inteiro de 8 bits (int_8t) como resultado.
 #include "ula.h"
+
+#include <stdio.h>
+
 #include "types.h"
 #include "main.h"
 
@@ -20,6 +23,7 @@ ULAOut ula(const int8_t input1, const int8_t input2, const int ulaControl) {
         case 1: // ADDI
         case 3: // LW. Calcula endereço somando os regs
         case 7: // SW. Calcula endereço somando os regs
+            printf("             %d\n             ", (input1 + input2));
             out.value = (int8_t) (input1 + input2);
             // Check if overflow was occurred with positive
             out.overflow = (input1 > 0 && input2 > 0 && out.value < 0) || (input1 < 0 && input2 < 0 && out.value > 0);

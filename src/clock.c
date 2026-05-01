@@ -11,13 +11,15 @@
 #include "ula.h"
 #include "view.h"
 
+Control control = {};
+
 void clock() {
     saveLastState();
 
     // Busca
     // Prevents incorrect access of the memory
     const Instruction *instruction = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
-    const Control control = makeControl(instruction);
+    makeControl(instruction->opcode, instruction->funct, &control);
 
     // --- Início da Coleta de Estatísticas ---
     stats.executedInstructions++;
@@ -72,18 +74,18 @@ void clock() {
     strcpy(bufferInformation2, "");
 
     // Jump!
-    if (control.jump) {
-        pc = instruction->addr;
-        sprintf(bufferInformation, " Salto executado para o endereço: %d.", pc);
-        showClockPc();
-        showClockInformation(bufferInformation, bufferInformation2);
-        return;
-    }
+    // if (control.jump) {
+    //     pc = instruction->addr;
+    //     sprintf(bufferInformation, " Salto executado para o endereço: %d.", pc);
+    //     showClockPc();
+    //     showClockInformation(bufferInformation, bufferInformation2);
+    //     return;
+    // }
 
     const Register input1 = registers[instruction->rs];
     const Register register2 = registers[instruction->rt];
     showClockRegisters(instruction->rs, input1, instruction->rt, register2);
-    const int8_t input2 = control.ulaSource == 0 ? register2 : instruction->imm;
+    const int8_t input2 = control.ulaSourceA == 0 ? register2 : instruction->imm;
 
     const ULAOut ulaOut = ula(input1, input2, control.ulaControl);
     showClockUla(input1, input2, control.ulaControl, &ulaOut);

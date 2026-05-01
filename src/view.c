@@ -52,36 +52,52 @@ void showClock(const Instruction *instruction, const Control *control) {
     println(buffer);
     println("├─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
 
-    char memToRegBuffer[14];
+    char memToRegBuffer[15];
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
-    char memToReg[14];
-    centerString(memToRegBuffer, memToReg, 13);
+    char memToReg[15];
+    centerString(memToRegBuffer, memToReg, 14);
 
-    const int8_t ulaSourceValue = (control->ulaSource == 0) ? registers[instruction->rt] : instruction->imm;
+    const int8_t ulaSourceValue = (control->ulaSourceA == 0) ? registers[instruction->rt] : instruction->imm;
     char ulaSourceBuffer[37];
-    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (fonte: %d, valor: %04d)", ulaSourceStr[control->ulaSource],
-             control->ulaSource, ulaSourceValue);
+    snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (fonte: %d, valor: %04d)", ulaSourceStr[control->ulaSourceA],
+             control->ulaSourceA, ulaSourceValue);
     char ulaSource[37];
     centerString(ulaSourceBuffer, ulaSource, 36);
     println(
         "│"BG_BLUE"                                               "BOLD_WHITE"Controle                                                     "RESET"│");
-    println(
-        "├──────┬────────┬─────────┬─────────────┬────────────────────────────────────┬──────────┬─────────┬──────────┤");
-    println(
-        "│ Jump │ Branch │ Reg Dst │ Mem para Reg│              Ula Fonte             │ Ula Ctrl │ Esc Reg │  Esc Mem │");
-    println(
-        "├──────┼────────┼─────────┼─────────────┼────────────────────────────────────┼──────────┼─────────┼──────────┤");
-    printf("│  %s   │   %s    │   %2d    │%-13s│%-36s│    %2d    │    %s    │     %s    │\n",
-           boolStr[control->jump ? 1 : 0],
-           boolStr[control->branch ? 1 : 0],
+    println("├──────────┬─────────────────┬─────────────────┬─────────┬─────────┬──────────────┬────────┬─────────┬───────┤");
+    println(BOLD_WHITE"│ Fonte PC │   Ula Fonte A   │   Ula Fonte B   │ Esc Reg │ Reg Dst │ Mem para Reg │ Esc IR │ Esc Mem │  IouD │"RESET);
+    println("├──────────┼─────────────────┼─────────────────┼─────────┼─────────┼──────────────┼────────┼─────────┼───────┤");
+    //  Ula Ctrl │ Esc Reg │  Esc Mem │
+    printf("│    %1d     │        %1d        │        %1d        │    %s    │    %1d    │%-13s│    %s   │    %s    │   %1d   │\n",
+           control->pcSource,
+           control->ulaSourceA,
+           control->ulaSourceB,
+           boolStr[control->wrtMem ? 1 : 0],
            control->regDst,
            memToReg,
-           ulaSource,
-           control->ulaControl,
-           boolStr[control->wrtReg ? 1 : 0],
-           boolStr[control->wrtMem ? 1 : 0]);
-    println(
-        "├──────┴────────┴─────────┴─────────────┴────────────────────────────────────┴──────────┴─────────┴──────────┤");
+           boolStr[control->wrtIr ? 1 : 0],
+           boolStr[control->wrtMem ? 1 : 0],
+           control->immOrData
+           // boolStr[control->branch ? 1 : 0],
+           // control->regDst,
+           // memToReg,
+           // control->ulaSourceA,
+           // control->ulaSourceB,
+           // control->ulaControl,
+           // boolStr[control->wrtReg ? 1 : 0],
+           // boolStr[control->wrtMem ? 1 : 0]
+           );
+
+    println("├────────┬─┴──────────┬──────┴───────────┬─────┴─────────┴─────────┴──────────────┴────────┴─────────┴───────┤");
+    println(BOLD_WHITE"│ Branch │   Esc PC   │   Controle ULA   │                               Estado                              │"RESET);
+    println("├────────┼────────────┼──────────────────┼───────────────────────────────────────────────────────────────────┤");
+    println("│    %s   │      %s     │        %03d       │                                %04d                               │",
+        boolStr[control->branch ? 1 : 0],
+        boolStr[control->wrtPc ? 1 : 0 ],
+        control->ulaControl,
+        control->state);
+    println("├────────┴────────────┴──────────────────┴───────────────────────────────────┬───────────────────────────────┤");
 }
 
 void showClockPc() {
