@@ -16,10 +16,10 @@ void saveLastState() {
     for (int i = 0; i < 8; i++) {
         lastState.registers[i] = registers[i];
     }
-    for (int i = 0; i < memData.size; i++) {
-        lastState.memData.data[i] = memData.data[i];
+    for (int i = 0; i < MemInstruction.size; i++) {
+        lastState.memData.data[i] = MemInstruction.data[i];
     }
-    lastState.memData.size = memData.size;
+    lastState.memData.size = MemInstruction.size;
 }
 
 void invalidateLastState() {
@@ -37,8 +37,8 @@ void back() {
         registers[i] = lastState.registers[i];
     }
 
-    for (int i = 0; i < memData.size; i++) {
-        memData.data[i] = lastState.memData.data[i];
+    for (int i = 0; i < MemInstruction.size; i++) {
+        MemInstruction.data[i] = lastState.memData.data[i];
     }
     println(" Retornando os valores do processador para:");
     showLastState();
