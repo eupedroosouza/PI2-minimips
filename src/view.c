@@ -323,7 +323,7 @@ void createDataMemTable(char table[260][255]) {
     sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
     for (int i = 0; i < 256; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memData.data[i]);
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i, MemInstruction.data[i]);
     }
     sprintf(table[259], "└─────┴───────┘");
 }
