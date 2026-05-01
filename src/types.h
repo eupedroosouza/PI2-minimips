@@ -43,18 +43,15 @@ typedef struct {
 typedef struct {
     Instruction instructions[256];
     uint8_t size;
+    uint8_t dataSize; // tamanho da mem de dados
+    int8_t data[256]; //memoria de dados
 } MemInstruction;
-
-typedef struct {
-    int8_t data[256];
-    int size;
-} MemData;
 
 // Estado (útil para a função de back)
 typedef struct {
     PC pc;
     Register registers[8];
-    MemData memData;
+    MemInstruction memData;
 } State;
 
 typedef struct {
