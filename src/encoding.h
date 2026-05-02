@@ -8,4 +8,4 @@ int binaryToUnsignedInt(const char *serializedBinary);
 
 void extendSignal(char *baseSerializedBinary, char *buffer, int size);
 
-int16_t complementOfTwoToInt(const char *serializedBinary);
+int8_t complementOfTwoToInt(const char *serializedBinary);
