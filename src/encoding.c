@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "utils.h"
 
@@ -35,14 +36,14 @@ void extendSignal(char *baseSerializedBinary, char *buffer, const int size) {
     strcat(buffer, baseSerializedBinary);
 }
 
-int8_t complementOfTwoToInt(const char *serializedBinary) {
+int16_t complementOfTwoToInt(const char *serializedBinary) {
     const size_t size = strlen(serializedBinary);
 
     const char firstCharacter = serializedBinary[0];
     switch (firstCharacter) {
         case '0': {
             // Convert to signed
-            return (int8_t) binaryToUnsignedInt(serializedBinary);
+            return binaryToUnsignedInt(serializedBinary);
         }
         case '1': {
             char binary[size + 1];
@@ -52,9 +53,9 @@ int8_t complementOfTwoToInt(const char *serializedBinary) {
             char invertedBinary[size + 1];
             invertBinary(binary, invertedBinary);
 
-            const uint8_t value = binaryToUnsignedInt(invertedBinary);
+            const int value = binaryToUnsignedInt(invertedBinary);
             // Convert to signed
-            return (int8_t) (-1 * value);
+            return -1 * value;
         }
         default: {
             return -1;
