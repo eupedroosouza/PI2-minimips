@@ -2,12 +2,9 @@
 #define RESET_H
 
 
-void resetInstructions();
+void resetMemory();
 
 
 void resetRegisters();
-
-
-void resetData();
 
 #endif

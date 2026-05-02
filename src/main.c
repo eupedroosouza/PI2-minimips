@@ -67,8 +67,7 @@ int main(const int argCount, char *args[]) {
 
     // Reset (do that to prevents incorrect data (trash data) on not loaded data)
     resetRegisters();
-    resetData();
-    resetInstructions();
+  resetMemory();
     // End-reset
 
     menu();

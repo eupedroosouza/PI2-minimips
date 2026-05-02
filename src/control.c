@@ -82,18 +82,32 @@ void makeControl(const unsigned int opcode, const unsigned int funct, Control *c
             control->ulaSourceB = 2;
             control->state = 0;
         }
-        case 7: {
-            control->ulaSourceA = 1;
-            control->ulaSourceB = 0;
-            control->ulaControl = funct;
-            control->regDst = 1;
-            control->state = 8;
+       case 7: {
+            control->ulaSourceA = 1;     
+            control->ulaSourceB = 0;    
+            control->ulaControl = funct; 
+            
+           
+            control->wrtReg = 0;         
+            control->wrtMem = 0;
+            control->wrtPc = 0;
+            
+            control->state = 8;          
+            break;                      
         }
+
+       
         case 8: {
-            control->regDst = 1;
-            control->wrtReg = 1;
-            control->memToReg = 0;
-            control->state = 0;
+            control->regDst = 1;         
+            control->memToReg = 0;      
+            control->wrtReg = 1;         
+            
+            
+            control->wrtMem = 0;
+            control->wrtPc = 0;
+            
+            control->state = 0;          
+            break;                      
         }
         case 9: {
             control->ulaSourceA =  1;

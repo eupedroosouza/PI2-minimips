@@ -17,12 +17,12 @@
 void menu() {
     while (1) {
         println("");
-        println("1. Carregar memória de instruções (.mem)");
-        println("2. Imprimir memórias (instruções e dados)");
+        println("1. Carregar memória unificada");
+        println(" 2.Salvar memória unificada)");
         println("3. Imprimir banco de registradores");
         println("4. Imprimir todo o simulador (registradores e memórias)");
         println("5. Salvar instruçôes em mnemônicos - assembly (.asm)");
-        println("6. Salvar memória de dados (.dat)");
+        println("6. Imprimir memórias (instruções e dados");
         println("7. Executa programa (run)");
         println("8. Executa uma instrução (step)");
         println("9. Voltar uma instrução (back)");
@@ -38,12 +38,11 @@ void menu() {
         const int opcao = readIntInStdinSafely();
         switch (opcao) {
             case 1: {
-                loadInstructionsOnMem();
+                loadUnifiedMemory();
                 break;
             }
             case 2: {
-                showMems();
-
+                saveUnifiedMemory(); 
                 break;
             }
             case 3: {
@@ -59,7 +58,7 @@ void menu() {
                 break;
             }
             case 6: {
-                saveMemData();
+                showMems();
                 break;
             }
             case 7: {
@@ -95,21 +94,18 @@ void menu() {
                 break;
             }
 
-            case 11: {
-                resetInstructions();
+            
+           case 11: {
+                resetMemory();
+                println("Memória unificada resetada");
                 break;
             }
-
             case 12: {
-                resetRegisters();
+                resetRegisters(); 
+                println("Registradores e PC resetados");
                 break;
             }
-
             case 13: {
-                resetData();
-                break;
-            }
-            case 14: {
                 debug = !debug;
                 if (debug) {
                     println(GREEN"Depuração ativada."RESET);

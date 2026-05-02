@@ -4,12 +4,22 @@
 #include "encoding.h"
 #include "main.h"
 
-void resetInstructions() {
+
+void resetMemory() {
+    
     for (int i = 0; i < MEM_SIZE; i++) {
         memInstruction.instructions[i] = emptyInstruction;
     }
     memInstruction.size = 0;
+
+  
+    for (int i = 0; i < MEM_SIZE; i++) {
+        memInstruction.data[i] = 0;
+    }
+    
+    memInstruction.dataSize = 0; 
 }
+
 
 void resetRegisters() {
     for (int i = 0; i < REG_SIZE; i++) {
@@ -18,11 +28,4 @@ void resetRegisters() {
 
     // PC Reset
     pc = 0;
-}
-
-void resetData() {
-    for (int i = 0; i < MEM_SIZE; i++) {
-        memInstruction.data[i] = 0;
-    }
-    memInstruction.size = 0;
 }
