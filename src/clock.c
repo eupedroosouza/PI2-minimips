@@ -113,7 +113,7 @@ void clock() {
     // Save Word
     if (control.wrtMem) {
         const int8_t addr = ulaOut.value;
-        MemInstruction.data[addr] = register2;
+        memInstruction.data[addr] = register2;
         sprintf(bufferInformation, " Escrito dado na memória de dados no endereço: %03d, o valor: %04d.", addr,
                 register2);
     }
