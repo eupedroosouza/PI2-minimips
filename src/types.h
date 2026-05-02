@@ -44,7 +44,7 @@ typedef struct {
     Instruction instructions[256];
     uint8_t size;
     uint8_t dataSize; // tamanho da mem de dados
-    int16_t data[256]; //memoria de dados
+    int8_t data[256]; //memoria de dados
 } MemInstruction;
 
 // Estado (útil para a função de back)
