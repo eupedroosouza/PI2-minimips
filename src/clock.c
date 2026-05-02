@@ -121,7 +121,7 @@ void clock() {
     // Load World and anyone instruction what save on register
     if (control.wrtReg) {
         const int8_t addr = ulaOut.value;
-        const int8_t value = control.memToReg == 0 ? memData.data[addr] : ulaOut.value;
+        const int8_t value = control.memToReg == 0 ? memInstruction.data[addr] : ulaOut.value;
         const unsigned int wrtReg = control.regDst == 0 ? instruction->rt : instruction->rd;
         registers[wrtReg] = value;
         if (control.memToReg == 0) {
