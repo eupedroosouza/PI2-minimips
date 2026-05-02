@@ -110,7 +110,9 @@ void loadInstructionsOnMem() {
                 i ++;
 
             } else { // dado
-                memInstruction.data[j] = binaryToUnsignedInt(linha);
+                char eightBytesPerLine[9];
+                charsToString(eightBytesPerLine, 8, linha[8], linha[9], linha[10], linha[11], linha[12], linha[13], linha[14], linha[15]);
+                memInstruction.data[j] = complementOfTwoToInt(eightBytesPerLine);
                 j ++;
             }
             
