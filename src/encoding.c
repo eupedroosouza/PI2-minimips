@@ -36,7 +36,7 @@ void extendSignal(char *baseSerializedBinary, char *buffer, const int size) {
     strcat(buffer, baseSerializedBinary);
 }
 
-int16_t complementOfTwoToInt(const char *serializedBinary) {
+int8_t complementOfTwoToInt(const char *serializedBinary) {
     const size_t size = strlen(serializedBinary);
 
     const char firstCharacter = serializedBinary[0];
