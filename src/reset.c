@@ -22,7 +22,7 @@ void resetRegisters() {
 
 void resetData() {
     for (int i = 0; i < MEM_SIZE; i++) {
-        MemInstruction.data[i] = 0;
+        memInstruction.data[i] = 0;
     }
-    MemInstruction.size = 0;
+    memInstruction.size = 0;
 }
