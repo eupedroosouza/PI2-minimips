@@ -98,7 +98,7 @@ void loadInstructionsOnMem() {
             // remove \n
             linha[strcspn(linha, "\n")] = 0;
 
-            if (strcmp(linha, ".data") == 0){
+            if (strcmp(linha, ".data") == 0){ // identifica quando .data aparece
                readingDat = 1;
                continue;
             }
@@ -110,7 +110,7 @@ void loadInstructionsOnMem() {
                 i ++;
 
             } else { // dado
-                memInstruction.data[j]= (int8_t) atoi(linha);
+                memInstruction.data[j] = binaryToUnsignedInt(linha);
                 j ++;
             }
             
@@ -130,7 +130,6 @@ void loadInstructionsOnMem() {
         invalidateLastState();
     } //fim do else
 }
-
 
 void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) {
     // Converte para mnemônio
