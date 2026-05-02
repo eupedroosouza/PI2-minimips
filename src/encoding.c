@@ -43,7 +43,7 @@ int8_t complementOfTwoToInt(const char *serializedBinary) {
     switch (firstCharacter) {
         case '0': {
             // Convert to signed
-            return binaryToUnsignedInt(serializedBinary);
+            return (int8_t) binaryToUnsignedInt(serializedBinary);
         }
         case '1': {
             char binary[size + 1];
@@ -53,9 +53,9 @@ int8_t complementOfTwoToInt(const char *serializedBinary) {
             char invertedBinary[size + 1];
             invertBinary(binary, invertedBinary);
 
-            const int value = binaryToUnsignedInt(invertedBinary);
+            const uint8_t value = binaryToUnsignedInt(invertedBinary);
             // Convert to signed
-            return -1 * value;
+            return (int8_t) (-1 * value);
         }
         default: {
             return -1;
