@@ -1,5 +1,4 @@
 #include "clock.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -11,168 +10,114 @@
 #include "ula.h"
 #include "view.h"
 
-Control control = {};
+// Variável global da Unidade de Controle.
+// Mantém os estados salvos entre as chamadas da função (Pulsos de Clock)
+Control control = {0}; 
 
 void clock() {
     saveLastState();
 
-    // Busca
-    // Prevents incorrect access of the memory
+    int currentState = control.state; // Guarda qual estado estamos executando AGORA
+
+    // 1. Busca da Instrução
+    // Como o PC só aumenta no final, ele vai apontar para a mesma instrução 
+    // durante todos os 3 a 5 ciclos necessários para ela terminar!
     const Instruction *instruction = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
+
+    // 2. Atualiza a Unidade de Controle
+    // Isso vai gerar as flags do ciclo atual e avançar o "control.state" pro próximo ciclo
     makeControl(instruction->opcode, instruction->funct, &control);
 
-    // --- Início da Coleta de Estatísticas ---
-    stats.executedInstructions++;
+    // --- Coleta de Estatísticas Multiciclo ---
+    stats.totalCycles++; // Incrementa 1 ciclo de clock
+    
+    // Contabiliza a instrução APENAS na primeira vez que passa por ela (Estado 0)
+    if (currentState == 0 && instruction->type != OTHER) {
+        stats.executedInstructions++;
 
-    // Incrementa por Tipo
-    if (instruction->type == R) {
-        stats.executedInstructionsPerType.r++;
-    } else if (instruction->type == I) {
-        stats.executedInstructionsPerType.i++;
-    } else if (instruction->type == J) {
-        stats.executedInstructionsPerType.j++;
-    } else {
-        stats.executedInstructionsPerType.other++;
-    }
+        if (instruction->type == R) stats.executedInstructionsPerType.r++;
+        else if (instruction->type == I) stats.executedInstructionsPerType.i++;
+        else if (instruction->type == J) stats.executedInstructionsPerType.j++;
+        else stats.executedInstructionsPerType.other++;
 
-    // Incrementa por Classe (Opcode/Funct)
-    if (instruction->opcode == R_TYPE_OPCODE) {
-        switch (instruction->funct) {
-            case ADD_FUNCT: stats.executedInstructionsPerClass.add++;
-                break;
-            case SUB_FUNCT: stats.executedInstructionsPerClass.sub++;
-                break;
-            case AND_FUNCT: stats.executedInstructionsPerClass.and_inst++;
-                break;
-            case OR_FUNCT: stats.executedInstructionsPerClass.or_inst++;
-                break;
-            default: stats.executedInstructionsPerClass.other++;
-                break;
-        }
-    } else {
-        switch (instruction->opcode) {
-            case ADDI_OPCODE: stats.executedInstructionsPerClass.addi++;
-                break;
-            case LW_OPCODE: stats.executedInstructionsPerClass.lw++;
-                break;
-            case SW_OPCODE: stats.executedInstructionsPerClass.sw++;
-                break;
-            case BEQ_OPCODE: stats.executedInstructionsPerClass.beq++;
-                break;
-            case J_OPCODE: stats.executedInstructionsPerClass.j++;
-                break;
-            default: stats.executedInstructionsPerClass.other++;
-                break;
-        }
-    }
-
-
-    showClock(instruction, &control);
-
-    char bufferInformation[255];
-    char bufferInformation2[255];
-    strcpy(bufferInformation2, "");
-
-    // Jump!
-    // if (control.jump) {
-    //     pc = instruction->addr;
-    //     sprintf(bufferInformation, " Salto executado para o endereço: %d.", pc);
-    //     showClockPc();
-    //     showClockInformation(bufferInformation, bufferInformation2);
-    //     return;
-    // }
-
-    const Register input1 = registers[instruction->rs];
-    const Register register2 = registers[instruction->rt];
-    showClockRegisters(instruction->rs, input1, instruction->rt, register2);
-    const int8_t input2 = control.ulaSourceA == 0 ? register2 : instruction->imm;
-
-    const ULAOut ulaOut = ula(input1, input2, control.ulaControl);
-    showClockUla(input1, input2, control.ulaControl, &ulaOut);
-
-
-    // Branch!
-    if (control.branch) {
-        if (ulaOut.equal) {
-            pc = pc + instruction->imm + 1;
-            sprintf(bufferInformation, " Ramificação executada para o endereço: %d (entrada 1 (valor: %04d) é igual .",
-                    pc, input1);
-            sprintf(bufferInformation2, " a entrada 2 (valor: %04d)", input2);
+        if (instruction->opcode == R_TYPE_OPCODE) {
+            switch (instruction->funct) {
+                case ADD_FUNCT: stats.executedInstructionsPerClass.add++; break;
+                case SUB_FUNCT: stats.executedInstructionsPerClass.sub++; break;
+                case AND_FUNCT: stats.executedInstructionsPerClass.and_inst++; break;
+                case OR_FUNCT:  stats.executedInstructionsPerClass.or_inst++; break;
+            }
         } else {
-            sprintf(bufferInformation,
-                    " Não executada a ramificação para o endereço: %d (entrada 1 (valor: %04d) não é igual", pc,
-                    input1);
-            sprintf(bufferInformation2, " a entrada 2 (valor: %04d)", input2);
-            pc++;
-        }
-        showClockPc();
-        showClockInformation(bufferInformation, bufferInformation2);
-        return;
-    }
-
-    // Save Word
-    if (control.wrtMem) {
-        const int8_t addr = ulaOut.value;
-        memInstruction.data[addr] = register2;
-        sprintf(bufferInformation, " Escrito dado na memória de dados no endereço: %03d, o valor: %04d.", addr,
-                register2);
-    }
-
-    // Load World and anyone instruction what save on register
-    if (control.wrtReg) {
-        const int8_t addr = ulaOut.value;
-        const int8_t value = control.memToReg == 0 ? memInstruction.data[addr] : ulaOut.value;
-        const unsigned int wrtReg = control.regDst == 0 ? instruction->rt : instruction->rd;
-        registers[wrtReg] = value;
-        if (control.memToReg == 0) {
-            sprintf(bufferInformation,
-                    " Carregado dado da memória de dados no endereço: %03d, e escrito no registrador: %1d, o valor: %04d.",
-                    addr, wrtReg, value);
-        } else {
-            if (instruction->opcode == ADDI_OPCODE) {
-                sprintf(bufferInformation,
-                        " Adição do registrador %1d (valor: %04d) com o imediato %04d, e escrito no registrador %1d (resultado: %04d).",
-                        instruction->rs, input1, instruction->imm, wrtReg, value);
-            } else if (instruction->opcode == R_TYPE_OPCODE) {
-                switch (instruction->funct) {
-                    case ADD_FUNCT: {
-                        sprintf(bufferInformation,
-                                " Adição do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d), e escrito no",
-                                instruction->rs, input1, instruction->rt, input2);
-                        sprintf(bufferInformation2, " registrador %1d (resultado: %04d).", wrtReg, value);
-                        break;
-                    }
-                    case SUB_FUNCT: {
-                        sprintf(bufferInformation,
-                                " Subtração do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d), e escrito no",
-                                instruction->rs, input1, instruction->rt, input2);
-                        sprintf(bufferInformation2, " registrador %1d (resultado: %04d).", wrtReg, value);
-                        break;
-                    }
-                    case AND_FUNCT: {
-                        sprintf(bufferInformation,
-                                " Operação AND (e / &) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d), e escrito no.",
-                                instruction->rs, input1, instruction->rt, input2);
-                        sprintf(bufferInformation2, " registrador %1d (resultado: %04d).", wrtReg, value);
-                        break;
-                    }
-                    case OR_FUNCT: {
-                        sprintf(bufferInformation,
-                                " Operação OR (ou / |) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d), e escrito no",
-                                instruction->rs, input1, instruction->rt, input2);
-                        sprintf(bufferInformation2, " registrador %1d (resultado: %04d).", wrtReg, value);
-                        break;
-                    }
-                    default: break;
-                }
-            } else {
-                sprintf(bufferInformation, " Executada operacao na ULA e escrito no registrador: $%1d o valor: %04d.",
-                        wrtReg, value);
+            switch (instruction->opcode) {
+                case LW_OPCODE: stats.executedInstructionsPerClass.lw++; break;
+                case SW_OPCODE: stats.executedInstructionsPerClass.sw++; break;
+                case ADDI_OPCODE: stats.executedInstructionsPerClass.addi++; break;
+                case BEQ_OPCODE: stats.executedInstructionsPerClass.beq++; break;
+                case J_OPCODE: stats.executedInstructionsPerClass.j++; break;
             }
         }
     }
 
-    pc++;
-    showClockPc();
+    // 3. Preparar Entradas da ULA (Muxes A e B)
+    int8_t input1 = (control.ulaSourceA == 0) ? pc : registers[instruction->rs];
+    int8_t input2;
+    if (control.ulaSourceB == 0)      input2 = registers[instruction->rt];
+    else if (control.ulaSourceB == 1) input2 = 1; // Geralmente usado para somar PC+1 (caso use)
+    else                              input2 = instruction->imm; // Extensão de sinal do Imediato
+
+    // 4. Executar ULA
+    // Se for Tipo-R (estado 7), a ULA faz a operação dita pelo 'funct'. Senão, usa a da Unidade de Controle
+    int ulaOp = (currentState == 7) ? instruction->funct : control.ulaControl;
+    ULAOut out = ula(input1, input2, ulaOp);
+
+    // 5. Escrita em Registradores (Write-Back) - Protegido pela flag wrtReg
+    if (control.wrtReg) {
+        int destination = (control.regDst == 1) ? instruction->rd : instruction->rt;
+        int value = (control.memToReg == 1) ? memInstruction.data[out.value] : out.value;
+        registers[destination] = value;
+    }
+
+    // 6. Escrita na Memória de Dados (Store Word) - Protegido pela flag wrtMem
+    if (control.wrtMem) {
+        memInstruction.data[out.value] = registers[instruction->rt];
+    }
+
+    // 7. Atualização do PC - Agora o PC só pula de linha nos últimos estados!
+    if (control.wrtPc) {
+        if (control.pcSource == 0)      pc = pc + 1; // Avança +1 para a próxima instrução
+        else if (control.pcSource == 2) pc = instruction->addr; // Salto de Jump
+    } else if (control.branch && out.equal) {
+        pc = pc + instruction->imm; // Salto de Branch (BEQ) se valores forem iguais
+    }
+
+    // 8. Textos informativos para imprimir na sua UI
+    char nomeEstado[100] = "";
+    switch(currentState) {
+        case 0: strcpy(nomeEstado, "0 (Busca da Instrucao)"); break;
+        case 1: strcpy(nomeEstado, "1 (Decodificacao e Leitura de Regs)"); break;
+        case 2: strcpy(nomeEstado, "2 (Calculo de Endereco / Exec. ADDI)"); break;
+        case 3: strcpy(nomeEstado, "3 (Acesso a Memoria - Lendo LW)"); break;
+        case 4: strcpy(nomeEstado, "4 (Write-Back - Salvando LW)"); break;
+        case 5: strcpy(nomeEstado, "5 (Acesso a Memoria - Escrevendo SW)"); break;
+        case 6: strcpy(nomeEstado, "6 (Write-Back - Salvando ADDI)"); break;
+        case 7: strcpy(nomeEstado, "7 (Execucao - Operacao ULA Tipo-R)"); break;
+        case 8: strcpy(nomeEstado, "8 (Write-Back - Salvando Tipo-R)"); break;
+        case 9: strcpy(nomeEstado, "9 (Conclusao Branch BEQ)"); break;
+        case 10: strcpy(nomeEstado, "10 (Conclusao Jump)"); break;
+    }
+
+    char bufferInformation[255] = "";
+    char bufferInformation2[255] = "";
+    sprintf(bufferInformation, " Estado Executado: %s", nomeEstado);
+    sprintf(bufferInformation2, " Proximo ciclo ira para o estado: %d", control.state);
+
+    // --- RENDERIZAÇÃO DA INTERFACE ---
+    // Exibe a tabela de sinais de controle atual da FSM
+    showClock(instruction, &control);
+    
+    // Mostra os textos com o nome dos estados
     showClockInformation(bufferInformation, bufferInformation2);
+
+    // Exibe a informação do PC atualizada
+    showClockPc();
 }

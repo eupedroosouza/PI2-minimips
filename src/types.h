@@ -100,7 +100,8 @@ typedef struct {
 
 
 typedef struct {
-    int executedInstructions; // Contador global de ciclos (1 ciclo = 1 instrução)
+    int executedInstructions;
+    int totalCycles; // Variável adicionada para contar todos os pulsos de clock
     StatisticsPerClass executedInstructionsPerClass;
     StatisticsPerType executedInstructionsPerType;
 } Statistics;
