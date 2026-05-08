@@ -16,18 +16,16 @@ Registradores reg;
 ULAOut ulaOut;
 
 void clock() {
+    
     saveState();
 
-    int currentState = control.state;
-    
+    int currentState = control.state; // pega o estado atual do controle
     
     const Instruction *instruction = &reg.IR;
     Control next = control;
-    makeControl(reg.IR.opcode, reg.IR.funct, &next);
+    makeControl(reg.IR.opcode, reg.IR.funct, &next); 
    
     // stats.totalCycles++; // Incrementa 1 ciclo de clock
-    
-
     if (currentState == 0 && reg.IR.type != OTHER) {
         stats.executedInstructions++;
 
@@ -54,62 +52,91 @@ void clock() {
         }
     }
 
-   
-    int8_t input1 = (next.ulaSourceA == 0) ? pc : registers[reg.IR.rs];
+    // controle da entrada A da ULA
+    int8_t input1;
+    if (next.ulaSourceA == 0) {
+    input1 = pc;
+        } else {
+    input1 = registers[reg.IR.rs];
+    }
+
+    // controle da entrada B da ULA
     int8_t input2;
-    if (next.ulaSourceB == 0)      input2 = registers[reg.IR.rt];
-    else if (next.ulaSourceB == 1) input2 = 1; // Geralmente usado para somar PC+1 (caso use)
-    else                              input2 = reg.IR.imm; // Extensão de sinal do Imediato
+    if (next.ulaSourceB == 0) {
+        input2 = registers[reg.IR.rt];
+    }
+    else if (next.ulaSourceB == 1){
+         input2 = 1; // Geralmente usado para somar PC+1 (caso use)
+     }
+    else {
+        input2 = reg.IR.imm; // Extensão de sinal do Imediato
+    }
 
+    int ulaOp;
+    // usa o operador para decidir qual operador a ULA vai executar
+    if (currentState == 7) {
+        ulaOp = reg.IR.funct;
+    } else {
+        ulaOp = next.ulaControl;
+    }
 
-    int ulaOp = (currentState == 7) ? reg.IR.funct : next.ulaControl;
-    ULAOut out = ula(input1, input2, ulaOp);
+    ULAOut out = ula(input1, input2, ulaOp); // ULA é chamada, com suas entradas A, B e função. Resultado é armazenado em "out"
 
+    // escreve o resultado final da instrução em um registrador
     if (next.wrtReg) {
-        int destination = (next.regDst == 1) ? reg.IR.rd : reg.IR.rt;
-        int value = (next.memToReg == 1) ? memory.data[out.value] : out.value;
+        int destination;
+
+         if (next.regDst == 1) {
+            destination = reg.IR.rd; // A
+        } else {
+            destination = reg.IR.rt; // B
+        }
+
+        int value;
+
+        if (next.memToReg == 1) {
+            value = memory.data[out.value];
+        } else {
+            value = out.value;
+        }
+
         registers[destination] = value;
     }
-
-    if (next.wrtMem) {
-        memory.data[out.value] = registers[reg.IR.rt];
-    }
-
    
  
+    // salva dados nos regs dependendo do estado do clock
+    switch (currentState){
 
-    switch (currentState){ // salva dados nos regs dependendo do estado do clock
-
-        case 0: // salva memória de instrução no registrador IR
+        case 0: // fetch - salva memória de instrução no registrador IR
             reg.IR = memory.instructions[pc];
             pc ++;
         break;
-        case 1: // salva valores saindo do banco de registradores nos regs A e B
+        case 1: // decode - salva valores saindo do banco de registradores nos regs A e B
             reg.A = registers[reg.IR.rs];
             reg.B = registers[reg.IR.rt];
         break;
-        case 2:
+        case 2: // execute / calculo de endereço
             reg.ULAOut = reg.A + reg.IR.imm;
         break;
-        case 3:
+        case 3: // acesso à memória / lw
             reg.MDR = memory.data[reg.ULAOut]; // registrador MDR recebe dado da memória de dados (endereço calculado pela ULA)
         break;
-        case 4:
+        case 4: // write back / lw
             if (reg.IR.rt != 0) registers[reg.IR.rt] = reg.MDR;
             registers[reg.IR.rt] = reg.MDR; // valor da memória de dados vai para banco de registradores
         break;
-        case 5:
+        case 5: // acesso à memória / sw
             memory.data[reg.ULAOut] = reg.B; // valor de B é salvo na memória de dados
         break;
-        case 6:
+        case 6: // write back ADDI
             if (reg.IR.rt != 0) registers[reg.IR.rt] = reg.ULAOut;
             registers[reg.IR.rt] = reg.ULAOut; // resultado da ULA no reg rt
         break;
-        case 7: // salva o resultado da ULA no reg ulaOut
+        case 7: // executa tipe R - salva o resultado da ULA no reg ulaOut
             ulaOut = ula(reg.A, reg.B, next.ulaControl); // chama ULA
             reg.ULAOut = ulaOut.value;
         break;
-        case 8: // R type
+        case 8: // write back R type
             registers[reg.IR.rd] = reg.ULAOut; // resultado da ULA no reg rd
         break;
         case 9: // beq
@@ -118,13 +145,10 @@ void clock() {
           }
          break;
         case 10: // jump
-      
-            pc = reg.IR.addr;
+            pc = reg.IR.addr; // PC recebe endereço do jump
         break;
 
     }
-
-
 
 
     char bufferInformation[255] = "";
@@ -140,9 +164,7 @@ void clock() {
     
     showClockInformation(bufferInformation, bufferInformation2);
 
-    
-
-    // Exibe a informação do PC atualizada
+    // Imprime clock
     showClockPc();
 
 }
