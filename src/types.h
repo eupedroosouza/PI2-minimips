@@ -42,10 +42,18 @@ typedef struct {
 // 2^8 = 256
 typedef struct {
     Instruction instructions[256];
-    uint8_t size;
-    uint8_t dataSize; // tamanho da mem de dados
+    uint8_t size;   // tamanho da memória de instrução
+    uint8_t dataSize; // tamanho da memória de dados
     int8_t data[256]; //memoria de dados
-} MemInstruction;
+} MemInstruction; // Memória geral
+
+// registradores intermediários
+typedef struct {
+Instruction IR; // reg de memória de instrução
+int8_t MDR; // reg de dados da memória
+int8_t A, B; // regs A e B, valores saindo do banco de registradores para a ULA
+int8_t ULAOut; // reg de saida da ULA
+} Registradores;
 
 // Estado (útil para a função de back)
 typedef struct {
@@ -100,8 +108,7 @@ typedef struct {
 
 
 typedef struct {
-    int executedInstructions;
-    int totalCycles; // Variável adicionada para contar todos os pulsos de clock
+    int executedInstructions; // Contador global de ciclos (1 ciclo = 1 instrução)
     StatisticsPerClass executedInstructionsPerClass;
     StatisticsPerType executedInstructionsPerType;
 } Statistics;
