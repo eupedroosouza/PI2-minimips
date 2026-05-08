@@ -20,7 +20,7 @@ void clock() {
 
     int currentState = control.state; // pega o estado atual do controle
     
-    const Instruction *instruction = &reg.IR;
+     
     Control next = control;
     makeControl(reg.IR.opcode, reg.IR.funct, &next); 
    
@@ -108,7 +108,10 @@ void clock() {
 
         case 0: // fetch - salva memória de instrução no registrador IR
             reg.IR = memory.instructions[pc];
-            pc ++;
+            reg.ULAOut = out.value; // salva PC + 1 calculado pela ULA
+            if (control.wrtPc) {
+                 pc = reg.ULAOut;
+            }
         break;
         case 1: // decode - salva valores saindo do banco de registradores nos regs A e B
             reg.A = registers[reg.IR.rs];
@@ -123,13 +126,22 @@ void clock() {
         case 4: // write back / lw
             if (reg.IR.rt != 0) registers[reg.IR.rt] = reg.MDR;
             registers[reg.IR.rt] = reg.MDR; // valor da memória de dados vai para banco de registradores
+            if (control.wrtPc) {
+                 pc = reg.ULAOut;
+            }
         break;
         case 5: // acesso à memória / sw
             memory.data[reg.ULAOut] = reg.B; // valor de B é salvo na memória de dados
+            if (control.wrtPc) {
+                 pc = reg.ULAOut;
+            }
         break;
         case 6: // write back ADDI
             if (reg.IR.rt != 0) registers[reg.IR.rt] = reg.ULAOut;
             registers[reg.IR.rt] = reg.ULAOut; // resultado da ULA no reg rt
+            if (control.wrtPc) {
+                 pc = reg.ULAOut;
+            }
         break;
         case 7: // executa tipe R - salva o resultado da ULA no reg ulaOut
             ulaOut = ula(reg.A, reg.B, next.ulaControl); // chama ULA
@@ -137,10 +149,15 @@ void clock() {
         break;
         case 8: // write back R type
             registers[reg.IR.rd] = reg.ULAOut; // resultado da ULA no reg rd
+            if (control.wrtPc) {
+                 pc = reg.ULAOut;
+            }
         break;
         case 9: // beq
             if (registers[reg.IR.rs] == registers[reg.IR.rt]) {
-            pc = pc + reg.IR.imm - 1;
+            pc = reg.ULAOut + reg.IR.imm - 1;
+          } else {
+            pc = reg.ULAOut;
           }
          break;
         case 10: // jump
@@ -149,7 +166,7 @@ void clock() {
 
     }
 
-
+    Instruction currentInstruction = memory.instructions[pc];
     char bufferInformation[255] = "";
     char bufferInformation2[255] = "";
 
@@ -159,8 +176,8 @@ void clock() {
     control = next;
 
     // Exibe a tabela de sinais de controle atual da FSM
-    showClock(instruction, &control);
-    
+    showClock(&currentInstruction, &control);   
+
     showClockInformation(bufferInformation, bufferInformation2);
 
     // Imprime clock
