@@ -102,7 +102,7 @@ void showClock(const Instruction *instruction, const Control *control) {
 }
 
 void showClockPc() {
-    println("│""     "BOLD_WHITE"PC     "RESET"│                                            %03d                                                │",pc - 1);
+    println("│""     "BOLD_WHITE"PC     "RESET"│                                            %03d                                                │",pc);
     println("├────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┤");
 }
 
