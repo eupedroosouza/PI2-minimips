@@ -11,7 +11,9 @@
 #include "view.h"
 
 Instruction emptyInstruction;
+Registradores registradores;
 
+// decodifica a instrução
 void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
     strcpy(instruction->stringedInstruction, serializedBinary);
 
@@ -36,13 +38,13 @@ void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
     char registerAndFunctBuffer[4];
     //rs
     charsToString(registerAndFunctBuffer, 3, serializedBinary[4], serializedBinary[5], serializedBinary[6]);
-    instruction->rs = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->rs = binaryToUnsignedInt(registerAndFunctBuffer); // salva rs
     //rt
     charsToString(registerAndFunctBuffer, 3, serializedBinary[7], serializedBinary[8], serializedBinary[9]);
-    instruction->rt = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->rt = binaryToUnsignedInt(registerAndFunctBuffer); // salva rt
     //rd
     charsToString(registerAndFunctBuffer, 3, serializedBinary[10], serializedBinary[11], serializedBinary[12]);
-    instruction->rd = binaryToUnsignedInt(registerAndFunctBuffer);
+    instruction->rd = binaryToUnsignedInt(registerAndFunctBuffer); // salva rd
     // funct
     charsToString(registerAndFunctBuffer, 3, serializedBinary[13], serializedBinary[14], serializedBinary[15]);
     instruction->funct = binaryToUnsignedInt(registerAndFunctBuffer);
@@ -109,12 +111,15 @@ void loadInstructionsOnMem() {
             // Pega os dados da variável string e coloca na estrutura memInstruction
                 i ++;
 
-            } else { // dado
-                char eightBytesPerLine[9];
+            } else { // salva memória de dados
+             char eightBytesPerLine[9];
                 charsToString(eightBytesPerLine, 8, linha[8], linha[9], linha[10], linha[11], linha[12], linha[13], linha[14], linha[15]);
                 memInstruction.data[j] = complementOfTwoToInt(eightBytesPerLine);
+
                 j ++;
             }
+         
+                
             
 
         }
@@ -131,6 +136,7 @@ void loadInstructionsOnMem() {
         println("Foram carregadas %d instruções na memória de instrução.", memInstruction.size);
         invalidateLastState();
     } //fim do else
+
 }
 
 void convertToAssemblyInstruction(const Instruction *instruction, char *buffer) {
