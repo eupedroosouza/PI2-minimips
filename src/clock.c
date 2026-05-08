@@ -103,7 +103,7 @@ void clock() {
     }
    
  
-    // salva dados nos regs dependendo do estado do clock
+    // salva dados nos registradores intermediários (IR, MDR, A, B, ULAOUT) dependendo do estado do clock
     switch (currentState){
 
         case 0: // fetch - salva memória de instrução no registrador IR
