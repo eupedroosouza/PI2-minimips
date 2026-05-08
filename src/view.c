@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "back.h"
 #include "colors.h"
 #include "main.h"
 #include "ula.h"
@@ -300,7 +301,7 @@ void createInstructionTable(char memInstructionTable[260][512]) {
     strcpy(memInstructionTable[1], "│  "BOLD_WHITE"#  │      Binário     │ Hexa │         Assembly        │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr"RESET"│");
     strcpy(memInstructionTable[2], "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     for (int i = 0; i < MEM_SIZE; i++) {
-        viewInstruction(&memInstruction.instructions[i], i, memInstructionTable[i + 3]);
+        viewInstruction(&memory.instructions[i], i, memInstructionTable[i + 3]);
     }
     strcpy(memInstructionTable[259],
       "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
@@ -323,7 +324,7 @@ void createDataMemTable(char table[260][255]) {
     sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
     for (int i = 0; i < 256; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memInstruction.data[i]);
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memory.data[i]);
     }
     sprintf(table[259], "└─────┴───────┘");
 }
@@ -389,7 +390,7 @@ void showLastState() {
     println("┌────────────────────────────────────────┐");
     println("│"BG_MAGENTA"              "BOLD_WHITE"Último Estado             "RESET"│ ");
     println("├────────────┬───────────────────────────┤");
-    println("│     "BOLD_WHITE"PC"RESET"     │            %03d            │", lastState.pc);
+    println("│     "BOLD_WHITE"PC"RESET"     │            %03d            │", lastState->pc);
     println("├────────────┴──────┬────────────────────┤");
     println("│   "BOLD_WHITE"Registradores"RESET"   │  "BOLD_WHITE"Memória de Dados"RESET"  │");
     println("├───────────────────┼────────────────────┤");

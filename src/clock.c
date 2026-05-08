@@ -13,18 +13,18 @@
 Control control = {0}; 
 
 void clock() {
-    saveLastState();
+    saveState();
 
     int currentState = control.state; // Guarda qual estado estamos executando AGORA
 
    
-    const Instruction *instruction = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
+    const Instruction *instruction = (pc < memory.size) ? &memory.instructions[pc] : &emptyInstruction;
 
 
     makeControl(instruction->opcode, instruction->funct, &control);
 
    
-    stats.totalCycles++; // Incrementa 1 ciclo de clock
+    // stats.totalCycles++; // Incrementa 1 ciclo de clock
     
 
     if (currentState == 0 && instruction->type != OTHER) {
@@ -66,12 +66,12 @@ void clock() {
 
     if (control.wrtReg) {
         int destination = (control.regDst == 1) ? instruction->rd : instruction->rt;
-        int value = (control.memToReg == 1) ? memInstruction.data[out.value] : out.value;
+        int value = (control.memToReg == 1) ? memory.data[out.value] : out.value;
         registers[destination] = value;
     }
 
     if (control.wrtMem) {
-        memInstruction.data[out.value] = registers[instruction->rt];
+        memory.data[out.value] = registers[instruction->rt];
     }
 
    

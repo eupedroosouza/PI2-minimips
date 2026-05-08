@@ -3,11 +3,9 @@
 
 extern bool debug;
 
-extern MemInstruction memInstruction;
+extern Memory memory;
 
 extern PC pc;
 extern Register registers[8];
-
-extern State lastState;
 
 extern Statistics stats;

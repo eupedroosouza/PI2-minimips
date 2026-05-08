@@ -8,16 +8,16 @@
 void resetMemory() {
     
     for (int i = 0; i < MEM_SIZE; i++) {
-        memInstruction.instructions[i] = emptyInstruction;
+        memory.instructions[i] = emptyInstruction;
     }
-    memInstruction.size = 0;
+    memory.size = 0;
 
   
     for (int i = 0; i < MEM_SIZE; i++) {
-        memInstruction.data[i] = 0;
+        memory.data[i] = 0;
     }
     
-    memInstruction.dataSize = 0; 
+    memory.dataSize = 0; 
 }
 
 

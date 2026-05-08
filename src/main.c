@@ -24,8 +24,7 @@
 
 bool debug = false;
 
-MemInstruction memInstruction;
-MemInstruction memData;
+Memory memory;
 
 PC pc;
 Register registers[8];

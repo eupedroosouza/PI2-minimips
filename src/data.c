@@ -28,8 +28,8 @@ void loadUnifiedMemory() {
     int carregandoDados = 0; // 0 = Lendo instruções 1 = Lendo dados
     
     
-    memInstruction.size = 0;
-    memInstruction.dataSize = 0;
+    memory.size = 0;
+    memory.dataSize = 0;
 
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
         linha[strcspn(linha, "\r\n")] = 0; 
@@ -47,25 +47,25 @@ void loadUnifiedMemory() {
 
         if (!carregandoDados) {
           
-            if (memInstruction.size < 256) {
+            if (memory.size < 256) {
                
-                decodeInstruction(&memInstruction.instructions[memInstruction.size], linha);
-                memInstruction.size++;
+                decodeInstruction(&memory.instructions[memory.size], linha);
+                memory.size++;
             }
         } else {
          
-            if (memInstruction.dataSize < 256) {
+            if (memory.dataSize < 256) {
                
-                memInstruction.data[memInstruction.dataSize] = (int8_t) strtol(linha, NULL, 2);
-                memInstruction.dataSize++;
+                memory.data[memory.dataSize] = (int8_t) strtol(linha, NULL, 2);
+                memory.dataSize++;
             }
         }
     }
     
     fclose(arquivo);
     printf("\nMemoria unificada carregada com sucesso!\n");
-    printf(" -> %d instrucoes lidas.\n", memInstruction.size);
-    printf(" -> %d dados lidos.\n", memInstruction.dataSize);
+    printf(" -> %d instrucoes lidas.\n", memory.size);
+    printf(" -> %d dados lidos.\n", memory.dataSize);
 
     
     if (debug) {
@@ -90,17 +90,17 @@ void saveUnifiedMemory() {
     }
 
    
-    for (int i = 0; i < memInstruction.size; i++) {
-        fprintf(arquivo, "%s\n", memInstruction.instructions[i].stringedInstruction);
+    for (int i = 0; i < memory.size; i++) {
+        fprintf(arquivo, "%s\n", memory.instructions[i].stringedInstruction);
     }
 
   
     fprintf(arquivo, ".data\n");
 
     
-    for (int i = 0; i < memInstruction.dataSize; i++) {
+    for (int i = 0; i < memory.dataSize; i++) {
         // Pega o dado e estende para 16 bits pra manter o sinal correto
-        int16_t valor = (int16_t) memInstruction.data[i];
+        int16_t valor = (int16_t) memory.data[i];
         
        
         for (int bit = 15; bit >= 0; bit--) {

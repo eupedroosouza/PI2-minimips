@@ -14,7 +14,7 @@
 #define BEQ_OPCODE    8
 #define J_OPCODE      2
 
-#define MEM_SIZE 256
+#define MEM_SIZE 128
 #define REG_SIZE 8
 
 typedef uint8_t PC;
@@ -41,25 +41,26 @@ typedef struct {
 
 // 2^8 = 256
 typedef struct {
-    Instruction instructions[256];
-    uint8_t size;   // tamanho da memória de instrução
+    Instruction instructions[128];
+    uint8_t size; // tamanho da memória de instrução
     uint8_t dataSize; // tamanho da memória de dados
-    int8_t data[256]; //memoria de dados
-} MemInstruction; // Memória geral
+    int8_t data[128]; //memoria de dados
+} Memory; // Memória geral
 
 // registradores intermediários
 typedef struct {
-Instruction IR; // reg de memória de instrução
-int8_t MDR; // reg de dados da memória
-int8_t A, B; // regs A e B, valores saindo do banco de registradores para a ULA
-int8_t ULAOut; // reg de saida da ULA
+    Instruction IR; // reg de memória de instrução
+    int8_t MDR; // reg de dados da memória
+    int8_t A, B; // regs A e B, valores saindo do banco de registradores para a ULA
+    int8_t ULAOut; // reg de saida da ULA
 } Registradores;
 
 // Estado (útil para a função de back)
-typedef struct {
+typedef struct state {
+    struct state *previous;
     PC pc;
     Register registers[8];
-    MemInstruction memData;
+    Memory memory;
 } State;
 
 typedef struct {
@@ -91,11 +92,11 @@ typedef struct {
     int add;
     int addi;
     int sub;
-    int and_inst; 
+    int and_inst;
     int or_inst;
     int beq;
     int j;
-    int other; 
+    int other;
 } StatisticsPerClass;
 
 // Estrutura para contar quantas instruções de CADA FORMATO (Tipo) rodaram.
