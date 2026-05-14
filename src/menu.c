@@ -18,7 +18,7 @@ void menu() {
     while (1) {
         println("");
         println("1. Carregar memória unificada");
-        println(" 2.Salvar memória unificada)");
+        println("2.Salvar memória unificada)");
         println("3. Imprimir banco de registradores");
         println("4. Imprimir todo o simulador (registradores e memórias)");
         println("5. Salvar instruçôes em mnemônicos - assembly (.asm)");
