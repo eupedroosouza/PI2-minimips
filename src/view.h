@@ -23,6 +23,7 @@ void showClockRegisters(unsigned int reg1, int value1, unsigned int reg2, int va
 
 void showClockUla(int input1, int input2, int ulaControl, const ULAOut *out);
 
+void showClockRegs();
 
 
 // End clock

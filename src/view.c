@@ -60,7 +60,7 @@ void createIntermediateTable(char table[10][255]) {
     sprintf(table[7], "│   B   │  %03d  │", reg.B);
     sprintf(table[8], "│ULA out│  %03d  │", reg.ULAOut);
     sprintf(table[9], "└───────┴───────┘");
-}   
+}
 
 
 void showRegisters() {
@@ -152,7 +152,7 @@ void showClock(const Instruction *instruction, const Control *control) {
         boolStr[control->wrtPc ? 1 : 0 ],
         control->ulaControl,
         control->state);
-    println("├────────┴────────────┴──────────────────┴───────────────────────────────────┬───────────────────────────────┤");
+    println("├────────┴────────────┴──────────────────┴───────────────────────────────────────────────────────────────────┤");
 }
 
 void showClockPc() {
@@ -224,6 +224,16 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
         "├────────────┬──────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
 }
 
+void showClockRegs() {
+    println("│"BG_RED"                                       "BOLD_WHITE"Registradores Intermediários                                         "RESET"│");
+    println("├─────────────────────┬───────────────────────────┬─────────────────────────┬────────────────────────────────┤");
+    println(BOLD_WHITE"│         MDR         │             A             |            B            |              ULA Out           │"RESET);
+    println("├─────────────────────┼───────────────────────────┼─────────────────────────┼────────────────────────────────┤");
+    println("│         %03d         │            %03d            │           %03d           │                 %03d            │",
+        reg.MDR, reg.A, reg.B, reg.ULAOut);
+    println("├─────────────────────┴───────────────────────────┴─────────────────────────┴────────────────────────────────┤");
+}
+
 // End clock
 
 // Statistics
@@ -234,7 +244,7 @@ void showStatistics() {
     println("│               Estatísticas de Execução               │");
     println("├──────────────────────────────────────────────────────┤");
     println("│ Total de Instruções Executadas: %-20d │", stats.executedInstructions);
-    // println("│ Ciclos de Clock Totais: %-28d │", stats.totalCycles); 
+    // println("│ Ciclos de Clock Totais: %-28d │", stats.totalCycles);
     println("├──────────────────────────────────────────────────────┤");
     println("│ Por Tipo de Instrução:                              │");
     println("│   Tipo R: %-42d │", stats.executedInstructionsPerType.r);

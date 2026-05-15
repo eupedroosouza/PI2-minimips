@@ -206,6 +206,7 @@ switch (currentState) {
     // Exibe a tabela de sinais de controle atual da FSM
     showClock(&currentInstruction, &control);   
 
+    showClockRegs();
     showClockInformation(bufferInformation, bufferInformation2);
 
     // Imprime clock
