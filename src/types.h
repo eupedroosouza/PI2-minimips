@@ -14,7 +14,7 @@
 #define BEQ_OPCODE    8
 #define J_OPCODE      2
 
-#define MEM_SIZE 128
+#define MEM_SIZE 256
 #define REG_SIZE 8
 
 typedef uint8_t PC;
@@ -41,10 +41,10 @@ typedef struct {
 
 // 2^8 = 256
 typedef struct {
-    Instruction instructions[128];
+    Instruction instructions[MEM_SIZE];
     uint8_t size; // tamanho da memória de instrução
     uint8_t dataSize; // tamanho da memória de dados
-    int8_t data[128]; //memoria de dados
+    int8_t data[MEM_SIZE]; //memoria de dados
 } Memory; // Memória geral
 
 // registradores intermediários

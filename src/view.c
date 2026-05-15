@@ -175,53 +175,32 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
 // Statistics
 
 void showStatistics() {
-    const int CYCLE_TIME_NS = 4; // 4ns por ciclo
-
-    int totalTime = stats.executedInstructions * CYCLE_TIME_NS;
-
-    println("┌─────────────────────────────────────────────────────────────┐");
-    println("│                 Estatísticas de Desempenho                  │");
-    println("├─────────────────────────────────────────────────────────────┤");
-    println("│ Tempo de cada ciclo: 4ns                                    │");
-    println("│ Total de Instruções Executadas: %-27d │", stats.executedInstructions);
-    println("│ Tempo Total de Programa:        %-24d ns │", totalTime);
-    println("├─────────────────────────────────────────────────────────────┤");
-    println("│                      Por Tipo (Formato)                     │");
-    println("├────────┬─────────────────────────┬──────────────────────────┤");
-    println("│  Tipo  │       Quantidade        │        Tempo Gasto       │");
-    println("├────────┼─────────────────────────┼──────────────────────────┤");
-    println("│ R      │ %-23d │ %-21d ns │", stats.executedInstructionsPerType.r,
-            stats.executedInstructionsPerType.r * CYCLE_TIME_NS);
-    println("│ I      │ %-23d │ %-21d ns │", stats.executedInstructionsPerType.i,
-            stats.executedInstructionsPerType.i * CYCLE_TIME_NS);
-    println("│ J      │ %-23d │ %-21d ns │", stats.executedInstructionsPerType.j,
-            stats.executedInstructionsPerType.j * CYCLE_TIME_NS);
-    println("├────────┴─────────────────────────┴──────────────────────────┤");
-    println("│                     Por Classe (Opcode)                     │");
-    println("├────────┬─────────────────────────┬──────────────────────────┤");
-    println("│ Classe │       Quantidade        │        Tempo Gasto       │");
-    println("├────────┼─────────────────────────┼──────────────────────────┤");
-    println("│ ADD    │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.add,
-            stats.executedInstructionsPerClass.add * CYCLE_TIME_NS);
-    println("│ SUB    │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.sub,
-            stats.executedInstructionsPerClass.sub * CYCLE_TIME_NS);
-    println("│ AND    │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.and_inst,
-            stats.executedInstructionsPerClass.and_inst * CYCLE_TIME_NS);
-    println("│ OR     │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.or_inst,
-            stats.executedInstructionsPerClass.or_inst * CYCLE_TIME_NS);
-    println("│ ADDI   │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.addi,
-            stats.executedInstructionsPerClass.addi * CYCLE_TIME_NS);
-    println("│ LW     │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.lw,
-            stats.executedInstructionsPerClass.lw * CYCLE_TIME_NS);
-    println("│ SW     │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.sw,
-            stats.executedInstructionsPerClass.sw * CYCLE_TIME_NS);
-    println("│ BEQ    │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.beq,
-            stats.executedInstructionsPerClass.beq * CYCLE_TIME_NS);
-    println("│ J      │ %-23d │ %-21d ns │", stats.executedInstructionsPerClass.j,
-            stats.executedInstructionsPerClass.j * CYCLE_TIME_NS);
-    println("└────────┴─────────────────────────┴──────────────────────────┘");
+    println("");
+    println("┌──────────────────────────────────────────────────────┐");
+    println("│               Estatísticas de Execução               │");
+    println("├──────────────────────────────────────────────────────┤");
+    println("│ Total de Instruções Executadas: %-20d │", stats.executedInstructions);
+    // println("│ Ciclos de Clock Totais: %-28d │", stats.totalCycles); 
+    println("├──────────────────────────────────────────────────────┤");
+    println("│ Por Tipo de Instrução:                              │");
+    println("│   Tipo R: %-42d │", stats.executedInstructionsPerType.r);
+    println("│   Tipo I: %-42d │", stats.executedInstructionsPerType.i);
+    println("│   Tipo J: %-42d │", stats.executedInstructionsPerType.j);
+    println("│   Outros: %-42d │", stats.executedInstructionsPerType.other);
+    println("├──────────────────────────────────────────────────────┤");
+    println("│ Por Classe de Instrução:                            │");
+    println("│   ADD   : %-42d │", stats.executedInstructionsPerClass.add);
+    println("│   SUB   : %-42d │", stats.executedInstructionsPerClass.sub);
+    println("│   AND   : %-42d │", stats.executedInstructionsPerClass.and_inst);
+    println("│   OR    : %-42d │", stats.executedInstructionsPerClass.or_inst);
+    println("│   ADDI  : %-42d │", stats.executedInstructionsPerClass.addi);
+    println("│   LW    : %-42d │", stats.executedInstructionsPerClass.lw);
+    println("│   SW    : %-42d │", stats.executedInstructionsPerClass.sw);
+    println("│   BEQ   : %-42d │", stats.executedInstructionsPerClass.beq);
+    println("│   J     : %-42d │", stats.executedInstructionsPerClass.j);
+    println("│   Outras: %-42d │", stats.executedInstructionsPerClass.other);
+    println("└──────────────────────────────────────────────────────┘");
 }
-
 // End-Statistics
 
 // Instruction
