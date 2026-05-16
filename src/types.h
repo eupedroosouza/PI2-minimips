@@ -76,7 +76,6 @@ typedef struct {
     bool branch;
     bool wrtPc;
     int ulaControl;
-    int state;
 } Control;
 
 typedef struct {
