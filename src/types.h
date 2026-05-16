@@ -60,9 +60,9 @@ typedef struct {
 typedef struct state {
     struct state *previous;
     PC pc;
-    Register registers[8];
+    Registers registers;
     Memory memory;
-} State;
+} BackState;
 
 typedef struct {
     int pcSource;

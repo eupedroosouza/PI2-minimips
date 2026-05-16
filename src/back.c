@@ -7,34 +7,32 @@
 #include "utils.h"
 #include "view.h"
 
-State *lastState = NULL;
+BackState *lastState = NULL;
 
 void saveState() {
-    State *state = malloc(sizeof(State));
-    if (state == NULL) {
+    BackState *backState = malloc(sizeof(BackState));
+    if (backState == NULL) {
         printf("Não há mais memória para armazenar backs!\n");
         // check if need exit de program
         return;
     }
-    state->pc = pc;
-    for (int i = 0; i < REG_SIZE; i++) {
-        state->registers[i] = registers.general[i];
-    }
+    backState->pc = pc;
+    backState->registers = registers;
     for (int i = 0; i < MEM_SIZE; i++) {
-        state->memory.data[i] = memory.data[i];
+        backState->memory.data[i] = memory.data[i];
     }
-    state->memory.dataSize = memory.dataSize;
-    state->previous = lastState;
-    lastState = state;
+    backState->memory.dataSize = memory.dataSize;
+    backState->previous = lastState;
+    lastState = backState;
 }
 
 void invalidateState() {
     if (lastState == NULL) {
         return;
     }
-    State *aux = lastState;
+    BackState *aux = lastState;
     while (aux != NULL) {
-        State *prev = aux->previous;
+        BackState *prev = aux->previous;
         free(aux);
         aux = prev;
     }
@@ -48,9 +46,7 @@ void back() {
     }
 
     pc = lastState->pc;
-    for (int i = 0; i < 8; i++) {
-        registers.general[i] = lastState->registers[i];
-    }
+    registers = lastState->registers;
 
     for (int i = 0; i < memory.dataSize; i++) {
         memory.data[i] = lastState->memory.data[i];
@@ -58,7 +54,7 @@ void back() {
     println(" Retornando os valores do processador para:");
     showLastState();
 
-    State *aux = lastState;
+    BackState *aux = lastState;
     lastState = lastState->previous;
     free(aux);
 }

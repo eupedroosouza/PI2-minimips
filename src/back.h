@@ -2,7 +2,7 @@
 #include "types.h"
 
 
-extern State *lastState;
+extern BackState *lastState;
 
 void saveState();
 
