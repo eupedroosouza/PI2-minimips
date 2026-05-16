@@ -11,7 +11,7 @@
 #include "view.h"
 
 Instruction emptyInstruction;
-Registradores registradores;
+Registers registradores;
 
 // decodifica a instrução
 void decodeInstruction(Instruction *instruction, const char *serializedBinary) {

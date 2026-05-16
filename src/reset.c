@@ -23,7 +23,7 @@ void resetMemory() {
 
 void resetRegisters() {
     for (int i = 0; i < REG_SIZE; i++) {
-        registers[i] = 0;
+        registers.general[i] = 0;
     }
 
     // PC Reset

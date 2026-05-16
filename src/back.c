@@ -18,7 +18,7 @@ void saveState() {
     }
     state->pc = pc;
     for (int i = 0; i < REG_SIZE; i++) {
-        state->registers[i] = registers[i];
+        state->registers[i] = registers.general[i];
     }
     for (int i = 0; i < MEM_SIZE; i++) {
         state->memory.data[i] = memory.data[i];
@@ -49,7 +49,7 @@ void back() {
 
     pc = lastState->pc;
     for (int i = 0; i < 8; i++) {
-        registers[i] = lastState->registers[i];
+        registers.general[i] = lastState->registers[i];
     }
 
     for (int i = 0; i < memory.dataSize; i++) {

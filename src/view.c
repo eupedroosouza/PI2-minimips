@@ -14,7 +14,6 @@
 const char *memToRegStr[2] = {"mem", "ula"};
 const char *ulaSourceStr[2] = {"registrador", "imediato"};
 const char *typeStr[4] = {"I", "J", "R", "O"};
-extern Registradores reg;
 
 // Registers
 
@@ -25,7 +24,7 @@ void createRegisterTable(char table[52][255]) {
     sprintf(table[3], "│   "BOLD_WHITE"#"RESET"   │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[4], "├───────┼───────┤");
     for (int i = 0; i < 8; i++) {
-        sprintf(table[i + 5], "│  $%01d   │  %03d  │", i, registers[i]);
+        sprintf(table[i + 5], "│  $%01d   │  %03d  │", i, registers.general[i]);
     }
     sprintf(table[11], "│  $pc  │  %03d  │", pc);
     sprintf(table[12], "└───────┴───────┘");
@@ -55,10 +54,10 @@ void createIntermediateTable(char table[10][255]) {
     sprintf(table[2], "├───────┬───────┤");
     sprintf(table[3], "│   "BOLD_WHITE"#"RESET"   │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[4], "├───────┼───────┤");
-    sprintf(table[5], "│  MDR  │  %03d  │", reg.MDR);
-    sprintf(table[6], "│   A   │  %03d  │", reg.A);
-    sprintf(table[7], "│   B   │  %03d  │", reg.B);
-    sprintf(table[8], "│ULA out│  %03d  │", reg.ULAOut);
+    sprintf(table[5], "│  MDR  │  %03d  │", registers.MDR);
+    sprintf(table[6], "│   A   │  %03d  │", registers.A);
+    sprintf(table[7], "│   B   │  %03d  │", registers.B);
+    sprintf(table[8], "│ULA out│  %03d  │", registers.ULAOut);
     sprintf(table[9], "└───────┴───────┘");
 }
 
@@ -112,7 +111,7 @@ void showClock(const Instruction *instruction, const Control *control) {
     char memToReg[15];
     centerString(memToRegBuffer, memToReg, 14);
 
-    const int8_t ulaSourceValue = (control->ulaSourceA == 0) ? registers[instruction->rt] : instruction->imm;
+    const int8_t ulaSourceValue = (control->ulaSourceA == 0) ? registers.general[instruction->rt] : instruction->imm;
     char ulaSourceBuffer[37];
     snprintf(ulaSourceBuffer, sizeof(ulaSourceBuffer), "%s (fonte: %d, valor: %04d)", ulaSourceStr[control->ulaSourceA],
              control->ulaSourceA, ulaSourceValue);
@@ -151,7 +150,7 @@ void showClock(const Instruction *instruction, const Control *control) {
         boolStr[control->branch ? 1 : 0],
         boolStr[control->wrtPc ? 1 : 0 ],
         control->ulaControl,
-        control->state);
+        state);
     println("├────────┴────────────┴──────────────────┴───────────────────────────────────────────────────────────────────┤");
 }
 
@@ -230,7 +229,7 @@ void showClockRegs() {
     println(BOLD_WHITE"│         MDR         │             A             |            B            |              ULA Out           │"RESET);
     println("├─────────────────────┼───────────────────────────┼─────────────────────────┼────────────────────────────────┤");
     println("│         %03d         │            %03d            │           %03d           │                 %03d            │",
-        reg.MDR, reg.A, reg.B, reg.ULAOut);
+        registers.MDR, registers.A, registers.B, registers.ULAOut);
     println("├─────────────────────┴───────────────────────────┴─────────────────────────┴────────────────────────────────┤");
 }
 

@@ -50,10 +50,11 @@ typedef struct {
 // registradores intermediários
 typedef struct {
     Instruction IR; // reg de memória de instrução
-    int8_t MDR; // reg de dados da memória
-    int8_t A, B; // regs A e B, valores saindo do banco de registradores para a ULA
-    int8_t ULAOut; // reg de saida da ULA
-} Registradores;
+    Register MDR; // reg de dados da memória
+    Register A, B; // regs A e B, valores saindo do banco de registradores para a ULA
+    Register ULAOut; // reg de saida da ULA
+    Register general[8];
+} Registers;
 
 // Estado (útil para a função de back)
 typedef struct state {

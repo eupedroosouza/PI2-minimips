@@ -26,8 +26,9 @@ bool debug = false;
 
 Memory memory;
 
+int state = 0;
 PC pc;
-Register registers[8];
+Registers registers = {0};
 
 Statistics stats = {0};
 

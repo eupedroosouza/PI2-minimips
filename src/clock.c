@@ -9,8 +9,7 @@
 #include "ula.h"
 #include "view.h"
 
-int state = 0;
-Registradores reg;
+
 ULAOut ulaOut;
 
 char bufferInformation[255] = "";
@@ -21,19 +20,19 @@ void clock() {
     saveState();
 
     const int currentState = state; // pega o estado atual do controle
-    const Control control = makeControl(reg.IR.opcode, reg.IR.funct, &state);
+    const Control control = makeControl(registers.IR.opcode, registers.IR.funct, &state);
 
     // stats.totalCycles++; // Incrementa 1 ciclo de clock
-    if (currentState == 0 && reg.IR.type != OTHER) {
+    if (currentState == 0 && registers.IR.type != OTHER) {
         stats.executedInstructions++;
 
-        if (reg.IR.type == R) stats.executedInstructionsPerType.r++;
-        else if (reg.IR.type == I) stats.executedInstructionsPerType.i++;
-        else if (reg.IR.type == J) stats.executedInstructionsPerType.j++;
+        if (registers.IR.type == R) stats.executedInstructionsPerType.r++;
+        else if (registers.IR.type == I) stats.executedInstructionsPerType.i++;
+        else if (registers.IR.type == J) stats.executedInstructionsPerType.j++;
         else stats.executedInstructionsPerType.other++;
 
-        if (reg.IR.opcode == R_TYPE_OPCODE) {
-            switch (reg.IR.funct) {
+        if (registers.IR.opcode == R_TYPE_OPCODE) {
+            switch (registers.IR.funct) {
                 case ADD_FUNCT: stats.executedInstructionsPerClass.add++;
                     break;
                 case SUB_FUNCT: stats.executedInstructionsPerClass.sub++;
@@ -44,7 +43,7 @@ void clock() {
                     break;
             }
         } else {
-            switch (reg.IR.opcode) {
+            switch (registers.IR.opcode) {
                 case LW_OPCODE: stats.executedInstructionsPerClass.lw++;
                     break;
                 case SW_OPCODE: stats.executedInstructionsPerClass.sw++;
@@ -64,23 +63,23 @@ void clock() {
     if (control.ulaSourceA == 0) {
         input1 = pc;
     } else {
-        input1 = registers[reg.IR.rs];
+        input1 = registers.general[registers.IR.rs];
     }
 
     // controle da entrada B da ULA
     int8_t input2;
     if (control.ulaSourceB == 0) {
-        input2 = registers[reg.IR.rt];
+        input2 = registers.general[registers.IR.rt];
     } else if (control.ulaSourceB == 1) {
         input2 = 1; // Geralmente usado para somar PC+1 (caso use)
     } else {
-        input2 = reg.IR.imm; // Extensão de sinal do Imediato
+        input2 = registers.IR.imm; // Extensão de sinal do Imediato
     }
 
     int ulaOp;
     // usa o operador para decidir qual operador a ULA vai executar
     if (currentState == 7) {
-        ulaOp = reg.IR.funct;
+        ulaOp = registers.IR.funct;
     } else {
         ulaOp = control.ulaControl;
     }
@@ -93,9 +92,9 @@ void clock() {
         int destination;
 
         if (control.regDst == 1) {
-            destination = reg.IR.rd; // A
+            destination = registers.IR.rd; // A
         } else {
-            destination = reg.IR.rt; // B
+            destination = registers.IR.rt; // B
         }
 
         int value;
@@ -106,105 +105,105 @@ void clock() {
             value = out.value;
         }
 
-        registers[destination] = value;
+        registers.general[destination] = value;
     }
 
 
     // salva dados nos registradores intermediários (IR, MDR, A, B, ULAOUT) dependendo do estado do clock
     switch (currentState) {
         case 0: // FETCH
-            reg.IR = memory.instructions[pc];
-            reg.ULAOut = out.value; // PC + 1
-            if (control.wrtPc) pc = reg.ULAOut;
+            registers.IR = memory.instructions[pc];
+            registers.ULAOut = out.value; // PC + 1
+            if (control.wrtPc) pc = registers.ULAOut;
 
             sprintf(bufferInformation, " Estado 0 (Fetch): Lendo instrução no endereço %03d e calculando PC+1.", pc);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 1 (Decode) para decodificar '%s'.",
-                    reg.IR.prettyAsmInstruction);
+                    registers.IR.prettyAsmInstruction);
             break;
 
         case 1: // DECODE
-            reg.A = registers[reg.IR.rs];
-            reg.B = registers[reg.IR.rt];
+            registers.A = registers.general[registers.IR.rs];
+            registers.B = registers.general[registers.IR.rt];
 
-            sprintf(bufferInformation, " Estado 1 (Decode): Lendo registradores rs($%d)=%d e rt($%d)=%d.", reg.IR.rs,
-                    reg.A, reg.IR.rt, reg.B);
-            sprintf(bufferInformation2, " Próximo ciclo: Estado %d baseado no opcode %d.", state, reg.IR.opcode);
+            sprintf(bufferInformation, " Estado 1 (Decode): Lendo registradores rs($%d)=%d e rt($%d)=%d.", registers.IR.rs,
+                    registers.A, registers.IR.rt, registers.B);
+            sprintf(bufferInformation2, " Próximo ciclo: Estado %d baseado no opcode %d.", state, registers.IR.opcode);
             break;
 
         case 2: // EXECUTE / CÁLCULO DE ENDEREÇO
-            reg.ULAOut = reg.A + reg.IR.imm;
+            registers.ULAOut = registers.A + registers.IR.imm;
 
-            sprintf(bufferInformation, " Estado 2 (Addr Calc): Calculando endereço de memória: %d + %d = %d.", reg.A,
-                    reg.IR.imm, reg.ULAOut);
+            sprintf(bufferInformation, " Estado 2 (Addr Calc): Calculando endereço de memória: %d + %d = %d.", registers.A,
+                    registers.IR.imm, registers.ULAOut);
             sprintf(bufferInformation2, " Próximo ciclo: Estado %d (Acesso à Memória).", state);
             break;
 
         case 3: // ACESSO À MEMÓRIA (LW)
-            reg.MDR = memory.data[reg.ULAOut];
+            registers.MDR = memory.data[registers.ULAOut];
 
-            sprintf(bufferInformation, " Estado 3 (Mem Read): Lendo valor %d da memória no endereço %d.", reg.MDR,
-                    reg.ULAOut);
+            sprintf(bufferInformation, " Estado 3 (Mem Read): Lendo valor %d da memória no endereço %d.", registers.MDR,
+                    registers.ULAOut);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 4 (Write Back do LW).");
             break;
 
         case 4: // WRITE BACK (LW)
-            if (reg.IR.rt != 0) registers[reg.IR.rt] = reg.MDR;
+            if (registers.IR.rt != 0) registers.general[registers.IR.rt] = registers.MDR;
 
-            sprintf(bufferInformation, " Estado 4 (Write Back LW): Escrevendo valor %d no registrador $%d.", reg.MDR,
-                    reg.IR.rt);
+            sprintf(bufferInformation, " Estado 4 (Write Back LW): Escrevendo valor %d no registrador $%d.", registers.MDR,
+                    registers.IR.rt);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 0 (Novo Fetch).");
             break;
 
         case 5: // ACESSO À MEMÓRIA (SW)
-            memory.data[reg.ULAOut] = reg.B;
+            memory.data[registers.ULAOut] = registers.B;
 
             sprintf(bufferInformation,
-                    " Estado 5 (Mem Write): Escrevendo valor do reg B (%d) na memória no endereço %d.", reg.B,
-                    reg.ULAOut);
+                    " Estado 5 (Mem Write): Escrevendo valor do reg B (%d) na memória no endereço %d.", registers.B,
+                    registers.ULAOut);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 0 (Novo Fetch).");
             break;
 
         case 6: // WRITE BACK (ADDI)
-            if (reg.IR.rt != 0) registers[reg.IR.rt] = reg.ULAOut;
+            if (registers.IR.rt != 0) registers.general[registers.IR.rt] = registers.ULAOut;
 
             sprintf(bufferInformation,
-                    " Estado 6 (Write Back ADDI): Salvando resultado da soma (%d) no registrador $%d.", reg.ULAOut,
-                    reg.IR.rt);
+                    " Estado 6 (Write Back ADDI): Salvando resultado da soma (%d) no registrador $%d.", registers.ULAOut,
+                    registers.IR.rt);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 0 (Novo Fetch).");
             break;
 
         case 7: // EXECUÇÃO TIPO R
-            ulaOut = ula(reg.A, reg.B, control.ulaControl);
-            reg.ULAOut = ulaOut.value;
+            ulaOut = ula(registers.A, registers.B, control.ulaControl);
+            registers.ULAOut = ulaOut.value;
 
             sprintf(bufferInformation, " Estado 7 (Execute R-Type): Executando operação ULA entre $%d e $%d.",
-                    reg.IR.rs, reg.IR.rt);
+                    registers.IR.rs, registers.IR.rt);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 8 (Write Back R-Type).");
             break;
 
         case 8: // WRITE BACK TIPO R
-            if (reg.IR.rd != 0) registers[reg.IR.rd] = reg.ULAOut;
+            if (registers.IR.rd != 0) registers.general[registers.IR.rd] = registers.ULAOut;
 
             sprintf(bufferInformation, " Estado 8 (Write Back R): Salvando resultado %d no registrador de destino $%d.",
-                    reg.ULAOut, reg.IR.rd);
+                    registers.ULAOut, registers.IR.rd);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 0 (Novo Fetch).");
             break;
 
         case 9: // BEQ
-            sprintf(bufferInformation, " Estado 9 (Branch): Comparando $%d (%d) com $%d (%d).", reg.IR.rs,
-                    registers[reg.IR.rs], reg.IR.rt, registers[reg.IR.rt]);
-            if (registers[reg.IR.rs] == registers[reg.IR.rt]) {
-                pc = reg.ULAOut + reg.IR.imm - 1;
+            sprintf(bufferInformation, " Estado 9 (Branch): Comparando $%d (%d) com $%d (%d).", registers.IR.rs,
+                    registers.general[registers.IR.rs], registers.IR.rt, registers.general[registers.IR.rt]);
+            if (registers.general[registers.IR.rs] == registers.general[registers.IR.rt]) {
+                pc = registers.ULAOut + registers.IR.imm - 1;
                 strcat(bufferInformation, " Condição atendida! PC saltará.");
             } else {
-                pc = reg.ULAOut;
+                pc = registers.ULAOut;
                 strcat(bufferInformation, " Condição não atendida. Segue fluxo normal.");
             }
             sprintf(bufferInformation2, " Próximo ciclo: Estado 0 (Novo Fetch).");
             break;
 
         case 10: // JUMP
-            pc = reg.IR.addr;
+            pc = registers.IR.addr;
             sprintf(bufferInformation, " Estado 10 (Jump): PC desviado para o endereço de salto %d.", pc);
             sprintf(bufferInformation2, " Próximo ciclo: Estado 0 (Novo Fetch).");
             break;
