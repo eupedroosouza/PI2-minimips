@@ -77,6 +77,8 @@ typedef struct {
     bool branch;
     bool wrtPc;
     int ulaControl;
+    // misc
+    int nextState; // only for view
 } Control;
 
 typedef struct {

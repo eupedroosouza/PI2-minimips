@@ -63,3 +63,6 @@ void printAllProgramData();
 void showLastState();
 
 // End Misc
+
+
+void viewStateOfMachine();

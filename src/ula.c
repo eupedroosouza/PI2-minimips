@@ -23,7 +23,6 @@ ULAOut ula(const int8_t input1, const int8_t input2, const int ulaControl) {
         case 1: // ADDI
         case 3: // LW. Calcula endereço somando os regs
         case 7: // SW. Calcula endereço somando os regs
-            printf("             %d\n             ", (input1 + input2));
             out.value = (int8_t) (input1 + input2);
             // Check if overflow was occurred with positive
             out.overflow = (input1 > 0 && input2 > 0 && out.value < 0) || (input1 < 0 && input2 < 0 && out.value > 0);

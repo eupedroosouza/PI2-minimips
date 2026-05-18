@@ -1,6 +1,4 @@
 #include "clock.h"
-#include <stdio.h>
-#include <string.h>
 
 #include "back.h"
 #include "control.h"
@@ -82,13 +80,6 @@ CombinationalState makeCombinational() {
     return C;
 }
 
-
-ULAOut ulaOut;
-
-char bufferInformation[255] = "";
-char bufferInformation2[255] = "";
-
-
 void clock() {
     saveState();
 
@@ -125,6 +116,7 @@ void clock() {
         registers.general[C.regToWrite] = C.regWriteData;
     }
 
+    viewStateOfMachine();
 
     // const int currentState = state; // pega o estado atual do controle
     // const Control control = makeControl(registers.IR.opcode, registers.IR.funct, &state);

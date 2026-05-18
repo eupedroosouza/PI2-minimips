@@ -134,6 +134,7 @@ Control makeControl(const unsigned int opcode, const unsigned int funct,  int *s
     if (clock) {
         *state = newState;
     }
+    control.nextState = newState;
 
     return control;
 }
