@@ -53,7 +53,7 @@ typedef struct {
     Register MDR; // reg de dados da memória
     Register A, B; // regs A e B, valores saindo do banco de registradores para a ULA
     Register ULAOut; // reg de saida da ULA
-    Register general[8];
+    Register general[8]; // regs de propósito geral
 } Registers;
 
 // Estado (útil para a função de back)
@@ -113,3 +113,24 @@ typedef struct {
     StatisticsPerClass executedInstructionsPerClass;
     StatisticsPerType executedInstructionsPerType;
 } Statistics;
+
+typedef struct {
+    // Load
+    Instruction instruction;
+    int8_t MDR;
+    // Decode
+    int8_t A;
+    int8_t B;
+    Control control; // = control based in actual state of machine
+    // ULA
+    ULAOut ULAOut;
+    // Memory Access (and PCSource)
+    int16_t pc; // use 16 bit to prevents PC overflow (you need transform in an int8_t or uint8_t again before the use)
+    int8_t memAddr;
+    int8_t memData;
+    // Register Write
+    unsigned int regToWrite;
+    int8_t regWriteData;
+    // Misc
+    bool wrtPc;
+} CombinationalState;

@@ -1,8 +1,9 @@
 #include "control.h"
 
-Control makeControl(const unsigned int opcode, const unsigned int funct, int *state) {
+Control makeControl(const unsigned int opcode, const unsigned int funct,  int *state, const bool clock) {
     Control control = {0}; // initialize control with empty
 
+    int newState = 0;
     switch (*state) {
         case 0: // Busca
             control.wrtMem = true;
@@ -14,7 +15,7 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.wrtPc = true;
             control.pcSource = 0;
             control.regDst = 1;
-            *state = 1;
+            newState = 1;
             break;
         case 1: // Decodificação
             control.ulaSourceA = 0;
@@ -25,19 +26,19 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
                 case ADDI_OPCODE:
                 case LW_OPCODE:
                 case SW_OPCODE: {
-                    *state = 2;
+                    newState = 2;
                     break;
                 }
                 case R_TYPE_OPCODE: {
-                    *state = 7;
+                    newState = 7;
                     break;
                 }
                 case BEQ_OPCODE: {
-                    *state = 9;
+                    newState = 9;
                     break;
                 }
                 case J_OPCODE: {
-                    *state = 10;
+                    newState = 10;
                     break;
                 }
                 default: break;
@@ -49,15 +50,15 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.ulaControl = 0;
             switch (opcode) {
                 case LW_OPCODE: {
-                    *state = 3;
+                    newState = 3;
                     break;
                 }
                 case SW_OPCODE: {
-                    *state = 5;
+                    newState = 5;
                     break;
                 }
                 case ADDI_OPCODE: {
-                    *state = 6;
+                    newState = 6;
                     break;
                 }
                 default: break;
@@ -69,7 +70,7 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.immOrData = 1;
             control.ulaSourceA = 1;
             control.ulaSourceB = 2;
-            *state = 4;
+            newState = 4;
             break;
 
         case 4: // Write-back (LW) - Fim da instrução
@@ -78,7 +79,7 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.regDst = 0;
             control.ulaSourceA = 1;
             control.ulaSourceB = 2;
-            *state = 0;
+            newState = 0;
             break;
 
         case 5: // Acesso Memória (SW) - Fim da instrução
@@ -86,7 +87,7 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.immOrData = 1;
             control.ulaSourceA = 1;
             control.ulaSourceB = 2;
-            *state = 0;
+            newState = 0;
             break;
 
         case 6: // Write-back (ADDI) - Fim da instrução
@@ -96,21 +97,21 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.memToReg = 0;
             control.ulaSourceA = 1;
             control.ulaSourceB = 2;
-            *state = 0;
+            newState = 0;
             break;
         case 7: // Execução Tipo-R
             control.ulaSourceA = 1;
             control.ulaSourceB = 0;
             control.ulaControl = (int) funct;
             control.regDst = 1;
-            *state = 8;
+            newState = 8;
             break;
 
         case 8: // Write-back Tipo-R - Fim da instrução
             control.regDst = 1;
             control.wrtReg = 1;
             control.memToReg = 0;
-            *state = 0;
+            newState = 0;
             break;
 
         case 9: // Branch (BEQ) - Fim da instrução
@@ -120,15 +121,18 @@ Control makeControl(const unsigned int opcode, const unsigned int funct, int *st
             control.branch = 1;
             control.wrtPc = false;
             control.pcSource = 1;
-            *state = 0;
+            newState = 0;
             break;
 
         case 10: // Jump - Fim da instrução
             control.wrtPc = true;
             control.pcSource = 2;
-            *state = 0;
+            newState = 0;
             break;
         default: break;
+    }
+    if (clock) {
+        *state = newState;
     }
 
     return control;
