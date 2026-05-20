@@ -114,7 +114,7 @@ void loadInstructionsOnMem() {
             } else { // salva memória de dados
              char eightBytesPerLine[9];
                 charsToString(eightBytesPerLine, 8, linha[8], linha[9], linha[10], linha[11], linha[12], linha[13], linha[14], linha[15]);
-                memory.data[j] = complementOfTwoToInt(eightBytesPerLine);
+                memory.instructions[j].data = complementOfTwoToInt(eightBytesPerLine);
 
                 j ++;
             }
