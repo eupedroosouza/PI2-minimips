@@ -14,7 +14,7 @@ void resetMemory() {
 
   
     for (int i = 0; i < MEM_SIZE; i++) {
-        memory.data[i] = 0;
+        memory.instructions[i].data = 0;
     }
     
     memory.dataSize = 0; 
