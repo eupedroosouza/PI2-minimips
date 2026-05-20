@@ -75,7 +75,7 @@ CombinationalState makeCombinational() {
     C.memAddr = C_Control.immOrData == 0 ? (int8_t) pc : Reg_ULAOut;
     C.instruction = memory.instructions[C.memAddr];
     // todo: fix that when memory was unified
-    C.MDR = memory.data[C.memAddr];
+    C.MDR = memory.instructions[C.memAddr].data;
 
     return C;
 }
@@ -108,7 +108,7 @@ void clock() {
     // Memory Access
     if (C.control.wrtMem) {
         // todo: fix this when memory be unified
-        memory.data[C.memAddr] = C.memData;
+        memory.instructions[C.memAddr].data = C.memData;
     }
 
     // Register Write
