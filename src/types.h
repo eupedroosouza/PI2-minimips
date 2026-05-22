@@ -37,6 +37,7 @@ typedef struct {
     unsigned int funct;
     int8_t imm;
     uint8_t addr;
+    int8_t data; //memoria de dados
 } Instruction;
 
 // 2^8 = 256
@@ -44,7 +45,6 @@ typedef struct {
     Instruction instructions[MEM_SIZE];
     uint8_t size; // tamanho da memória de instrução
     uint8_t dataSize; // tamanho da memória de dados
-    int8_t data[MEM_SIZE]; //memoria de dados
 } Memory; // Memória geral
 
 // registradores intermediários

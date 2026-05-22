@@ -56,7 +56,7 @@ void loadUnifiedMemory() {
          
             if (memory.dataSize < 256) {
                
-                memory.data[memory.dataSize] = (int8_t) strtol(linha, NULL, 2);
+                memory.instructions[memory.dataSize].data = (int8_t) strtol(linha, NULL, 2);
                 memory.dataSize++;
             }
         }
@@ -100,7 +100,7 @@ void saveUnifiedMemory() {
     
     for (int i = 0; i < memory.dataSize; i++) {
         // Pega o dado e estende para 16 bits pra manter o sinal correto
-        int16_t valor = (int16_t) memory.data[i];
+        int16_t valor = (int16_t) memory.instructions[i].data;
         
        
         for (int bit = 15; bit >= 0; bit--) {

@@ -32,21 +32,21 @@ void createRegisterTable(char table[52][255]) {
     sprintf(table[12], "└───────┴───────┘");
 }
 
-//void createIRTable(char table[13][255]) {
-//    sprintf(table[0], "┌───────────────┐");
-//    sprintf(table[1], "│      IR       │");
-//    sprintf(table[2], "├───────┬───────┤");
-//    sprintf(table[3], "│   "BOLD_WHITE"#"RESET"   │ "BOLD_WHITE"Valor"RESET" │");
-//    sprintf(table[4], "├───────┼───────┤");
-//    sprintf(table[5], "│Opcode │  %03d  │", regs.IR.opcode);
-//    sprintf(table[6], "│   rs  │  %03d  │", regs.IR.rs);
-//    sprintf(table[7], "│   rt  │  %03d  │", regs.IR.rt);
-//    sprintf(table[8], "│   rd  │  %03d  │", regs.IR.rd);
-//    sprintf(table[9], "│ funct │  %03d  │", regs.IR.funct);
-//    sprintf(table[10], "│  imm  │  %03u  │", regs.IR.imm);
-//    sprintf(table[11], "│ addr  │  %03u  │", regs.IR.addr);
-//    sprintf(table[12], "└───────┴───────┘");
-// }
+void createIRTable(char table[13][255]) {
+    sprintf(table[0], "┌───────────────┐");
+    sprintf(table[1], "│      IR       │");
+    sprintf(table[2], "├───────┬───────┤");
+    sprintf(table[3], "│   "BOLD_WHITE"#"RESET"   │ "BOLD_WHITE"Valor"RESET" │");
+    sprintf(table[4], "├───────┼───────┤");
+    sprintf(table[5], "│Opcode │  %03d  │", registers.IR.opcode);
+    sprintf(table[6], "│   RS  │  %03d  │", registers.IR.rs);
+    sprintf(table[7], "│   RT  │  %03d  │", registers.IR.rt);
+    sprintf(table[8], "│   RD  │  %03d  │", registers.IR.rd);
+    sprintf(table[9], "│ funct │  %03d  │", registers.IR.funct);
+    sprintf(table[10], "│  imm  │  %03d  │", registers.IR.imm);
+    sprintf(table[11], "│ addr  │  %03d  │", registers.IR.addr);
+    sprintf(table[12], "└───────┴───────┘");
+ }
 
 void createIntermediateTable(char table[10][255]) {
     sprintf(table[0], "┌───────────────┐");
@@ -412,10 +412,18 @@ void createDataMemTable(char table[260][255]) {
     sprintf(table[0], "┌─────┬───────┐");
     sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
-    for (int i = 0; i < 256; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memory.data[i]);
+    int i;
+
+    for (i = 0; i < 256 - (memory.size); i++) {
+        sprintf(table[i + 3], "│ %03d │  %03d  │", memory.size + i, memory.instructions[i].data);
     }
-    sprintf(table[259], "└─────┴───────┘");
+    
+    sprintf(table[i + 3], "└─────┴───────┘");
+    i ++;
+    for (; i < 256; i++) {
+        sprintf(table[i + 3], "               ");
+    }
+    
 }
 
 
@@ -456,54 +464,76 @@ void showMems() {
         "└─────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n");
 }
 
+void printBinary(int8_t n) {
+    for (int i = 7; i >= 0; i--) {
+        printf("%d", (n >> i) & 1); // imprime cada bit
+    }
+}
+
 // Case 5 do menu. Função que escreve todos os dados do programa na tela
 void printAllProgramData() {
     char registerTable[255][255];
-    // char IRtable [13][255];
+    char IRtable [13][255];
     char intermediateTable[10][255];
-
     char memDataTable[260][255];
     char memInstructionTable[260][512];
-
     createRegisterTable(registerTable); // Função que printa os registradores
-    //  createIRTable(IRtable);
+    createIRTable(IRtable);
     createIntermediateTable(intermediateTable);
-
     createDataMemTable(memDataTable); // Função que printa a memória de dados
     createInstructionTable(memInstructionTable); // Create a memInstructions table
 
     // Cabeçalho
     println(
-        "┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
+    "┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println(
-        "│                                                             "BOLD_WHITE
-        "Todos os Dados do Programa                                                               │");
+    "│                                                             "BOLD_WHITE
+    "Todos os Dados do Programa                                                               │");
     println(
-        "├───────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    "├───────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
     println(
-        "│   Registradores   │  Mem. de Dados  │                                           Memória de Instruções                                                "
-        RESET"│");
+    "│   Registradores   │  Mem. de Dados  │                                           Memória de Instruções                                                "
+    RESET"│");
     println(
-        "├───────────────────┼─────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-
+    "├───────────────────┼─────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
     const int maxLinhas = 260; // MemData/MemInstruction é a maior
     char tabelaRegistradores[255];
-    for (int i = 0; i < maxLinhas; i++) {
-        strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
 
-        if (i < 13) {
-            // imprime banco de registradores
-            strcpy(tabelaRegistradores, registerTable[i]);
+    for (int i = 0; i < maxLinhas; i++) {
+    strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
+
+    if (i < 13) {
+
+    // imprime banco de registradores
+    strcpy(tabelaRegistradores, registerTable[i]);
         } else if (i >= 14 && i < 24) {
-            // imprime registradores intermediários
-            strcpy(tabelaRegistradores, intermediateTable[i - 14]);
+    // imprime registradores intermediários
+    strcpy(tabelaRegistradores, intermediateTable[i - 14]);
+            }
+            else if (i >= 25 && i < 38) {
+            // Imprime a tabela do IR logo abaixo (linhas 25 a 37)
+            // i - 25 faz o índice do IRtable ir perfeitamente de 0 até 12
+            strcpy(tabelaRegistradores, IRtable[i - 25]);
         }
 
+    if (i <= memory.size + 2){
         // Registers / MemData / MemInstruction
-        printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]);
-    }
-    println(
-        "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
+         printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]); // imprime até memória de dados
+            }  else if (i > memory.size && i - 3 < MEM_SIZE){
+
+    printf("│ %s │ %s │ │ %03d │ ", tabelaRegistradores, memDataTable[i], i - 3); // imprime até numeração da memória
+
+    printf("00000000");
+
+    printBinary(memory.instructions[i - memory.size - 3].data); // chama printBinary para imprimir bit a bit
+
+    printf(" │  %02x %03d │\n", memory.instructions[i - memory.size - 3].data); // dado
+}
+        
+
+        }
+    println(  "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
+
 }
 
 void showLastState() {

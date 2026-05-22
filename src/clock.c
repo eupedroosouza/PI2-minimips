@@ -1,5 +1,5 @@
 #include "clock.h"
-
+#include "stats.h"
 #include "back.h"
 #include "control.h"
 #include "main.h"
@@ -77,7 +77,7 @@ Combinational makeCombinational() {
     C.memAddr = C_Control.immOrData == 0 ? (int8_t) pc : Reg_ULAOut;
     C.instruction = memory.instructions[C.memAddr];
     // todo: fix that when memory was unified
-    C.MDR = memory.data[C.memAddr];
+    C.MDR = memory.instructions[C.memAddr].data;
 
     return C;
 }
@@ -93,6 +93,10 @@ void clock() {
     if (C.wrtPc) {
         pc = (uint8_t) C.pc;
     }
+
+if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabo
+    updateStatistics(&registers.IR); 
+}
 
     // Decode
     makeControl(registers.IR.opcode, registers.IR.funct, &state, true);
@@ -111,7 +115,7 @@ void clock() {
     // Memory Access
     if (C.control.wrtMem) {
         // todo: fix this when memory be unified
-        memory.data[C.memAddr] = C.memData;
+        memory.instructions[C.memAddr].data = C.memData;
     }
 
     // Register Write
