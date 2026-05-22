@@ -125,6 +125,8 @@ typedef struct {
     int8_t B;
     Control control; // = control based in actual state of machine
     // ULA
+    int8_t input1;
+    int8_t input2;
     ULAOut ULAOut;
     // Memory Access (and PCSource)
     int16_t pc; // use 16 bit to prevents PC overflow (you need transform in an int8_t or uint8_t again before the use)
@@ -135,4 +137,4 @@ typedef struct {
     int8_t regWriteData;
     // Misc
     bool wrtPc;
-} CombinationalState;
+} Combinational;

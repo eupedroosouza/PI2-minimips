@@ -64,6 +64,7 @@ int main(const int argCount, char *args[]) {
 
     // Create empty Instruction
     decodeInstruction(&emptyInstruction, "0000000000000000");
+    registers.IR = emptyInstruction;
 
     // Reset (do that to prevents incorrect data (trash data) on not loaded data)
     resetRegisters();

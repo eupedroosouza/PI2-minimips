@@ -8,6 +8,7 @@
 #include "back.h"
 #include "clock.h"
 #include "colors.h"
+#include "control.h"
 #include "main.h"
 #include "ula.h"
 #include "utils.h"
@@ -532,60 +533,29 @@ void showLastState() {
 
 // End Misc
 
-void viewStateOfMachine() {
-    const CombinationalState C = makeCombinational();
-
-    println(
-        "┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println(
-        "│"BG_YELLOW"                                                  Busca                                                     "RESET"│ ");
-    println(
-        "├────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println(
-        "│  Endereço  │                                            %03d                                                │",
-        C.memAddr);
-    println(
-        "├─────┬──────┴───────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
-    println(
-        "│  #  │      Binário     │ Hexa │         Assembly        │  Tipo  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
-    println(
-        "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
+void viewStateOfMachine(const Combinational *C) {
+    println("\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
+    println("│"BG_CYAN"                                             "BOLD_WHITE"Combinacional                                                  "RESET"│");
+    println("├────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│     "BOLD_WHITE"PC     "RESET"│                                            %03d                                                │", pc);
+    println("├────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│"BG_BLUE"                                                   "BOLD_WHITE"RI                                                       "RESET"│");
+    println("├─────┬──────────────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
+    println("│  #  │      Binário     │ Hexa │         Assembly        │  Tipo  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
+    println("├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     char buffer[256];
-    viewInstruction(&C.instruction, C.memAddr, buffer);
-    println(buffer);
-    println(
-        "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
-    println("                                                     │");
-    println("                                                     ▼");
-    println(
-        "┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println(
-        "│                                                    RI                                                      │ ");
-    println(
-        "├─────┬──────────────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
-    println(
-        "│  #  │      Binário     │ Hexa │         Assembly        │  Tipo  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
-    println(
-        "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     viewInstruction(&registers.IR, -1, buffer);
     println(buffer);
-    println(
-        "├─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
-    println(
-        "│                                                   MDR                                                      │ ");
-    println(
-        "├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println(
-        "│                                                  %04d                                                      │",
-        registers.MDR);
-    println(
-        "└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
-    println("                                                     │");
-    println("                                                     ▼");
+    println("├─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┤");
+    println("│"BG_MAGENTA"                                                  "BOLD_WHITE"RDM                                                       "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│                                                 %04d                                                       │",registers.MDR);
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│"BG_CYAN"                                               "BOLD_WHITE"Controle                                                     "RESET"│");
+    println("├──────────┬─────────────────┬─────────────────┬─────────┬─────────┬──────────────┬────────┬─────────┬───────┤");
 
+    const Control control = C->control;
 
-
-    const Control control = C.control;
     char memToRegBuffer[15];
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control.memToReg], control.memToReg);
     char memToReg[15];
@@ -597,14 +567,9 @@ void viewStateOfMachine() {
              control.ulaSourceA, ulaSourceValue);
     char ulaSource[37];
     centerString(ulaSourceBuffer, ulaSource, 36);
-    println("┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println("│"BG_MAGENTA BOLD_WHITE"                                             Decodificação                                                  "RESET"│");
-    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│                                               Controle                                                     │");
-    println("├──────────┬─────────────────┬─────────────────┬─────────┬─────────┬──────────────┬────────┬─────────┬───────┤");
+
     println(BOLD_WHITE"│ Fonte PC │   Ula Fonte A   │   Ula Fonte B   │ Esc Reg │ Reg Dst │ Mem para Reg │ Esc IR │ Esc Mem │  IouD │"RESET);
-    println(
-        "├──────────┼─────────────────┼─────────────────┼─────────┼─────────┼──────────────┼────────┼─────────┼───────┤");
+    println("├──────────┼─────────────────┼─────────────────┼─────────┼─────────┼──────────────┼────────┼─────────┼───────┤");
     //  Ula Ctrl │ Esc Reg │  Esc Mem │
     printf(
         "│    %1d     │        %1d        │        %1d        │    %s    │    %1d    │%-13s│    %s   │    %s    │   %1d   │\n",
@@ -619,91 +584,153 @@ void viewStateOfMachine() {
         control.immOrData
     );
 
-
-    println("├────────┬─┴──────────┬──────┴───────────┬─────┴─────────┴─────────┴───────┬──────┴────────┴─────────┴───────┤");
-    println("│ Branch │   Esc PC   │   Controle ULA   │               Estado            │            Próx. Estado         │");
-    println("├────────┼────────────┼──────────────────┼─────────────────────────────────┼─────────────────────────────────┤");
-    println("│    %s   │      %s     │        %03d       │                %04d             │               %04d              │",
-        boolStr[control.branch ? 1 : 0],
-        boolStr[control.wrtPc ? 1 : 0],
-        control.ulaControl,
-        state,
-        control.nextState);
-    println("├────────┴────────────┴──────────────────┴─────────────────────────────────┴─────────────────────────────────┤");
-    println("│                                            Registradores                                                   │");
+    println("├────────┬─┴──────────┬──────┴───────────┬─────┴─────────┴─────────┴──────────────┴────────┴─────────┴───────┤");
+    println(BOLD_WHITE"│ Branch │   Esc PC   │   Controle ULA   │                               Estado                              │"RESET);
+    println("├────────┼────────────┼──────────────────┼───────────────────────────────────────────────────────────────────┤");
+    println("│    %s   │      %s     │        %03d       │                                %04d                               │",boolStr[control.branch ? 1 : 0],boolStr[control.wrtPc ? 1 : 0],control.ulaControl,state);
+    println("├────────┴────────────┴──────────────────┴───────────────────────────────────────────────────────────────────┤");
+    println("│"BG_RED"                                             "BOLD_WHITE"Registradores                                                  "RESET"│");
     println("├─────────────────────┬──────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│       $%01d (A)        │                                          %04d                                        │", registers.IR.rs, C.A);
-
-    println("│       $%01d (B)        │                                          %04d                                        │", registers.IR.rt, C.B);
-    println("└─────────────────────┴──────────────────────────────────────────────────────────────────────────────────────┘");
-
-    println("                                                     │");
-    println("                                                     ▼");
-
-    println("┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println("│                                                    A                                                       │ ");
-    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│                                                  %04d                                                      │",registers.A);
-    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│                                                    B                                                       │ ");
-    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│                                                  %04d                                                      │",registers.B);
-    println("└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
-
-    println("                                                     │");
-    println("                                                     ▼");
+    println("│          $%1d         │                                          %04d                                        │",registers.IR.rs, registers.general[registers.IR.rs]);
+    println("├─────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│          $%1d         │                                          %04d                                        │",registers.IR.rt, registers.general[registers.IR.rt]);
+    println("├─────────────────────┴─────────────────────────────┬────────────────────────────────────────────────────────┤");
+    println("│"BG_HI_BLUE"                       "BOLD_WHITE"A                           "RESET"│"BG_HI_GREEN"                            "BOLD_WHITE"B                           "RESET"│");
+    println("├───────────────────────────────────────────────────┼────────────────────────────────────────────────────────┤");
+    println("│                     %04d                          │                           %04d                         │",registers.A, registers.B);
+    println("├───────────────────────────────────────────────────┴────────────────────────────────────────────────────────┤");
 
     char equalVal[128];
-    if (C.control.ulaControl == 6) {
-        sprintf(equalVal, "%s", boolStr[C.ULAOut.equal == 0 ? 0 : 1]);
+    if (C->control.ulaControl == 6) {
+        sprintf(equalVal, "%s", boolStr[C->ULAOut.equal == 0 ? 0 : 1]);
     } else {
         strcpy(equalVal, "-");
     }
 
-    const int8_t input1 = C.control.ulaSourceA == 0 ? (int8_t) pc : registers.A;
-    int8_t input2 = 0;
-    switch (C.control.ulaSourceB) {
-        case 0: {
-            input2 = registers.B;
-            break;
+    println("│"BG_YELLOW"                                                  "BOLD_WHITE"ULA                                                       "RESET"│");
+    println("├───────────────────────────────────────────────────┬────────────────────────────────────────────────────────┤");
+    println("│                    Entrada                        │                          Saída                         │");
+    println("├───────────────────────┬───────────────────────────┼────────────────────────────┬───────────────────────────┤");
+    println("│       Entrada 1       │           %04d            │          Resultado         │            %04d           │",C->input1, C->ULAOut.value);
+    println("├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
+    println("│       Entrada 2       │           %04d            │         Val. Iguais        │              %-1s            │",C->input2, equalVal);
+    println("├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
+    println("│     Controle ULA      │           %04d            │          Overflow          │              %-1s            │",C->control.ulaControl, boolStr[C->ULAOut.overflow == 0 ? 0 : 1]);
+    println("├───────────────────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
+    println("│"BG_GREEN"                                                 "BOLD_WHITE"Clock                                                      "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│"BG_HI_BLACK"                                                   "BOLD_WHITE"PC                                                       "RESET"│");
+    println("├───────────────────────────────────────────────────┬────────────────────────────┬──────────────┬────────────┤");
+    println("│                   Escrever o PC                   │           Fonte PC         │      De      │    Para    │");
+    println("├───────────────────────────────────────────────────┼────────────────────────────┼──────────────┼────────────┤");
+    char escPc[256];
+    sprintf(escPc, "(%s & %s) | %s = %s", boolStr[C->ULAOut.equal], boolStr[C->control.branch],
+            boolStr[C->control.wrtPc], boolStr[C->wrtPc]);
+
+    char pcSource[256];
+    char fromPc[256];
+    char toPc[256];
+    if (C->control.wrtPc) {
+        switch (C->control.pcSource) {
+            case 0: {
+                sprintf(pcSource, "ULA");
+                break;
+            }
+            case 1: {
+                sprintf(pcSource, "Imediato");
+                break;
+            }
+            case 3: {
+                sprintf(pcSource, "Reg. Saida ULA");
+                break;
+            }
+            default: {
+                sprintf(pcSource, "WTF BRO!");
+                break;
+            }
         }
-        case 1: {
-            input2 = 1;
-            break;
+        sprintf(fromPc, "%03d", pc);
+        sprintf(toPc, "%03d", C->pc);
+    } else {
+        sprintf(pcSource, "-");
+        sprintf(fromPc, " - ");
+        sprintf(toPc, " - ");
+    }
+    char pcSourceCentered[27];
+
+    centerString(pcSource, pcSourceCentered, 26);
+
+    println("│  ((ula.Valores_Iguais & branch) | control.EscPc)  │  %s│      %s     │     %s    │", pcSourceCentered, fromPc, toPc);
+    println("│                  %s                  │                            │              │            │", escPc);
+    println("├───────────────────────────────────────────────────┴────────────────────────────┴──────────────┴────────────┤");
+    println("│"BG_BLUE"                                                   "BOLD_WHITE"RI                                                       "RESET"│");
+    println("├────────────────────────────────────┬───────────────────────────────────┬───────────────────────────────────┤");
+    println("│             Escrever RI            │                 De                │                 Para              │");
+    println("├────────────────────────────────────┼───────────────────────────────────┼───────────────────────────────────┤");
+    char fromRi[256];
+    sprintf(fromRi, "%s", C->control.wrtIr ? registers.IR.prettyAsmInstruction : "-");
+    completeWithSpace(fromRi, 33, 256);
+    char toRi[256];
+    sprintf(toRi, "%s", C->control.wrtIr ? C->instruction.prettyAsmInstruction : "-");
+    completeWithSpace(toRi, 33, 256);
+    println("│         (control.EscRI) = %s        │ %s │ %s │",  boolStr[C->control.wrtIr], fromRi, toRi);
+    println("├────────────────────────────────────┴───────────────────────────────────┴───────────────────────────────────┤");
+    println("│"BG_MAGENTA"                                                  "BOLD_WHITE"RDM                                                       "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│                                                 %04d                                                       │",C->MDR);
+    println("├───────────────────────────────────────────────────┬────────────────────────────────────────────────────────┤");
+    println("│"BG_HI_BLUE"                       "BOLD_WHITE"A                           "RESET"│"BG_HI_GREEN"                            "BOLD_WHITE"B                           "RESET"│");
+    println("├───────────────────────────────────────────────────┼────────────────────────────────────────────────────────┤");
+    println("│                     %04d                          │                           %04d                         │",C->A, C->B);
+    println("├───────────────────────────────────────────────────┴────────────────────────────────────────────────────────┤");
+    println("│"BG_HI_MAGENTA"                                               "BOLD_WHITE"ULA Saída                                                    "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│                                                 %04d                                                       │", C->ULAOut.value);
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│"BG_HI_RED"                                          "BOLD_WHITE"Escrita na Memória                                                "RESET"│");
+    println("├────────────────────────────────┬─────────────────┬─────────────────────────┬───────────────────────────────┤");
+    println("│      Escrever na Memória       │     Endereço    │    Fonte do Endereço    │              Dado             │   ");
+    println("├────────────────────────────────┼─────────────────┼─────────────────────────┼───────────────────────────────┤");
+
+    char addr[256];
+    char addrSource[256];
+    char data[256];
+    if (C->control.wrtMem) {
+        sprintf(addr, "%03d", C->memAddr);
+        if (C->control.immOrData == 0) {
+            sprintf(addrSource, "Imediato");
+        } else {
+            sprintf(addrSource, "Reg. Saida ULA");
         }
-        case 2: {
-            input2 = registers.IR.imm;
-            break;
-        }
-        default: break;
+        sprintf(data, "%04d", C->memAddr);
+    } else {
+        sprintf(addr, " - ");
+        sprintf(addrSource, "-");
+        sprintf(data, " -  ");
     }
 
-    println(
-        "┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println(
-        "│"BG_RED BOLD_WHITE"                                                  ULA                                                       "RESET"│");
-    println(
-        "├───────────────────────────────────────────────────┬────────────────────────────────────────────────────────┤");
-    println(
-        "│                    Entrada                        │                          Saída                         │");
-    println(
-        "├───────────────────────┬───────────────────────────┼────────────────────────────┬───────────────────────────┤");
-    println(
-        "│     Entrada 1 (A)     │           %04d            │          Resultado         │            %04d           │",
-        input1, C.ULAOut.value);
-    println(
-        "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
-    println(
-        "│Entrada 2 (B, 1 ou imm)│           %04d            │         Val. Iguais        │              %-1s            │",
-        input2, equalVal);
-    println(
-        "├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
-    println(
-        "│     Controle ULA      │           %04d            │          Overflow          │              %-1s            │",
-        C.control.ulaControl, boolStr[C.ULAOut.overflow == 0 ? 0 : 1]);
-    println(
-        "└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 
-    println("                                                     │");
-    println("                                                     ▼");
+    char addSourceCentered[26];
+    centerString(addrSource, addSourceCentered, 23);
+    println("│      (control.EscMem) = %s      │       %s       │ %s │              %s             │", boolStr[C->control.wrtMem], addr, addSourceCentered, data);
+    println("├────────────────────────────────┴─────────────────┴─────────────────────────┴───────────────────────────────┤");
+    println("│"BG_HI_BLACK"                                         "BOLD_WHITE"Escrita no Registrador                                             "RESET"│");
+    println("├──────────────────────────────────┬────────────────────────────────┬────────────────────────────────────────┤");
+    println("│      Escrever no Registador      │          Reg. Destino          │                  Dado                  │");
+    println("├──────────────────────────────────┼────────────────────────────────┼────────────────────────────────────────┤");
+    char regDst[256];
+    char regData[256];
+    if (C->control.wrtReg) {
+        sprintf(regDst, "$%01d", C->regToWrite);
+        sprintf(regData, "%04d", C->regWriteData);
+    } else {
+        sprintf(regDst, " -");
+        sprintf(regData, " -  ");
+    }
+    println("│       (control.EscReg) = %s       │                %s              │                   %s                 │", boolStr[C->control.wrtReg], regDst, regData);
+    println("├──────────────────────────────────┴────────────────────────────────┴────────────────────────────────────────┤");
+    println("│"BG_HI_GREEN"                                                 "BOLD_WHITE"Estado                                                     "RESET"│");
+    println("├────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│                                                  %04d                                                      │", C->control.nextState);
+    println("└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 }

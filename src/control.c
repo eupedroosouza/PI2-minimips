@@ -6,7 +6,7 @@ Control makeControl(const unsigned int opcode, const unsigned int funct,  int *s
     int newState = 0;
     switch (*state) {
         case 0: // Busca
-            control.wrtMem = true;
+            control.wrtMem = false;
             control.ulaSourceA = 0;
             control.immOrData = 0;
             control.wrtIr = true;

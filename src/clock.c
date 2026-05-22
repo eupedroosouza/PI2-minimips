@@ -7,8 +7,8 @@
 #include "ula.h"
 #include "view.h"
 
-CombinationalState makeCombinational() {
-    CombinationalState C = {0};
+Combinational makeCombinational() {
+    Combinational C = {0};
 
 
     // Decode
@@ -41,6 +41,8 @@ CombinationalState makeCombinational() {
         }
         default: return C; // it can never happen
     }
+    C.input1 = input1;
+    C.input2 = input2;
     const ULAOut C_ULAOut = ula(input1, input2, C_Control.ulaControl);
     C.ULAOut = C_ULAOut;
 
@@ -84,7 +86,8 @@ void clock() {
     saveState();
 
     // Combinational
-    const CombinationalState C = makeCombinational();
+    const Combinational C = makeCombinational();
+    viewStateOfMachine(&C);
 
     // Sequential
     if (C.wrtPc) {
@@ -116,7 +119,7 @@ void clock() {
         registers.general[C.regToWrite] = C.regWriteData;
     }
 
-    viewStateOfMachine();
+
 
     // const int currentState = state; // pega o estado atual do controle
     // const Control control = makeControl(registers.IR.opcode, registers.IR.funct, &state);

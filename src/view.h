@@ -65,4 +65,4 @@ void showLastState();
 // End Misc
 
 
-void viewStateOfMachine();
+void viewStateOfMachine(const Combinational *C);
