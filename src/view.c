@@ -413,8 +413,8 @@ void createDataMemTable(char table[260][255]) {
     sprintf(table[2], "├─────┼───────┤");
     int i;
 
-    for (i = 0; i < 256 - (memory.size); i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", memory.size + i, memory.instructions[i].data);
+    for (i = 0; i < 256 - 128; i++) {
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i + 128, memory.instructions[i].data);
     }
     
     sprintf(table[i + 3], "└─────┴───────┘");
@@ -515,18 +515,18 @@ void printAllProgramData() {
             strcpy(tabelaRegistradores, IRtable[i - 25]);
         }
 
-    if (i <= memory.size + 2){
+    if (i < 131){
         // Registers / MemData / MemInstruction
          printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]); // imprime até memória de dados
-            }  else if (i > memory.size && i - 3 < MEM_SIZE){
+            }  else if (i < 259){
 
     printf("│ %s │ %s │ │ %03d │ ", tabelaRegistradores, memDataTable[i], i - 3); // imprime até numeração da memória
 
     printf("00000000");
 
-    printBinary(memory.instructions[i - memory.size - 3].data); // chama printBinary para imprimir bit a bit
+    printBinary(memory.instructions[i - 131].data); // chama printBinary para imprimir bit a bit
 
-    printf(" │  %02x %03d │\n", memory.instructions[i - memory.size - 3].data); // dado
+    printf(" │                                     %03d                                             │\n", memory.instructions[i - 131].data); // dado inteiro
 }
         
 
