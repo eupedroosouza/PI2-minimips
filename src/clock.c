@@ -74,8 +74,8 @@ Combinational makeCombinational() {
 
     // Load (needs do here because we need memAddr, but memAddr is ready only after the ULA)
     C.memAddr = C_Control.immOrData == 0 ? pc : (uint8_t) Reg_ULAOut;
-    C.instruction = memory.memory[C.memAddr];
-    C.MDR = memory.memory[C.memAddr].data;
+    C.instruction = memory.instructions[C.memAddr];
+    C.MDR = memory.instructions[C.memAddr].data;
 
     return C;
 }
@@ -112,7 +112,7 @@ if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a i
 
     // Memory Access
     if (C.control.wrtMem) {
-        memory.memory[C.memAddr].data = C.memData;
+        memory.instructions[C.memAddr].data = C.memData;
     }
 
     // Register Write

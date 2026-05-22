@@ -67,6 +67,11 @@ void decodeInstruction(Instruction *instruction, const char *serializedBinary) {
 
     convertToAssemblyInstruction(instruction, instruction->asmInstruction);
     convertToPrettyAssemblyInstruction(instruction, instruction->prettyAsmInstruction);
+
+    // data
+    char eightBytesPerLine[9];
+    charsToString(eightBytesPerLine, 8, serializedBinary[8], serializedBinary[9], serializedBinary[10], serializedBinary[11], serializedBinary[12], serializedBinary[13], serializedBinary[14], serializedBinary[15]);
+    instruction->data = complementOfTwoToInt(eightBytesPerLine);
 }
 
 
@@ -107,14 +112,15 @@ void loadInstructionsOnMem() {
             
             if (!readingDat){ // instruções
                 sscanf(linha, "%16[^\n]\n", string); // Lê os primeiros 16 dígitos do .mem e armazena na variável string
-                decodeInstruction(&memory.memory[i], string);
+                decodeInstruction(&memory.instructions[i], string);
             // Pega os dados da variável string e coloca na estrutura memInstruction
                 i ++;
 
             } else { // salva memória de dados
-                char eightBytesPerLine[9];
+             char eightBytesPerLine[9];
                 charsToString(eightBytesPerLine, 8, linha[8], linha[9], linha[10], linha[11], linha[12], linha[13], linha[14], linha[15]);
-                memory.memory[j].data = complementOfTwoToInt(eightBytesPerLine);
+                memory.instructions[j].data = complementOfTwoToInt(eightBytesPerLine);
+
                 j ++;
             }
          
@@ -123,6 +129,7 @@ void loadInstructionsOnMem() {
 
         }
         memory.size = i;
+        memory.dataSize = j;
 
         fclose(arquivo); // Fecha arquivo
 
@@ -291,7 +298,7 @@ void saveInstructionOnAssembly() {
         printf("\nErro");
     } else {
         for (int i = 0; i < 256; i++) {
-            fprintf(arquivoDestino, "%s\n", memory.memory[i].asmInstruction);
+            fprintf(arquivoDestino, "%s\n", memory.instructions[i].asmInstruction);
         }
     }
     fclose(arquivoDestino);
