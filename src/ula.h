@@ -4,4 +4,4 @@
 #include "types.h"
 
 
-ULAOut ula(int8_t input1, int8_t input2, int ulaControl);
+ULAOut ula(int16_t input1, int16_t input2, int ulaControl);

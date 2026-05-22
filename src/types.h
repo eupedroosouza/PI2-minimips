@@ -51,7 +51,7 @@ typedef struct {
     Instruction IR; // reg de memória de instrução
     Register MDR; // reg de dados da memória
     Register A, B; // regs A e B, valores saindo do banco de registradores para a ULA
-    Register ULAOut; // reg de saida da ULA
+    int16_t ULAOut; // reg de saida da ULA
     Register general[8]; // regs de propósito geral
 } Registers;
 
@@ -82,7 +82,7 @@ typedef struct {
 } Control;
 
 typedef struct {
-    int8_t value;
+    int16_t value;
     bool equal;
     bool overflow;
 } ULAOut;
@@ -130,7 +130,7 @@ typedef struct {
     ULAOut ULAOut;
     // Memory Access (and PCSource)
     int16_t pc; // use 16 bit to prevents PC overflow (you need transform in an int8_t or uint8_t again before the use)
-    int8_t memAddr;
+    uint8_t memAddr;
     int8_t memData;
     // Register Write
     unsigned int regToWrite;

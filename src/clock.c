@@ -23,7 +23,6 @@ Combinational makeCombinational() {
     // ULA
     const Register A = registers.A;
     const Register B = registers.B;
-    // Todo: on input1 the int8 with signal ocorres a error here (PC can be larger than 127) what do to solve that?
     const int8_t input1 = C_Control.ulaSourceA == 0 ? (int8_t) pc : A;
     int8_t input2;
     switch (C_Control.ulaSourceB) {
@@ -47,15 +46,15 @@ Combinational makeCombinational() {
     C.ULAOut = C_ULAOut;
 
     // Memory Access
-    const Register Reg_ULAOut = registers.ULAOut;
+    const int16_t Reg_ULAOut = registers.ULAOut;
     int16_t C_PC;
     switch (C_Control.pcSource) {
         case 0: {
-            C_PC = (int16_t) C_ULAOut.value;
+            C_PC = (uint8_t) C_ULAOut.value;
             break;
         }
         case 1: {
-            C_PC = (int16_t) Reg_ULAOut;
+            C_PC = (uint8_t) Reg_ULAOut;
             break;
         }
         case 2: {
@@ -69,12 +68,12 @@ Combinational makeCombinational() {
 
     // Reg Write
     C.regToWrite = C_Control.regDst == 0 ? IR.rt : IR.rd;
-    C.regWriteData = C_Control.memToReg == 0 ? Reg_ULAOut : MDR;
+    C.regWriteData = C_Control.memToReg == 0 ? (int8_t) Reg_ULAOut : MDR;
 
     C.wrtPc = C_Control.wrtPc | (C_Control.branch && C_ULAOut.equal);
 
     // Load (needs do here because we need memAddr, but memAddr is ready only after the ULA)
-    C.memAddr = C_Control.immOrData == 0 ? (int8_t) pc : Reg_ULAOut;
+    C.memAddr = C_Control.immOrData == 0 ? pc : (uint8_t) Reg_ULAOut;
     C.instruction = memory.memory[C.memAddr];
     C.MDR = memory.memory[C.memAddr].data;
 
