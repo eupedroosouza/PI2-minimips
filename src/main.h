@@ -3,7 +3,7 @@
 
 extern bool debug;
 
-extern Memory memory;
+extern Word memory[256];
 
 extern int state;
 extern PC pc;

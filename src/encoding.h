@@ -1,7 +1,7 @@
 #pragma once
 #include "types.h"
 
-extern Instruction emptyInstruction;
+extern Word emptyWord;
 
 // Use somente para valores sem sinal (registradores rs, rt e rd, etc)
 int binaryToUnsignedInt(const char *serializedBinary);

@@ -25,12 +25,8 @@ void loadUnifiedMemory() {
     }
 
     char linha[100];
-    int carregandoDados = 0; // 0 = Lendo instruções 1 = Lendo dados
-    
-    
-    memory.size = 0;
-    memory.dataSize = 0;
 
+    int i = 0;
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
         linha[strcspn(linha, "\r\n")] = 0; 
 
@@ -39,33 +35,17 @@ void loadUnifiedMemory() {
             continue;
         }
 
-        
         if (strcmp(linha, ".data") == 0) {
-            carregandoDados = 1;
+            i = 128;
             continue;
         }
 
-        if (!carregandoDados) {
-          
-            if (memory.size < 256) {
-               
-                decodeInstruction(&memory.instructions[memory.size], linha);
-                memory.size++;
-            }
-        } else {
-         
-            if (memory.dataSize < 256) {
-               
-                memory.instructions[memory.dataSize].data = (int8_t) strtol(linha, NULL, 2);
-                memory.dataSize++;
-            }
-        }
+        decodeWord(&memory[i], linha);
+        i++;
     }
     
     fclose(arquivo);
     printf("\nMemoria unificada carregada com sucesso!\n");
-    printf(" -> %d instrucoes lidas.\n", memory.size);
-    printf(" -> %d dados lidos.\n", memory.dataSize);
 
     
     if (debug) {
@@ -89,19 +69,13 @@ void saveUnifiedMemory() {
         return;
     }
 
-   
-    for (int i = 0; i < memory.size; i++) {
-        fprintf(arquivo, "%s\n", memory.instructions[i].stringedInstruction);
+    for (int i = 0; i < SPECIFIC_MEM_SIZE; i++) {
+        fprintf(arquivo, "%s\n", memory[i].stringedInstruction);
     }
-
-  
     fprintf(arquivo, ".data\n");
-
-    
-    for (int i = 0; i < memory.dataSize; i++) {
+    for (int i = 0; i < SPECIFIC_MEM_SIZE; i++) {
         // Pega o dado e estende para 16 bits pra manter o sinal correto
-        int16_t valor = (int16_t) memory.instructions[i].data;
-        
+        const int16_t valor = (int16_t) memory[i].data;
        
         for (int bit = 15; bit >= 0; bit--) {
             fprintf(arquivo, "%d", (valor >> bit) & 1);

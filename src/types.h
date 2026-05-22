@@ -15,10 +15,16 @@
 #define J_OPCODE      2
 
 #define MEM_SIZE 256
+#define SPECIFIC_MEM_SIZE 128
 #define REG_SIZE 8
 
 typedef uint8_t PC;
 typedef int8_t Register;
+
+typedef enum {
+    INSTRUCTION,
+    DATA
+} WordType;
 
 typedef enum {
     I, J, R, OTHER
@@ -38,18 +44,14 @@ typedef struct {
     int8_t imm;
     uint8_t addr;
     int8_t data; //memoria de dados
-} Instruction;
+} Word;
 
 // 2^8 = 256
-typedef struct {
-    Instruction instructions[MEM_SIZE];
-    uint8_t size; // tamanho da memória de instrução
-    uint8_t dataSize; // tamanho da memória de dados
-} Memory; // Memória geral
+
 
 // registradores intermediários
 typedef struct {
-    Instruction IR; // reg de memória de instrução
+    Word IR; // reg de memória de instrução
     Register MDR; // reg de dados da memória
     Register A, B; // regs A e B, valores saindo do banco de registradores para a ULA
     int16_t ULAOut; // reg de saida da ULA
@@ -62,7 +64,7 @@ typedef struct state {
     PC pc;
     Registers registers;
     int state;
-    Memory memory;
+    Word memory[256];
 } BackState;
 
 typedef struct {
@@ -119,7 +121,7 @@ typedef struct {
 
 typedef struct {
     // Load
-    Instruction instruction;
+    Word instruction;
     int8_t MDR;
     // Decode
     int8_t A;

@@ -13,7 +13,7 @@ void showRegisters();
 
 // Clock
 
-void showClock(const Instruction *instruction, const Control *control);
+void showClock(const Word *instruction, const Control *control);
 
 void showClockPc();
 
@@ -37,7 +37,7 @@ void showStatistics();
 
 // Instruction
 
-void viewInstruction(const Instruction *instruction, int idx, char *buffer);
+void viewInstruction(const Word *instruction, int idx, char *buffer);
 
 void createInstructionTable(char memInstructionTable[260][512]);
 

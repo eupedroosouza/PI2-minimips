@@ -1,7 +1,7 @@
 #include "stats.h"
 #include "main.h" 
 
-void updateStatistics(const Instruction *instruction) {
+void updateStatistics(const Word *instruction) {
     if (!instruction) return;
 
     // Incrementa contador geral de ciclos/instruções

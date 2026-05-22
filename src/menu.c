@@ -18,7 +18,7 @@ void menu() {
     while (1) {
         println("");
         println("1. Carregar memória unificada");
-        println("2. Salvar memória unificada)");
+        println("2. Salvar memória unificada");
         println("3. Imprimir banco de registradores");
         println("4. Imprimir todo o simulador (registradores e memórias)");
         println("5. Salvar instruçôes em mnemônicos - assembly (.asm)");
@@ -27,10 +27,9 @@ void menu() {
         println("8. Executa uma instrução (step)");
         println("9. Voltar uma instrução (back)");
         println("10. Exibir estatísticas de desempenho");
-        println("11. Resetar memória de instruções");
+        println("11. Resetar memória");
         println("12. Resetar registradores");
-        println("13. Resetar memória de dados ");
-        println("14. Ativar/desativar depuração (debug)");
+        println("13. Ativar/desativar depuração (debug)");
         println("0. Sair do Simulador");
 
         printf("\nDigite uma opção: ");

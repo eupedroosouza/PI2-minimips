@@ -1,7 +1,12 @@
 #include "clock.h"
+
+#include <stdio.h>
+#include <string.h>
+
 #include "stats.h"
 #include "back.h"
 #include "control.h"
+#include "instruction.h"
 #include "main.h"
 #include "types.h"
 #include "ula.h"
@@ -12,7 +17,7 @@ Combinational makeCombinational() {
 
 
     // Decode
-    const Instruction IR = registers.IR;
+    const Word IR = registers.IR;
     const Register MDR = registers.MDR;
     C.A = registers.general[IR.rs];
     C.B = registers.general[IR.rt];
@@ -74,8 +79,8 @@ Combinational makeCombinational() {
 
     // Load (needs do here because we need memAddr, but memAddr is ready only after the ULA)
     C.memAddr = C_Control.immOrData == 0 ? pc : (uint8_t) Reg_ULAOut;
-    C.instruction = memory.instructions[C.memAddr];
-    C.MDR = memory.instructions[C.memAddr].data;
+    C.instruction = memory[C.memAddr];
+    C.MDR = memory[C.memAddr].data;
 
     return C;
 }
@@ -101,7 +106,7 @@ if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a i
     if (C.control.wrtIr) {
         registers.IR = C.instruction;
     }
-    registers.MDR = C.instruction.imm;
+    registers.MDR = memory[C.memAddr].data;
 
     // Load
     registers.A = C.A;
@@ -112,7 +117,17 @@ if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a i
 
     // Memory Access
     if (C.control.wrtMem) {
-        memory.instructions[C.memAddr].data = C.memData;
+
+        char strInst[17];
+        const int16_t valor = (int16_t) C.memData;
+
+        char bff[255];
+        for (int bit = 15; bit >= 0; bit--) {
+            sprintf(bff, "%d", (valor >> bit) & 1);
+            strcat(strInst, bff);
+        }
+
+        decodeWord(&memory[C.memAddr], strInst);
     }
 
     // Register Write

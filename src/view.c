@@ -93,7 +93,7 @@ void showRegisters() {
 
 // Clock
 
-void showClock(const Instruction *instruction, const Control *control) {
+void showClock(const Word *instruction, const Control *control) {
     println(
         "\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println(
@@ -310,7 +310,7 @@ void showStatistics() {
 
 // Instruction
 
-void viewInstruction(const Instruction *instruction, const int idx, char *buffer) {
+void viewInstruction(const Word *instruction, const int idx, char *buffer) {
     char strIdx[4];
     if (idx == -1) {
         strcpy(strIdx, " - ");
@@ -389,10 +389,10 @@ void createInstructionTable(char memInstructionTable[260][512]) {
            RESET"│");
     strcpy(memInstructionTable[2],
            "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
-    for (int i = 0; i < MEM_SIZE; i++) {
-        viewInstruction(&memory.instructions[i], i, memInstructionTable[i + 3]);
+    for (int i = 0; i < SPECIFIC_MEM_SIZE; i++) {
+        viewInstruction(&memory[i], i, memInstructionTable[i + 3]);
     }
-    strcpy(memInstructionTable[259],
+    strcpy(memInstructionTable[131],
            "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
 }
 
@@ -409,21 +409,14 @@ void viewInstructions() {
 // Mem Data
 
 void createDataMemTable(char table[260][255]) {
-    sprintf(table[0], "┌─────┬───────┐");
-    sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
-    sprintf(table[2], "├─────┼───────┤");
-    int i;
+    sprintf(table[0], "┌─────┬────────┐");
+    sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET"  │");
+    sprintf(table[2], "├─────┼────────┤");
+    for (int i = 128; i < 256; i++) {
+        sprintf(table[(i - 128) + 3], "│ %03d │  %04d  │", i, memory[i].data);
+    }
+    sprintf(table[131], "└─────┴────────┘");
 
-    for (i = 0; i < 256 - 128; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i + 128, memory.instructions[i].data);
-    }
-    
-    sprintf(table[i + 3], "└─────┴───────┘");
-    i ++;
-    for (; i < 256; i++) {
-        sprintf(table[i + 3], "               ");
-    }
-    
 }
 
 
@@ -485,55 +478,58 @@ void printAllProgramData() {
 
     // Cabeçalho
     println(
-    "┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
+    "┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println(
     "│                                                             "BOLD_WHITE
     "Todos os Dados do Programa                                                               │");
     println(
-    "├───────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    "├───────────────────┬──────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
     println(
-    "│   Registradores   │  Mem. de Dados  │                                           Memória de Instruções                                                "
+    "│   Registradores   │  Mem. de Dados   │                                           Memória de Instruções                                                "
     RESET"│");
     println(
-    "├───────────────────┼─────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    const int maxLinhas = 260; // MemData/MemInstruction é a maior
+    "├───────────────────┼──────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+    const int maxLinhas = 132; // MemData/MemInstruction é a maior
     char tabelaRegistradores[255];
 
     for (int i = 0; i < maxLinhas; i++) {
-    strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
 
-    if (i < 13) {
-
-    // imprime banco de registradores
-    strcpy(tabelaRegistradores, registerTable[i]);
+        // Registers
+        strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
+        if (i < 13) {
+            // imprime banco de registradores
+            strcpy(tabelaRegistradores, registerTable[i]);
         } else if (i >= 14 && i < 24) {
-    // imprime registradores intermediários
-    strcpy(tabelaRegistradores, intermediateTable[i - 14]);
-            }
-            else if (i >= 25 && i < 38) {
+            // imprime registradores intermediários
+            strcpy(tabelaRegistradores, intermediateTable[i - 14]);
+        } else if (i >= 25 && i < 38) {
             // Imprime a tabela do IR logo abaixo (linhas 25 a 37)
             // i - 25 faz o índice do IRtable ir perfeitamente de 0 até 12
             strcpy(tabelaRegistradores, IRtable[i - 25]);
         }
 
-    if (i < 131){
-        // Registers / MemData / MemInstruction
-         printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]); // imprime até memória de dados
-            }  else if (i < 259){
+        // MemData(128 - 255)
+        printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]);
 
-    printf("│ %s │ %s │ │ %03d │ ", tabelaRegistradores, memDataTable[i], i - 3); // imprime até numeração da memória
+        // MemInstruction (0 - 127)
 
-    printf("00000000");
+        //
+        // if (i < 131){
+        //     // Registers / MemData / MemInstruction
+        //      printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]); // imprime até memória de dados
+        //         }  else if (i < 259){
+        //
+        // printf("│ %s │ %s │ │ %03d │ ", tabelaRegistradores, memDataTable[i], i - 3); // imprime até numeração da memória
 
-    printBinary(memory.instructions[i - 131].data); // chama printBinary para imprimir bit a bit
+        // printf("00000000");
 
-    printf(" │                                     %03d                                             │\n", memory.instructions[i - 131].data); // dado inteiro
-}
-        
+        // printBinary(memory[i - 131].data); // chama printBinary para imprimir bit a bit
 
-        }
-    println(  "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
+        // printf(" │                                     %03d                                             │\n", memory[i - 131].data); // dado inteiro
+    }
 
+    println(
+        "└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 }
 
 void showLastState() {
@@ -660,7 +656,7 @@ void viewStateOfMachine(const Combinational *C) {
     char pcSource[256];
     char fromPc[256];
     char toPc[256];
-    if (C->control.wrtPc) {
+    if (C->wrtPc) {
         switch (C->control.pcSource) {
             case 0: {
                 sprintf(pcSource, "ULA");
@@ -732,7 +728,7 @@ void viewStateOfMachine(const Combinational *C) {
         } else {
             sprintf(addrSource, "Reg. Saida ULA");
         }
-        sprintf(data, "%04d", C->memAddr);
+        sprintf(data, "%04d", C->memData);
     } else {
         sprintf(addr, " - ");
         sprintf(addrSource, "-");
