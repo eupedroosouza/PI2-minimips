@@ -1,6 +1,6 @@
 #include <string.h>
 #include "reset.h"
-
+#include "stats.h"
 #include "encoding.h"
 #include "main.h"
 
@@ -28,4 +28,6 @@ void resetRegisters() {
 
     // PC Reset
     pc = 0;
+
+    resetStatistics();
 }

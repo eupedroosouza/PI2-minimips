@@ -1,5 +1,5 @@
 #include "clock.h"
-
+#include "stats.h"
 #include "back.h"
 #include "control.h"
 #include "main.h"
@@ -90,6 +90,10 @@ void clock() {
     if (C.wrtPc) {
         pc = (uint8_t) C.pc;
     }
+
+if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabou!
+    updateStatistics(&registers.IR); 
+}
 
     // Decode
     makeControl(registers.IR.opcode, registers.IR.funct, &state, true);
