@@ -407,14 +407,23 @@ void viewInstructions() {
 
 // Mem Data
 
+
 void createDataMemTable(char table[260][255]) {
     sprintf(table[0], "┌─────┬───────┐");
     sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
-    for (int i = 0; i < 256; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memory.instructions[i].data);
+    int i;
+
+    for (i = 0; i < 256 - (memory.size); i++) {
+        sprintf(table[i + 3], "│ %03d │  %03d  │", memory.size + i, memory.instructions[i].data);
     }
-    sprintf(table[259], "└─────┴───────┘");
+    
+    sprintf(table[i + 3], "└─────┴───────┘");
+    i ++;
+    for (; i < 256; i++) {
+        sprintf(table[i + 3], "               ");
+    }
+    
 }
 
 
