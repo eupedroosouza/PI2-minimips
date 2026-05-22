@@ -58,6 +58,8 @@ void viewDataMem();
 
 void showMems();
 
+void printBinary(int8_t n);
+
 void printAllProgramData();
 
 void showLastState();
