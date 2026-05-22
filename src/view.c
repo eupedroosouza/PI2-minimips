@@ -390,7 +390,7 @@ void createInstructionTable(char memInstructionTable[260][512]) {
     strcpy(memInstructionTable[2],
            "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     for (int i = 0; i < MEM_SIZE; i++) {
-        viewInstruction(&memory.instructions[i], i, memInstructionTable[i + 3]);
+        viewInstruction(&memory.memory[i], i, memInstructionTable[i + 3]);
     }
     strcpy(memInstructionTable[259],
            "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
@@ -415,7 +415,7 @@ void createDataMemTable(char table[260][255]) {
     int i;
 
     for (i = 0; i < 256 - 128; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i + 128, memory.instructions[i].data);
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i + 128, memory.memory[i].data);
     }
     
     sprintf(table[i + 3], "└─────┴───────┘");
@@ -525,9 +525,9 @@ void printAllProgramData() {
 
     printf("00000000");
 
-    printBinary(memory.instructions[i - 131].data); // chama printBinary para imprimir bit a bit
+    printBinary(memory.memory[i - 131].data); // chama printBinary para imprimir bit a bit
 
-    printf(" │                                     %03d                                             │\n", memory.instructions[i - 131].data); // dado inteiro
+    printf(" │                                     %03d                                             │\n", memory.memory[i - 131].data); // dado inteiro
 }
         
 

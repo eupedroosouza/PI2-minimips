@@ -18,10 +18,7 @@ void saveState() {
     }
     backState->pc = pc;
     backState->registers = registers;
-    for (int i = 0; i < MEM_SIZE; i++) {
-        backState->memory.instructions[i].data = memory.instructions[i].data;
-    }
-    backState->memory.dataSize = memory.dataSize;
+    backState->memory = memory;
     backState->previous = lastState;
     backState->state = state;
     lastState = backState;
@@ -49,10 +46,7 @@ void back() {
     pc = lastState->pc;
     registers = lastState->registers;
     state = lastState->state;
-
-    for (int i = 0; i < memory.dataSize; i++) {
-        memory.instructions[i].data = lastState->memory.instructions[i].data;
-    }
+    memory = lastState->memory;
 
     println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 

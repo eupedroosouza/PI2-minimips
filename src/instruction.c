@@ -107,15 +107,14 @@ void loadInstructionsOnMem() {
             
             if (!readingDat){ // instruções
                 sscanf(linha, "%16[^\n]\n", string); // Lê os primeiros 16 dígitos do .mem e armazena na variável string
-                decodeInstruction(&memory.instructions[i], string);
+                decodeInstruction(&memory.memory[i], string);
             // Pega os dados da variável string e coloca na estrutura memInstruction
                 i ++;
 
             } else { // salva memória de dados
-             char eightBytesPerLine[9];
+                char eightBytesPerLine[9];
                 charsToString(eightBytesPerLine, 8, linha[8], linha[9], linha[10], linha[11], linha[12], linha[13], linha[14], linha[15]);
-                memory.instructions[j].data = complementOfTwoToInt(eightBytesPerLine);
-
+                memory.memory[j].data = complementOfTwoToInt(eightBytesPerLine);
                 j ++;
             }
          
@@ -124,7 +123,6 @@ void loadInstructionsOnMem() {
 
         }
         memory.size = i;
-        memory.dataSize = j;
 
         fclose(arquivo); // Fecha arquivo
 
@@ -293,7 +291,7 @@ void saveInstructionOnAssembly() {
         printf("\nErro");
     } else {
         for (int i = 0; i < 256; i++) {
-            fprintf(arquivoDestino, "%s\n", memory.instructions[i].asmInstruction);
+            fprintf(arquivoDestino, "%s\n", memory.memory[i].asmInstruction);
         }
     }
     fclose(arquivoDestino);

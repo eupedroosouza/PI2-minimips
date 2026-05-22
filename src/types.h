@@ -42,9 +42,8 @@ typedef struct {
 
 // 2^8 = 256
 typedef struct {
-    Instruction instructions[MEM_SIZE];
+    Instruction memory[MEM_SIZE];
     uint8_t size; // tamanho da memória de instrução
-    uint8_t dataSize; // tamanho da memória de dados
 } Memory; // Memória geral
 
 // registradores intermediários
