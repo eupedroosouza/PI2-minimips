@@ -61,6 +61,7 @@ typedef struct state {
     struct state *previous;
     PC pc;
     Registers registers;
+    int state;
     Memory memory;
 } BackState;
 

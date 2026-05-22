@@ -23,6 +23,7 @@ void saveState() {
     }
     backState->memory.dataSize = memory.dataSize;
     backState->previous = lastState;
+    backState->state = state;
     lastState = backState;
 }
 
@@ -47,12 +48,13 @@ void back() {
 
     pc = lastState->pc;
     registers = lastState->registers;
+    state = lastState->state;
 
     for (int i = 0; i < memory.dataSize; i++) {
         memory.instructions[i].data = lastState->memory.instructions[i].data;
     }
-    println(" Retornando os valores do processador para:");
-    showLastState();
+
+    println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
     BackState *aux = lastState;
     lastState = lastState->previous;
