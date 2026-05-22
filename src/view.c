@@ -463,6 +463,12 @@ void showMems() {
         "└─────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n");
 }
 
+void printBinary(int8_t n) {
+    for (int i = 7; i >= 0; i--) {
+        printf("%d", (n >> i) & 1); // imprime cada bit
+    }
+}
+
 // Case 5 do menu. Função que escreve todos os dados do programa na tela
 void printAllProgramData() {
     char registerTable[255][255];
@@ -511,15 +517,22 @@ void printAllProgramData() {
 
     if (i <= memory.size + 2){
         // Registers / MemData / MemInstruction
-         printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]);
-            } else if (i > memory.size && i - 3 < MEM_SIZE){
+         printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]); // imprime até memória de dados
+            }  else if (i > memory.size && i - 3 < MEM_SIZE){
 
-    printf("│ %s │ %s │ │ %03d │ %s  %03d\n", tabelaRegistradores, memDataTable[i], i - 3, memory.instructions[i - memory.size - 3].binaryData, memory.instructions[i - memory.size - 3].data);
-            }
+    printf("│ %s │ %s │ │ %03d │ ", tabelaRegistradores, memDataTable[i], i - 3); // imprime até numeração da memória
+
+    printf("00000000");
+
+    printBinary(memory.instructions[i - memory.size - 3].data); // chama printBinary para imprimir bit a bit
+
+    printf(" │  %02x %03d │\n", memory.instructions[i - memory.size - 3].data); // dado
+}
+        
 
         }
     println(  "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
-printf("DEBUG DATA: %s\n", memory.instructions[1].binaryData);
+
 }
 
 void showLastState() {
