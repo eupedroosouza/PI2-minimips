@@ -91,7 +91,7 @@ void clock() {
         pc = (uint8_t) C.pc;
     }
 
-if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabou!
+if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabo
     updateStatistics(&registers.IR); 
 }
 
