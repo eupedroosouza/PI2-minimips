@@ -1,5 +1,5 @@
 #include "stats.h"
-#include "main.h" // Necessário porque a variável global 'stats' está no main.h
+#include "main.h" 
 
 void updateStatistics(const Instruction *instruction) {
     if (!instruction) return;
