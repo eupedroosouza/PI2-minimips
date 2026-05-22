@@ -458,51 +458,48 @@ void showMems() {
 // Case 5 do menu. Função que escreve todos os dados do programa na tela
 void printAllProgramData() {
     char registerTable[255][255];
-    // char IRtable [13][255];
-    char intermediateTable[10][255];
-
-    char memDataTable[260][255];
-    char memInstructionTable[260][512];
-
-    createRegisterTable(registerTable); // Função que printa os registradores
-    //  createIRTable(IRtable);
-    createIntermediateTable(intermediateTable);
-
-    createDataMemTable(memDataTable); // Função que printa a memória de dados
-    createInstructionTable(memInstructionTable); // Create a memInstructions table
-
-    // Cabeçalho
-    println(
-        "┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
-    println(
-        "│                                                             "BOLD_WHITE
-        "Todos os Dados do Programa                                                               │");
-    println(
-        "├───────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println(
-        "│   Registradores   │  Mem. de Dados  │                                           Memória de Instruções                                                "
-        RESET"│");
-    println(
-        "├───────────────────┼─────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
-
-    const int maxLinhas = 260; // MemData/MemInstruction é a maior
-    char tabelaRegistradores[255];
-    for (int i = 0; i < maxLinhas; i++) {
-        strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
-
-        if (i < 13) {
-            // imprime banco de registradores
-            strcpy(tabelaRegistradores, registerTable[i]);
+// char IRtable [13][255];
+char intermediateTable[10][255];
+char memDataTable[260][255];
+char memInstructionTable[260][512];
+createRegisterTable(registerTable); // Função que printa os registradores
+//  createIRTable(IRtable);
+createIntermediateTable(intermediateTable);
+createDataMemTable(memDataTable); // Função que printa a memória de dados
+createInstructionTable(memInstructionTable); // Create a memInstructions table
+// Cabeçalho
+println(
+"┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
+println(
+"│                                                             "BOLD_WHITE
+"Todos os Dados do Programa                                                               │");
+println(
+"├───────────────────┬─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+println(
+"│   Registradores   │  Mem. de Dados  │                                           Memória de Instruções                                                "
+RESET"│");
+println(
+"├───────────────────┼─────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤");
+const int maxLinhas = 260; // MemData/MemInstruction é a maior
+char tabelaRegistradores[255];
+for (int i = 0; i < maxLinhas; i++) {
+strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
+if (i < 13) {
+// imprime banco de registradores
+strcpy(tabelaRegistradores, registerTable[i]);
         } else if (i >= 14 && i < 24) {
-            // imprime registradores intermediários
-            strcpy(tabelaRegistradores, intermediateTable[i - 14]);
+// imprime registradores intermediários
+strcpy(tabelaRegistradores, intermediateTable[i - 14]);
         }
-
-        // Registers / MemData / MemInstruction
-        printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]);
+if (i <= memory.size + 2){
+// Registers / MemData / MemInstruction
+printf("│ %s │ %s │ %s │\n", tabelaRegistradores, memDataTable[i], memInstructionTable[i]);
+        } else if (i > memory.size && i - 3 < MEM_SIZE){
+printf("│ %s │ %s │ │ %03d │ %s  %03d\n", tabelaRegistradores, memDataTable[i], i - 3, memory.instructions[i - memory.size - 3].binaryData, memory.instructions[i - memory.size - 3].data);
+        }
     }
-    println(
-        "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
+println(
+"└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 }
 
 void showLastState() {
