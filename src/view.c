@@ -284,15 +284,19 @@ void showStatistics() {
     println("│               Estatísticas de Execução               │");
     println("├──────────────────────────────────────────────────────┤");
     println("│ Total de Instruções Executadas: %-20d │", stats.executedInstructions);
-    // println("│ Ciclos de Clock Totais: %-28d │", stats.totalCycles);
+    println("| Total de Clocks executados:      %d                  |", stats.executedClocks);
+    if (stats.executedInstructions > 0) {
+        float cpi = (float)stats.executedClocks / stats.executedInstructions;
+    println("| CPI Médio (Clocks/Instrução):    %.2f                |", cpi);
+    }
     println("├──────────────────────────────────────────────────────┤");
-    println("│ Por Tipo de Instrução:                              │");
+    println("│ Por Tipo de Instrução:                               │");
     println("│   Tipo R: %-42d │", stats.executedInstructionsPerType.r);
     println("│   Tipo I: %-42d │", stats.executedInstructionsPerType.i);
     println("│   Tipo J: %-42d │", stats.executedInstructionsPerType.j);
     println("│   Outros: %-42d │", stats.executedInstructionsPerType.other);
     println("├──────────────────────────────────────────────────────┤");
-    println("│ Por Classe de Instrução:                            │");
+    println("│ Por Classe de Instrução:                             │");
     println("│   ADD   : %-42d │", stats.executedInstructionsPerClass.add);
     println("│   SUB   : %-42d │", stats.executedInstructionsPerClass.sub);
     println("│   AND   : %-42d │", stats.executedInstructionsPerClass.and_inst);

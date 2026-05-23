@@ -22,6 +22,7 @@ void saveState() {
         backState->memory[i] = memory[i];
     }
     backState->previous = lastState;
+    backState->stats = stats;
     backState->state = state;
     lastState = backState;
 }
@@ -51,6 +52,8 @@ void back() {
     for (int i = 0; i < MEM_SIZE; i++) {
         memory[i] = lastState->memory[i];
     }
+    stats = lastState->stats;
+    
     println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
     BackState *aux = lastState;

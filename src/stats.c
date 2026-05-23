@@ -48,6 +48,7 @@ void updateStatistics(const Word *instruction) {
 }
 
 void resetStatistics() {
+    stats.executedClocks = 0;       
     stats.executedInstructions = 0;
     
     // Zera a struct de Tipos

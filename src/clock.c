@@ -88,6 +88,9 @@ Combinational makeCombinational() {
 void clock() {
     saveState();
 
+    
+    stats.executedClocks++;
+
     // Combinational
     const Combinational C = makeCombinational();
     viewStateOfMachine(&C);
@@ -97,9 +100,10 @@ void clock() {
         pc = (uint8_t) C.pc;
     }
 
-if (state == 0) { // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabo
-    updateStatistics(&registers.IR); 
-}
+    if (state == 0) { 
+        // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabou
+        updateStatistics(&registers.IR); 
+    }
 
     // Decode
     makeControl(registers.IR.opcode, registers.IR.funct, &state, true);

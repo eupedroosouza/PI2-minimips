@@ -58,14 +58,7 @@ typedef struct {
     Register general[8]; // regs de propósito geral
 } Registers;
 
-// Estado (útil para a função de back)
-typedef struct state {
-    struct state *previous;
-    PC pc;
-    Registers registers;
-    int state;
-    Word memory[256];
-} BackState;
+
 
 typedef struct {
     int pcSource;
@@ -114,6 +107,7 @@ typedef struct {
 
 
 typedef struct {
+    int executedClocks;
     int executedInstructions; // Contador global de ciclos (1 ciclo = 1 instrução)
     StatisticsPerClass executedInstructionsPerClass;
     StatisticsPerType executedInstructionsPerType;
@@ -141,3 +135,13 @@ typedef struct {
     // Misc
     bool wrtPc;
 } Combinational;
+
+// Estado (útil para a função de back)
+typedef struct state {
+    struct state *previous;
+    PC pc;
+    Registers registers;
+    int state;
+    Statistics stats;
+    Word memory[256];
+} BackState;
