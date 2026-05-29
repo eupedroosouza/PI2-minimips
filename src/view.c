@@ -567,8 +567,31 @@ void viewStateOfMachine(const Combinational *C) {
     println("\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐");
     println("│"BG_CYAN"                                             "BOLD_WHITE"Combinacional                                                  "RESET"│");
     println("├────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┤");
-    println("│     "BOLD_WHITE"PC     "RESET"│                                            %03d                                                │", pc);
-    println("├────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┤");
+    println("│""                                                  "BOLD_WHITE"Busca                                                     "RESET"│");
+    println("├────────────┬──────────────────┬────────────────┬───────────────────────────────────────────────────────────┤");
+    println("│"BOLD_WHITE"     PC     │      I ou D      │    Endereço    │                        Instrução/Dado                     "RESET"│");
+    println("├────────────┼──────────────────┼────────────────┼───────────────────────────────────────────────────────────┤");
+    char immOrDStr[255];
+    if (C->control.immOrData == 0) {
+        strcpy(immOrDStr, "PC");
+    } else {
+        strcpy(immOrDStr, "Reg. Saida ULA");
+    }
+    char centeredImOrData[256];
+    centerString(immOrDStr, centeredImOrData, 18);
+    char insOrData[255];
+    if (C->memAddr < 128) {
+        char prettyInstruction[512];
+        strcpy(prettyInstruction, C->instruction.prettyAsmInstruction);
+        completeWithSpace(prettyInstruction, 57, 512);
+        strcpy(insOrData, prettyInstruction);
+    } else {
+        char bff[255];
+        sprintf(bff, "%04d", C->instruction.data);
+        centerString(bff, insOrData, 57);
+    }
+    println("│    %03d     │%s│      %03d       │ %s │", pc, centeredImOrData, C->memAddr, insOrData);
+    println("├────────────┴──────────────────┴────────────────┴───────────────────────────────────────────────────────────┤");
     println("│"BG_BLUE"                                                   "BOLD_WHITE"RI                                                       "RESET"│");
     println("├─────┬──────────────────┬──────┬─────────────────────────┬────────┬────┬─────┬─────┬─────┬─────┬──────┬─────┤");
     println("│  #  │      Binário     │ Hexa │         Assembly        │  Tipo  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr│");
@@ -637,13 +660,39 @@ void viewStateOfMachine(const Combinational *C) {
         strcpy(equalVal, "-");
     }
 
+    char input1Source[255];
+    strcpy(input1Source, "");
+    if (C->control.ulaSourceA == 0) {
+        strcpy(input1Source, "Entrada 1 (PC)");
+    } else {
+        strcpy(input1Source, "Entrada 1 (reg. A)");
+    }
+    char input2Source[255];
+    switch (C->control.ulaSourceB) {
+        case 0: {
+            strcpy(input2Source, "Entrada 2 (reg. B)");
+            break;
+        }
+        case 1: {
+            strcpy(input2Source, "Entrada 2 (+1)");
+            break;
+        }
+        case 2: {
+            strcpy(input2Source, "Entrada 2 (imediato)");
+        }
+    }
+    char centeredInput1[255];
+    centerString(input1Source, centeredInput1, 23);
+    char centeredInput2[255];
+    centerString(input2Source, centeredInput2, 23);
+
     println("│"BG_YELLOW"                                                  "BOLD_WHITE"ULA                                                       "RESET"│");
     println("├───────────────────────────────────────────────────┬────────────────────────────────────────────────────────┤");
     println("│                    Entrada                        │                          Saída                         │");
     println("├───────────────────────┬───────────────────────────┼────────────────────────────┬───────────────────────────┤");
-    println("│       Entrada 1       │           %04d            │          Resultado         │            %04d           │",C->input1, C->ULAOut.value);
+    println("│%s│           %04d            │          Resultado         │            %04d           │", centeredInput1, C->input1, C->ULAOut.value);
     println("├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
-    println("│       Entrada 2       │           %04d            │         Val. Iguais        │              %-1s            │",C->input2, equalVal);
+    println("│%s│           %04d            │         Val. Iguais        │              %-1s            │", centeredInput2, C->input2, equalVal);
     println("├───────────────────────┼───────────────────────────┼────────────────────────────┼───────────────────────────┤");
     println("│     Controle ULA      │           %04d            │          Overflow          │              %-1s            │",C->control.ulaControl, boolStr[C->ULAOut.overflow == 0 ? 0 : 1]);
     println("├───────────────────────┴───────────────────────────┴────────────────────────────┴───────────────────────────┤");
