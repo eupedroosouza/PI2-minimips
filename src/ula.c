@@ -25,14 +25,16 @@ ULAOut ula(const int16_t input1, const int16_t input2, const int ulaControl) {
         case 7: // SW. Calcula endereço somando os regs
             out.value = (int16_t) (input1 + input2);
             // Check if overflow was occurred with positive
-            out.overflow = (input1 > 0 && input2 > 0 && out.value < 0) || (input1 < 0 && input2 < 0 && out.value > 0);
+            out.overflow = ((int8_t) input1 > 0 && (int8_t) input2 > 0 && (int8_t) out.value < 0) || (
+                               (int8_t) input1 < 0 && (int8_t) input2 < 0 && (int8_t) out.value > 0);
             // se resultar em overflow, manda sinal para out.overflow
             break;
         case 2: // SUB/BEQ
         case 6:
             out.value = (int16_t) (input1 - input2);
             // Check if overflow was occurred with negative
-            out.overflow = (input1 > 0 && input2 < 0 && out.value < 0) || (input1 < 0 && input2 > 0 && out.value > 0);
+            out.overflow = ((int8_t) input1 > 0 && (int8_t) input2 < 0 && (int8_t) out.value < 0) || (
+                               (int8_t) input1 < 0 && (int8_t) input2 > 0 && (int8_t) out.value > 0);
             // Util only for branch (ulaControl = 6), check if sub of inputs is 0 (two equal inputs subtracted is 0)
             out.equal = (out.value == 0);
             break;
