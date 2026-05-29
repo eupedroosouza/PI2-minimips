@@ -4,7 +4,7 @@
 
 // Registers
 
-void createRegisterTable(char table[13][255]);
+void createRegisterTable(char table[15][255]);
 
 void showRegisters();
 

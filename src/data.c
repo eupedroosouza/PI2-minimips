@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "encoding.h"
 #include "main.h"
 #include "instruction.h"
 #include "view.h"
@@ -75,12 +76,9 @@ void saveUnifiedMemory() {
     fprintf(arquivo, ".data\n");
     for (int i = 0; i < SPECIFIC_MEM_SIZE; i++) {
         // Pega o dado e estende para 16 bits pra manter o sinal correto
-        const int16_t valor = (int16_t) memory[i].data;
-       
-        for (int bit = 15; bit >= 0; bit--) {
-            fprintf(arquivo, "%d", (valor >> bit) & 1);
-        }
-        fprintf(arquivo, "\n"); 
+        char str[17];
+        intToBinaryStringWithComplementOfTwo(memory[i].data, str);
+        fprintf(arquivo, "%s\n", str);
     }
 
     fclose(arquivo);

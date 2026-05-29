@@ -19,7 +19,7 @@ const char *typeStr[4] = {"I", "J", "R", "O"};
 
 // Registers
 
-void createRegisterTable(char table[52][255]) {
+void createRegisterTable(char table[15][255]) {
     sprintf(table[0], "┌───────────────┐");
     sprintf(table[1], "│ Banco de Reg. │");
     sprintf(table[2], "├───────┬───────┤");
@@ -28,8 +28,8 @@ void createRegisterTable(char table[52][255]) {
     for (int i = 0; i < 8; i++) {
         sprintf(table[i + 5], "│  $%01d   │  %03d  │", i, registers.general[i]);
     }
-    sprintf(table[11], "│  $pc  │  %03d  │", pc);
-    sprintf(table[12], "└───────┴───────┘");
+    sprintf(table[13], "│  $pc  │  %03d  │", pc);
+    sprintf(table[14], "└───────┴───────┘");
 }
 
 void createIRTable(char table[13][255]) {
@@ -72,7 +72,7 @@ void showRegisters() {
     //createIRTable (IRtable);
     createIntermediateTable(intermediateTable);
 
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 15; i++) {
         println(table[i]);
     }
 
@@ -500,16 +500,16 @@ void printAllProgramData() {
 
         // Registers
         strcpy(tabelaRegistradores, "                 "); // por padrão a linha é vazia
-        if (i < 13) {
+        if (i < 15) {
             // imprime banco de registradores
             strcpy(tabelaRegistradores, registerTable[i]);
-        } else if (i >= 14 && i < 24) {
+        } else if (i >= 16 && i < 26) {
             // imprime registradores intermediários
-            strcpy(tabelaRegistradores, intermediateTable[i - 14]);
-        } else if (i >= 25 && i < 38) {
+            strcpy(tabelaRegistradores, intermediateTable[i - 16]);
+        } else if (i >= 27 && i < 40) {
             // Imprime a tabela do IR logo abaixo (linhas 25 a 37)
             // i - 25 faz o índice do IRtable ir perfeitamente de 0 até 12
-            strcpy(tabelaRegistradores, IRtable[i - 25]);
+            strcpy(tabelaRegistradores, IRtable[i - 27]);
         }
 
         // MemData(128 - 255)
@@ -544,7 +544,7 @@ void showLastState() {
     println("├────────────┴──────┬────────────────────┤");
     println("│   "BOLD_WHITE"Registradores"RESET"   │  "BOLD_WHITE"Memória de Dados"RESET"  │");
     println("├───────────────────┼────────────────────┤");
-    char registerTable[13][255];
+    char registerTable[15][255];
     createRegisterTable(registerTable);
     char memDataTable[260][255];
     createDataMemTable(memDataTable);

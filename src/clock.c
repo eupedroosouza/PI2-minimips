@@ -6,6 +6,7 @@
 #include "stats.h"
 #include "back.h"
 #include "control.h"
+#include "encoding.h"
 #include "instruction.h"
 #include "main.h"
 #include "types.h"
@@ -121,17 +122,9 @@ void clock() {
 
     // Memory Access
     if (C.control.wrtMem) {
-
-        char strInst[17];
-        const int16_t valor = (int16_t) C.memData;
-
-        char bff[255];
-        for (int bit = 15; bit >= 0; bit--) {
-            sprintf(bff, "%d", (valor >> bit) & 1);
-            strcat(strInst, bff);
-        }
-
-        decodeWord(&memory[C.memAddr], strInst);
+        char strItr[17];
+        intToBinaryStringWithComplementOfTwo(C.memData, strItr);
+        decodeWord(&memory[C.memAddr], strItr);
     }
 
     // Register Write

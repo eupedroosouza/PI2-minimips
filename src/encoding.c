@@ -62,3 +62,13 @@ int8_t complementOfTwoToInt(const char *serializedBinary) {
         }
     }
 }
+
+void intToBinaryStringWithComplementOfTwo(const int8_t data, char * buffer) {
+    const int16_t value16 = (int16_t) data; // make 16 bit
+    buffer[0] = '\0';
+    for (int i = 15; i >= 0; i--) { // write bit-a-bit
+        const int bit = (value16 >> i) & 1;
+        const char c[2] = { (char)('0' + bit), '\0' };
+        strcat(buffer, c);
+    }
+}
