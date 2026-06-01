@@ -4,7 +4,7 @@
 
 // Registers
 
-void createRegisterTable(char table[15][255]);
+void createRegisterTable(char table[13][255]);
 
 void showRegisters();
 
@@ -13,7 +13,7 @@ void showRegisters();
 
 // Clock
 
-void showClock(const Word *instruction, const Control *control);
+void showClock(const Instruction *instruction, const Control *control);
 
 void showClockPc();
 
@@ -22,9 +22,6 @@ void showClockInformation(char *msg, char *msg2);
 void showClockRegisters(unsigned int reg1, int value1, unsigned int reg2, int value2);
 
 void showClockUla(int input1, int input2, int ulaControl, const ULAOut *out);
-
-void showClockRegs();
-
 
 // End clock
 
@@ -37,7 +34,7 @@ void showStatistics();
 
 // Instruction
 
-void viewInstruction(const Word *instruction, int idx, char *buffer);
+void viewInstruction(const Instruction *instruction, int idx, char *buffer);
 
 void createInstructionTable(char memInstructionTable[260][512]);
 
@@ -58,13 +55,8 @@ void viewDataMem();
 
 void showMems();
 
-void printBinary(int8_t n);
-
 void printAllProgramData();
 
 void showLastState();
 
 // End Misc
-
-
-void viewStateOfMachine(const Combinational *C);

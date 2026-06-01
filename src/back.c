@@ -1,62 +1,48 @@
 #include "back.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "main.h"
 #include "utils.h"
 #include "view.h"
 
-BackState *lastState = NULL;
+State lastState;
+bool alreadySavedAState = false;
 
-void saveState() {
-    BackState *backState = malloc(sizeof(BackState));
-    if (backState == NULL) {
-        printf("Não há mais memória para armazenar backs!\n");
-        // check if need exit de program
-        return;
+
+void saveLastState() {
+    alreadySavedAState = true;
+    lastState.pc = pc;
+    for (int i = 0; i < 8; i++) {
+        lastState.registers[i] = registers[i];
     }
-    backState->pc = pc;
-    backState->registers = registers;
-    for (int i = 0; i < MEM_SIZE; i++) {
-        backState->memory[i] = memory[i];
+    for (int i = 0; i < memData.size; i++) {
+        lastState.memData.data[i] = memData.data[i];
     }
-    backState->previous = lastState;
-    backState->stats = stats;
-    backState->state = state;
-    lastState = backState;
+    lastState.memData.size = memData.size;
 }
 
-void invalidateState() {
-    if (lastState == NULL) {
-        return;
-    }
-    BackState *aux = lastState;
-    while (aux != NULL) {
-        BackState *prev = aux->previous;
-        free(aux);
-        aux = prev;
-    }
+void invalidateLastState() {
+    alreadySavedAState = false;
 }
 
 void back() {
-    if (lastState == NULL) {
-        println(
-            "Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
+    if (!alreadySavedAState) {
+        println("Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
         return;
     }
 
-    pc = lastState->pc;
-    registers = lastState->registers;
-    state = lastState->state;
-    for (int i = 0; i < MEM_SIZE; i++) {
-        memory[i] = lastState->memory[i];
+    pc = lastState.pc;
+    for (int i = 0; i < 8; i++) {
+        registers[i] = lastState.registers[i];
     }
-    stats = lastState->stats;
-    
-    println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
-    BackState *aux = lastState;
-    lastState = lastState->previous;
-    free(aux);
+    for (int i = 0; i < memData.size; i++) {
+        memData.data[i] = lastState.memData.data[i];
+    }
+    println(" Retornando os valores do processador para:");
+    showLastState();
 }
+
+
+

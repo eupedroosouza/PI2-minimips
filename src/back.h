@@ -1,11 +1,10 @@
 #pragma once
 #include "types.h"
 
+extern State lastState;
 
-extern BackState *lastState;
+void saveLastState();
 
-void saveState();
-
-void invalidateState();
+void invalidateLastState();
 
 void back();

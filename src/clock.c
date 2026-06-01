@@ -3,132 +3,147 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "stats.h"
 #include "back.h"
 #include "control.h"
 #include "encoding.h"
-#include "instruction.h"
 #include "main.h"
 #include "types.h"
 #include "ula.h"
 #include "view.h"
+#include "stats.h" 
 
-Combinational makeCombinational() {
-    Combinational C = {0};
+// VARIÁVEIS GLOBAIS TEMPORÁRIAS, modificar apos ser feito os registradores de pipeline
+static const Instruction *inst_atual = NULL;
+static Control ctrl_atual;
+static int8_t dado_rs = 0;
+static int8_t dado_rt = 0;
+static ULAOut resultado_ula;
+static int8_t dado_memoria_lido = 0;
+static unsigned int reg_escrita_destino = 0;
 
+static char bufferInformation[1000];
+static char bufferInformation2[1000];
 
-    // Decode
-    const Word IR = registers.IR;
-    const Register MDR = registers.MDR;
-    C.A = registers.general[IR.rs];
-    C.B = registers.general[IR.rt];
-    // Create a control based on IR (but isn't clock yet, that step it's combinational :) )
-    const Control C_Control = makeControl(IR.opcode, IR.funct, &state, false);
-    C.control = C_Control;
-
-    // ULA
-    const Register A = registers.A;
-    const Register B = registers.B;
-    const int8_t input1 = C_Control.ulaSourceA == 0 ? (int8_t) pc : A;
-    int8_t input2;
-    switch (C_Control.ulaSourceB) {
-        case 0: {
-            input2 = B;
-            break;
-        }
-        case 1: {
-            input2 = 1;
-            break;
-        }
-        case 2: {
-            input2 = IR.imm;
-            break;
-        }
-        default: return C; // it can never happen
-    }
-    C.input1 = input1;
-    C.input2 = input2;
-    const ULAOut C_ULAOut = ula(input1, input2, C_Control.ulaControl);
-    C.ULAOut = C_ULAOut;
-
-    // Memory Access
-    const int16_t Reg_ULAOut = registers.ULAOut;
-    int16_t C_PC;
-    switch (C_Control.pcSource) {
-        case 0: {
-            C_PC = (uint8_t) C_ULAOut.value;
-            break;
-        }
-        case 1: {
-            C_PC = (uint8_t) Reg_ULAOut;
-            break;
-        }
-        case 2: {
-            C_PC = IR.addr;
-            break;
-        }
-        default: return C; // it can never happen
-    }
-    C.pc = C_PC;
-    C.memData = B;
-
-    // Reg Write
-    C.regToWrite = C_Control.regDst == 0 ? IR.rt : IR.rd;
-    C.regWriteData = C_Control.memToReg == 0 ? (int8_t) Reg_ULAOut : MDR;
-
-    C.wrtPc = C_Control.wrtPc | (C_Control.branch && C_ULAOut.equal);
-
-    // Load (needs do here because we need memAddr, but memAddr is ready only after the ULA)
-    C.memAddr = C_Control.immOrData == 0 ? pc : (uint8_t) Reg_ULAOut;
-    C.instruction = memory[C.memAddr];
-    C.MDR = memory[C.memAddr].data;
-
-    return C;
-}
+// Protótipos dos estágios
+void estagio_IF();
+void estagio_ID();
+void estagio_EX();
+void estagio_MEM();
+void estagio_WB();
 
 void clock() {
-    saveState();
+    saveLastState();
+
+    bufferInformation[0] = '\0';
+    bufferInformation2[0] = '\0';
+
+    //  Executa as 5 etapas separadas 
+    
+    estagio_IF();
+    estagio_ID();
+    estagio_EX();
+    estagio_MEM();
+    estagio_WB();
+
+    // Atualização do PC após a execução da instrução
+    if (ctrl_atual.jump) {
+        pc = inst_atual->addr;
+    } else if (ctrl_atual.branch && resultado_ula.equal) {
+        pc = pc + 1 + inst_atual->imm;
+    } else {
+        pc++;
+    }
+
+   
+    if (inst_atual != NULL && inst_atual->type != OTHER) {
+        // Mostra o quadro de Controle e da ULA para a instrução atual
+        showClock(inst_atual, &ctrl_atual);
+        int8_t operando2 = ctrl_atual.ulaSource ? inst_atual->imm : dado_rt;
+        showClockUla(dado_rs, operando2, ctrl_atual.ulaControl, &resultado_ula);
+    }
 
     
-    stats.executedClocks++;
+    showClockPc();
+    showClockInformation(bufferInformation, bufferInformation2);
+    
+    
+   
+}
 
-    // Combinational
-    const Combinational C = makeCombinational();
-    viewStateOfMachine(&C);
+// IMPLEMENTAÇÃO DOS ESTÁGIOS 
 
-    // Sequential
-    if (C.wrtPc) {
-        pc = (uint8_t) C.pc;
+void estagio_IF() {
+    inst_atual = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
+    
+    
+    computeInstructionStats(inst_atual);
+}
+
+void estagio_ID() {
+    if (inst_atual == NULL || inst_atual->type == OTHER) return;
+
+    ctrl_atual = makeControl(inst_atual);
+    dado_rs = registers[inst_atual->rs];
+    dado_rt = registers[inst_atual->rt];
+    reg_escrita_destino = ctrl_atual.regDst ? inst_atual->rd : inst_atual->rt;
+}
+
+void estagio_EX() {
+    if (inst_atual == NULL || inst_atual->type == OTHER) return;
+
+    int8_t operando2 = ctrl_atual.ulaSource ? inst_atual->imm : dado_rt;
+    resultado_ula = ula(dado_rs, operando2, ctrl_atual.ulaControl);
+}
+
+void estagio_MEM() {
+    if (inst_atual == NULL || inst_atual->type == OTHER) return;
+
+    if (ctrl_atual.wrtMem) {
+        if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
+            memData.data[resultado_ula.value] = dado_rt;
+            if (resultado_ula.value >= memData.size) {
+                memData.size = resultado_ula.value + 1;
+            }
+        }
+        sprintf(bufferInformation, " Escrita na memoria no endereco: %04d o valor do registrador $%1d (valor: %04d).", resultado_ula.value, inst_atual->rt, dado_rt);
+    } 
+    else if (inst_atual->opcode == LW_OPCODE) {
+        if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
+            dado_memoria_lido = memData.data[resultado_ula.value];
+        }
+        sprintf(bufferInformation, " Leitura da memoria no endereco: %04d (valor lido: %04d) e preparado para o registrador $%1d.", resultado_ula.value, dado_memoria_lido, inst_atual->rt);
     }
+}
 
-    if (state == 0) { 
-        // Se a FSM vai voltar pro Fetch (estado 0), significa que a instrução atual acabou
-        updateStatistics(&registers.IR); 
-    }
+void estagio_WB() {
+    if (inst_atual == NULL || inst_atual->type == OTHER) return;
 
-    // Decode
-    makeControl(registers.IR.opcode, registers.IR.funct, &state, true);
-    if (C.control.wrtIr) {
-        registers.IR = C.instruction;
-    }
-    registers.MDR = memory[C.memAddr].data;
+    if (ctrl_atual.wrtReg) {
+        int8_t valor_final = ctrl_atual.memToReg ? resultado_ula.value : dado_memoria_lido;
+        registers[reg_escrita_destino] = valor_final;
 
-    // Load
-    registers.A = C.A;
-    registers.B = C.B;
-
-    // ULA
-    registers.ULAOut = C.ULAOut.value;
-
-    // Memory Access
-    if (C.control.wrtMem) {
-        char strItr[17];
-        intToBinaryStringWithComplementOfTwo(C.memData, strItr);
-        decodeWord(&memory[C.memAddr], strItr);
-    }
-
-    // Register Write
-    if (C.control.wrtReg) {
-        registers.general[C.regToWrite] = C.regWriteData;
+        if (inst_atual->opcode == R_TYPE_OPCODE) {
+            switch (inst_atual->funct) {
+                case ADD_FUNCT:
+                    sprintf(bufferInformation, " Operação ADD (soma) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
+                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
+                    break;
+                case SUB_FUNCT:
+                    sprintf(bufferInformation, " Operação SUB (subtração) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
+                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
+                    break;
+                case AND_FUNCT:
+                    sprintf(bufferInformation, " Operação AND (e / &) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
+                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
+                    break;
+                case OR_FUNCT:
+                    sprintf(bufferInformation, " Operação OR (ou / |) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
+                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
+                    break;
+                default: break;
+            }
+        } else if (inst_atual->opcode != LW_OPCODE) {
+            sprintf(bufferInformation, " Executada operacao na ULA e escrito no registrador: $%1d o valor: %04d.", reg_escrita_destino, valor_final);
+        }
     }
 }

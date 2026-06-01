@@ -1,7 +1,5 @@
 #pragma once
 
+void loadDataOnMem();
 
-void loadUnifiedMemory();
-
-
-void saveUnifiedMemory();
+void saveMemData();

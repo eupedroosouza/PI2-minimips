@@ -1,4 +1,5 @@
 #pragma once
 #include "types.h"
 
-Control makeControl(unsigned int opcode, unsigned int funct, int *state, bool clock);
+Control makeControl(const Instruction *instruction);
+

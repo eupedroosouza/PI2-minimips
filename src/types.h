@@ -15,16 +15,10 @@
 #define J_OPCODE      2
 
 #define MEM_SIZE 256
-#define SPECIFIC_MEM_SIZE 128
 #define REG_SIZE 8
 
 typedef uint8_t PC;
 typedef int8_t Register;
-
-typedef enum {
-    INSTRUCTION,
-    DATA
-} WordType;
 
 typedef enum {
     I, J, R, OTHER
@@ -43,105 +37,40 @@ typedef struct {
     unsigned int funct;
     int8_t imm;
     uint8_t addr;
-    int8_t data; //memoria de dados
-} Word;
+} Instruction;
 
 // 2^8 = 256
-
-
-// registradores intermediários
 typedef struct {
-    Word IR; // reg de memória de instrução
-    Register MDR; // reg de dados da memória
-    Register A, B; // regs A e B, valores saindo do banco de registradores para a ULA
-    int16_t ULAOut; // reg de saida da ULA
-    Register general[8]; // regs de propósito geral
-} Registers;
-
-
+    Instruction instructions[256];
+    uint8_t size;
+} MemInstruction;
 
 typedef struct {
-    int pcSource;
-    int ulaSourceB;
-    int ulaSourceA;
-    bool wrtReg;
-    int regDst;
-    int memToReg;
-    bool wrtIr;
-    bool wrtMem;
-    int immOrData;
+    int8_t data[256];
+    int size;
+} MemData;
+
+// Estado (útil para a função de back)
+typedef struct {
+    PC pc;
+    Register registers[8];
+    MemData memData;
+} State;
+
+typedef struct {
+    bool jump;
     bool branch;
-    bool wrtPc;
+    int regDst;
+    int ulaSource;
+    int memToReg;
+    bool wrtReg;
+    bool wrtMem;
     int ulaControl;
-    // misc
-    int nextState; // only for view
 } Control;
 
 typedef struct {
-    int16_t value;
+    int8_t value;
     bool equal;
     bool overflow;
 } ULAOut;
 
-// Estrutura para contar quantas vezes CADA INSTRUÇÃO ESPECÍFICA foi executada.
-typedef struct {
-    int lw;
-    int sw;
-    int add;
-    int addi;
-    int sub;
-    int and_inst;
-    int or_inst;
-    int beq;
-    int j;
-    int other;
-} StatisticsPerClass;
-
-// Estrutura para contar quantas instruções de CADA FORMATO (Tipo) rodaram.
-typedef struct {
-    int i; // lw, sw, beq, addi
-    int j; // Jump
-    int r; // add, sub, and, or
-    int other;
-} StatisticsPerType;
-
-
-typedef struct {
-    int executedClocks;
-    int executedInstructions; // Contador global de ciclos (1 ciclo = 1 instrução)
-    StatisticsPerClass executedInstructionsPerClass;
-    StatisticsPerType executedInstructionsPerType;
-} Statistics;
-
-typedef struct {
-    // Load
-    Word instruction;
-    int8_t MDR;
-    // Decode
-    int8_t A;
-    int8_t B;
-    Control control; // = control based in actual state of machine
-    // ULA
-    int8_t input1;
-    int8_t input2;
-    ULAOut ULAOut;
-    // Memory Access (and PCSource)
-    int16_t pc; // use 16 bit to prevents PC overflow (you need transform in an int8_t or uint8_t again before the use)
-    uint8_t memAddr;
-    int8_t memData;
-    // Register Write
-    unsigned int regToWrite;
-    int8_t regWriteData;
-    // Misc
-    bool wrtPc;
-} Combinational;
-
-// Estado (útil para a função de back)
-typedef struct state {
-    struct state *previous;
-    PC pc;
-    Registers registers;
-    int state;
-    Statistics stats;
-    Word memory[256];
-} BackState;

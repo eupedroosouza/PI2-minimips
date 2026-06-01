@@ -3,9 +3,9 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "reset.h"
+#include "stats.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,13 +24,13 @@
 
 bool debug = false;
 
-Word memory[256];
+MemInstruction memInstruction;
+MemData memData;
 
-int state = 0;
 PC pc;
-Registers registers = {0};
+Register registers[8];
 
-Statistics stats = {0};
+
 
 int main(const int argCount, char *args[]) {
     if (argCount >= 1) {
@@ -60,19 +60,19 @@ int main(const int argCount, char *args[]) {
 
     // header
     println(
-        "                    "BOLD_WHITE"Simulador Mini-MIPS 8 bits Multiciclo - Versão 0.0.1"RESET
-        "\n            Autores:  Pedro S. Moreira, Willian A. Correa, William N. A. Paiva\n\n                             Engenharia de Computação\n               Universidade Federal do Pampa (Unipampa) - Campus Bagé");
-
+        "                    "BOLD_WHITE"Simulador Mini-MIPS 8 bits monociclo - Versão 0.0.1"RESET"\n            Autores:  Pedro S. Moreira, Willian A. Correa, William N. A. Paiva\n\n                             Engenharia de Computação\n               Universidade Federal do Pampa (Unipampa) - Campus Bagé");
+   initStatistics();
     // Create empty Instruction
-    decodeWord(&emptyWord, "0000000000000000");
-    registers.IR = emptyWord;
+    decodeInstruction(&emptyInstruction, "0000000000000000");
 
     // Reset (do that to prevents incorrect data (trash data) on not loaded data)
     resetRegisters();
-    resetMemory();
+    resetData();
+    resetInstructions();
     // End-reset
 
     menu();
 
     return 0;
 }
+

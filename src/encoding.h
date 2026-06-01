@@ -1,7 +1,7 @@
 #pragma once
 #include "types.h"
 
-extern Word emptyWord;
+extern Instruction emptyInstruction;
 
 // Use somente para valores sem sinal (registradores rs, rt e rd, etc)
 int binaryToUnsignedInt(const char *serializedBinary);
@@ -9,5 +9,3 @@ int binaryToUnsignedInt(const char *serializedBinary);
 void extendSignal(char *baseSerializedBinary, char *buffer, int size);
 
 int8_t complementOfTwoToInt(const char *serializedBinary);
-
-void intToBinaryStringWithComplementOfTwo(int8_t data, char * buffer);

@@ -5,82 +5,72 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "encoding.h"
 #include "main.h"
-#include "instruction.h"
 #include "view.h"
 
-void loadUnifiedMemory() {
-    char caminho[1000];
-    printf("Digite o caminho do arquivo de memoria (.mem ou .txt): ");
-    
+void loadDataOnMem() {
+    char caminho_arquivo_dat[1000];
+
+
+    printf("Digite o caminho do arquivo .dat: ");
+
     setbuf(stdin, NULL);
-    if (fgets(caminho, sizeof(caminho), stdin) != NULL) {
-        caminho[strcspn(caminho, "\n")] = 0; 
+    if (fgets(caminho_arquivo_dat, sizeof(caminho_arquivo_dat), stdin) != NULL) {
+        caminho_arquivo_dat[strcspn(caminho_arquivo_dat, "\n")] = 0;
     }
 
-    FILE *arquivo = fopen(caminho, "r");
+    FILE *arquivo = fopen(caminho_arquivo_dat, "r");
+
     if (arquivo == NULL) {
-        printf("\nErro: O arquivo '%s' nao foi encontrado!\n", caminho);
+        printf("\nErro: O arquivo '%s' nao foi encontrado!\n", caminho_arquivo_dat);
         return;
     }
 
     char linha[100];
-
     int i = 0;
-    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        linha[strcspn(linha, "\r\n")] = 0; 
 
-        
-        if (strlen(linha) == 0) {
-            continue;
+    while (fgets(linha, sizeof(linha), arquivo) != NULL && i < 256) {
+        linha[strcspn(linha, "\r\n")] = 0;
+
+        if (strlen(linha) > 0) {
+            memData.data[i] = (int8_t) strtol(linha, NULL, 10);
+            i++;
         }
-
-        if (strcmp(linha, ".data") == 0) {
-            i = 128;
-            continue;
-        }
-
-        decodeWord(&memory[i], linha);
-        i++;
     }
-    
-    fclose(arquivo);
-    printf("\nMemoria unificada carregada com sucesso!\n");
 
-    
+    memData.size =  i;
+    fclose(arquivo);
+
     if (debug) {
-        printf("\n Conteudo da memoria apos o carregamento:\n");
-        showMems(); 
+        printf(" Conteudo da memoria:\n");
+        viewDataMem();
     }
 }
 
-void saveUnifiedMemory() {
-    char caminho[1000];
-    printf("Digite o caminho para salvar o arquivo de memoria (.mem): ");
-    
+void saveMemData() {
+    char caminho_arquivo_dat[1000];
+
+    printf("Digite o caminho para salvar o arquivo .dat: ");
+
     setbuf(stdin, NULL);
-    if (fgets(caminho, sizeof(caminho), stdin) != NULL) {
-        caminho[strcspn(caminho, "\n")] = 0;
+    if (fgets(caminho_arquivo_dat, sizeof(caminho_arquivo_dat), stdin) != NULL) {
+        caminho_arquivo_dat[strcspn(caminho_arquivo_dat, "\n")] = 0;
     }
 
-    FILE *arquivo = fopen(caminho, "w");
+
+    FILE *arquivo = fopen(caminho_arquivo_dat, "w");
+
     if (arquivo == NULL) {
-        printf("\nErro: Nao foi possivel criar o arquivo '%s'!\n", caminho);
+        printf("\nErro: Nao foi possivel criar ou abrir o arquivo\n");
         return;
     }
 
-    for (int i = 0; i < SPECIFIC_MEM_SIZE; i++) {
-        fprintf(arquivo, "%s\n", memory[i].stringedInstruction);
-    }
-    fprintf(arquivo, ".data\n");
-    for (int i = 0; i < SPECIFIC_MEM_SIZE; i++) {
-        // Pega o dado e estende para 16 bits pra manter o sinal correto
-        char str[17];
-        intToBinaryStringWithComplementOfTwo(memory[i].data, str);
-        fprintf(arquivo, "%s\n", str);
+
+    for (int i = 0; i < memData.size; i++) {
+        fprintf(arquivo, "%d\n", memData.data[i]);
     }
 
     fclose(arquivo);
-    printf("\nMemoria unificada salva com sucesso em '%s'!\n", caminho);
+
+
 }

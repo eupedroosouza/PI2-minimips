@@ -3,10 +3,12 @@
 
 extern bool debug;
 
-extern Word memory[256];
+extern MemInstruction memInstruction;
+extern MemData memData;
 
-extern int state;
 extern PC pc;
-extern Registers registers;
+extern Register registers[8];
 
-extern Statistics stats;
+extern State lastState;
+
+
