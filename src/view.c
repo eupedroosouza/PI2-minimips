@@ -178,7 +178,7 @@ void showStatistics() {
 
     // Painel Superior de Resumo Geral (Largura total interna perfeitamente alinhada = 53 caracteres)
     println("┌─────────────────────────────────────────────────────┐");
-    println("│       " BOLD_WHITE "ESTATÍSTICAS DE DESEMPENHO (MULTICICLO)" RESET "       │");
+    println("│       " BOLD_WHITE "ESTATÍSTICAS DE DESEMPENHO (monociclo/pipeline)" RESET "       │");
     println("├─────────────────────────────────────────────────────┤");
     println("│ Total de Instruções Executadas:%-21d│", stats.executedInstructions);
     println("│ Total de Ciclos de Clock:      %-21d│", totalCycles);
