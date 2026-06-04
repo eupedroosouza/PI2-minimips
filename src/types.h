@@ -50,6 +50,37 @@ typedef struct {
     int size;
 } MemData;
 
+typedef struct {
+    Instruction IR;
+    uint8_t pc;
+} IF_ID; // busca de instrução
+
+typedef struct {
+    Instruction IR;
+    int8_t A;
+    int8_t B;
+    int8_t imm;
+} ID_EX; // decodificação da instrução e leitura do banco de registradores
+
+typedef struct {
+    Instruction IR;
+    int8_t ulaOut;
+    int8_t B;
+} EX_MEM; // acesso à memória de dados
+
+typedef struct {
+    Instruction IR;
+    int8_t memData;
+    int8_t ulaOut;
+} MEM_WB; // escrita no banco de registradores
+
+typedef struct {
+    IF_ID if_id;
+    ID_EX id_ex;
+    EX_MEM ex_mem;
+    MEM_WB mem_wb; 
+} PipelineRegisters; // registradores intermediários
+
 // Estado (útil para a função de back)
 typedef struct {
     PC pc;
