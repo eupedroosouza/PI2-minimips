@@ -1,47 +1,65 @@
 #include "back.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+
 
 #include "main.h"
 #include "utils.h"
 #include "view.h"
 
-State lastState;
-bool alreadySavedAState = false;
-
+BackState *lastState = NULL;
 
 void saveLastState() {
-    alreadySavedAState = true;
-    lastState.pc = pc;
+    BackState *backState = malloc(sizeof(BackState));
+    if (backState == NULL) {
+        printf("Não há mais memória para armazenar backs!\n");
+        // check if need exit de program
+        return;
+    }
+    backState->pc = pc;
     for (int i = 0; i < 8; i++) {
-        lastState.registers[i] = registers[i];
+        backState->registers[i] = registers[i];
     }
     for (int i = 0; i < memData.size; i++) {
-        lastState.memData.data[i] = memData.data[i];
+        backState->memData.data[i] = memData.data[i];
     }
-    lastState.memData.size = memData.size;
+    backState->memData.size = memData.size;
+    lastState = backState;
 }
 
 void invalidateLastState() {
-    alreadySavedAState = false;
+    if (lastState == NULL) {
+        return;
+    }
+    BackState *aux = lastState;
+    while (aux != NULL) {
+        BackState *prev = aux->previous;
+        free(aux);
+        aux = prev;
+    }
 }
 
 void back() {
-    if (!alreadySavedAState) {
-        println("Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
+    if (lastState == NULL) {
+        println(
+            "Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
         return;
     }
 
-    pc = lastState.pc;
+    pc = lastState->pc;
     for (int i = 0; i < 8; i++) {
-        registers[i] = lastState.registers[i];
+        registers[i] = lastState->registers[i];
     }
 
     for (int i = 0; i < memData.size; i++) {
-        memData.data[i] = lastState.memData.data[i];
+        memData.data[i] = lastState->memData.data[i];
     }
-    println(" Retornando os valores do processador para:");
-    showLastState();
+    println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
+
+    BackState *aux = lastState;
+    lastState = lastState->previous;
+    free(aux);
 }
 
 

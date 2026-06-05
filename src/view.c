@@ -363,29 +363,6 @@ void printAllProgramData() {
     println("└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
 }
 
-void showLastState() {
-    println("┌────────────────────────────────────────┐");
-    println("│"BG_MAGENTA"              "BOLD_WHITE"Último Estado             "RESET"│ ");
-    println("├────────────┬───────────────────────────┤");
-    println("│     "BOLD_WHITE"PC"RESET"     │            %03d            │", lastState.pc);
-    println("├────────────┴──────┬────────────────────┤");
-    println("│   "BOLD_WHITE"Registradores"RESET"   │  "BOLD_WHITE"Memória de Dados"RESET"  │");
-    println("├───────────────────┼────────────────────┤");
-    char registerTable[13][255];
-    createRegisterTable(registerTable);
-    char memDataTable[260][255];
-    createDataMemTable(memDataTable);
-    for (int i = 0; i < 260; i++) {
-        if (i < 13) {
-            printf("│ %-17s │", registerTable[i]);
-        } else {
-            printf("│                   │");
-        }
-        printf("   %-17s  │\n", memDataTable[i]);
-    }
-
-    println("└───────────────────┴────────────────────┘");
-}
 
 
 // End Misc

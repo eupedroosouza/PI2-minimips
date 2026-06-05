@@ -9,6 +9,5 @@ extern MemData memData;
 extern PC pc;
 extern Register registers[8];
 
-extern State lastState;
 
 

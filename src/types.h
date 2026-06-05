@@ -78,15 +78,17 @@ typedef struct {
     IF_ID if_id;
     ID_EX id_ex;
     EX_MEM ex_mem;
-    MEM_WB mem_wb; 
+    MEM_WB mem_wb;
 } PipelineRegisters; // registradores intermediários
 
 // Estado (útil para a função de back)
-typedef struct {
+typedef struct state {
+    struct state *previous;
     PC pc;
     Register registers[8];
+    PipelineRegisters pipelineRegisters;
     MemData memData;
-} State;
+} BackState;
 
 typedef struct {
     bool jump;
@@ -104,4 +106,3 @@ typedef struct {
     bool equal;
     bool overflow;
 } ULAOut;
-
