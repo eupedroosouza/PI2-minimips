@@ -1,6 +1,5 @@
 #include "main.h"
 
-#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,7 +28,6 @@ MemData memData;
 
 PC pc;
 Register registers[8];
-
 
 
 int main(const int argCount, char *args[]) {
