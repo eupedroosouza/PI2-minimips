@@ -50,28 +50,37 @@ typedef struct {
     int size;
 } MemData;
 
+// --- REGISTRADORES INTERMEDIÁRIOS (PIPELINE) ---
+
 typedef struct {
-    Instruction IR;
-    uint8_t pc;
+    Instruction IR;        
+    uint8_t pc;            
 } IF_ID; // busca de instrução
 
 typedef struct {
-    Instruction IR;
-    int8_t A;
-    int8_t B;
-    int8_t imm;
-} ID_EX; // decodificação da instrução e leitura do banco de registradores
+    Instruction IR;        
+    int8_t A;               
+    int8_t B;               
+    int8_t imm;             
+    uint8_t pc;             // PC que veio do IF_ID necessário para o cálculo do BEQ
+    Control ctrl;           // Sinais de controle da instrução
+} ID_EX; // decodificação da instrução
 
 typedef struct {
-    Instruction IR;
-    int8_t ulaOut;
-    int8_t B;
+    Instruction IR;        
+    int8_t ulaOut;          
+    int8_t B;              
+    bool ula_equal;         // Guarda a flag equal  para o BEQ
+    Control ctrl;           // Sinais de controle para as fases de MEM e WB
+    unsigned int reg_escrita_destino; //Lembra em qual registrador salvar no final
 } EX_MEM; // acesso à memória de dados
 
 typedef struct {
-    Instruction IR;
-    int8_t memData;
-    int8_t ulaOut;
+    Instruction IR;        
+    int8_t memData;         
+    int8_t ulaOut;          
+    Control ctrl;           //Sinais de controle para a fase de WB
+    unsigned int reg_escrita_destino; //Lembra em qual registrador salvar no final
 } MEM_WB; // escrita no banco de registradores
 
 typedef struct {
@@ -79,7 +88,7 @@ typedef struct {
     ID_EX id_ex;
     EX_MEM ex_mem;
     MEM_WB mem_wb;
-} PipelineRegisters; // registradores intermediários
+} PipelineRegisters; // Variável global unificada
 
 // Estado (útil para a função de back)
 typedef struct state {

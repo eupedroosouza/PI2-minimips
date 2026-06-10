@@ -10,9 +10,12 @@
 #include "types.h"
 #include "ula.h"
 #include "view.h"
-#include "stats.h" 
+#include "stats.h"
 
-// VARIÁVEIS GLOBAIS TEMPORÁRIAS, modificar apos ser feito os registradores de pipeline
+// Acessa o registrador de pipeline global definido no projeto
+extern PipelineRegisters pipeline;
+
+// VARIÁVEIS GLOBAIS qnd for terminado a implementaçao dos registradores de pipeline, essas ficaram obsoletas
 static const Instruction *inst_atual = NULL;
 static Control ctrl_atual;
 static int8_t dado_rs = 0;
@@ -24,7 +27,6 @@ static unsigned int reg_escrita_destino = 0;
 static char bufferInformation[1000];
 static char bufferInformation2[1000];
 
-// Protótipos dos estágios
 void estagio_IF();
 void estagio_ID();
 void estagio_EX();
@@ -37,65 +39,82 @@ void clock() {
     bufferInformation[0] = '\0';
     bufferInformation2[0] = '\0';
 
-    //  Executa as 5 etapas separadas 
     
-    estagio_IF();
-    estagio_ID();
-    estagio_EX();
-    estagio_MEM();
-    estagio_WB();
+    estagio_WB();   
+    estagio_MEM();  
+    estagio_EX();   
+    estagio_ID();   
+    estagio_IF();   
 
-    // Atualização do PC após a execução da instrução
-    if (ctrl_atual.jump) {
-        pc = inst_atual->addr;
-    } else if (ctrl_atual.branch && resultado_ula.equal) {
-        pc = pc + 1 + inst_atual->imm;
-    } else {
-        pc++;
-    }
-
-   
+   // tem q modifica dpois  n fiz isso pq precisa q todo o clock ja esteja utilizando os registradpres de pipeline, provavel q de erro
     if (inst_atual != NULL && inst_atual->type != OTHER) {
-        // Mostra o quadro de Controle e da ULA para a instrução atual
+        if (ctrl_atual.jump) {
+            pc = inst_atual->addr;
+        } else if (ctrl_atual.branch && resultado_ula.equal) {
+            pc = pc + inst_atual->imm;
+        }
         showClock(inst_atual, &ctrl_atual);
-        int8_t operando2 = ctrl_atual.ulaSource ? inst_atual->imm : dado_rt;
-        showClockUla(dado_rs, operando2, ctrl_atual.ulaControl, &resultado_ula);
     }
 
-    
     showClockPc();
     showClockInformation(bufferInformation, bufferInformation2);
-    
-    
-   
 }
 
-// IMPLEMENTAÇÃO DOS ESTÁGIOS 
+
 
 void estagio_IF() {
-    inst_atual = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
+    // Busca a instrução na memória utilizando o PC atual
+    const Instruction *inst = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
     
-    
-    computeInstructionStats(inst_atual);
+    // manda a intruçao pros registradores de pipeline 
+    pipeline.if_id.IR = *inst;
+    pipeline.if_id.pc = pc; 
+
+    if (inst->type != OTHER) {
+        computeInstructionStats(inst);
+    }
+
+    // Incrementa o PC para a próxima busca
+    pc++;
 }
 
 void estagio_ID() {
-    if (inst_atual == NULL || inst_atual->type == OTHER) return;
+    // le os registradores de pipeline q vieram do if
+    Instruction inst = pipeline.if_id.IR;
 
-    ctrl_atual = makeControl(inst_atual);
-    dado_rs = registers[inst_atual->rs];
-    dado_rt = registers[inst_atual->rt];
-    reg_escrita_destino = ctrl_atual.regDst ? inst_atual->rd : inst_atual->rt;
+    if (inst.type == OTHER) {
+        // Se for uma instrução inválida limpa o registrador de saída para evitar lixo no EX
+        pipeline.id_ex.IR = emptyInstruction;
+        pipeline.id_ex.A = 0;
+        pipeline.id_ex.B = 0;
+        pipeline.id_ex.imm = 0;
+        return;
+    }
+
+    
+  
+    pipeline.id_ex.IR = inst;
+    pipeline.id_ex.A = registers[inst.rs]; // Valor lido de RS
+    pipeline.id_ex.B = registers[inst.rt]; // Valor lido de RT
+    pipeline.id_ex.imm = inst.imm;         // Valor imediato estendido
+    
+  
 }
 
+
+
 void estagio_EX() {
+   
     if (inst_atual == NULL || inst_atual->type == OTHER) return;
 
     int8_t operando2 = ctrl_atual.ulaSource ? inst_atual->imm : dado_rt;
     resultado_ula = ula(dado_rs, operando2, ctrl_atual.ulaControl);
+    
+    reg_escrita_destino = ctrl_atual.regDst ? inst_atual->rd : inst_atual->rt;
 }
 
 void estagio_MEM() {
+    
     if (inst_atual == NULL || inst_atual->type == OTHER) return;
 
     if (ctrl_atual.wrtMem) {
@@ -105,17 +124,18 @@ void estagio_MEM() {
                 memData.size = resultado_ula.value + 1;
             }
         }
-        sprintf(bufferInformation, " Escrita na memoria no endereco: %04d o valor do registrador $%1d (valor: %04d).", resultado_ula.value, inst_atual->rt, dado_rt);
+        sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", resultado_ula.value, dado_rt);
     } 
     else if (inst_atual->opcode == LW_OPCODE) {
         if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
             dado_memoria_lido = memData.data[resultado_ula.value];
         }
-        sprintf(bufferInformation, " Leitura da memoria no endereco: %04d (valor lido: %04d) e preparado para o registrador $%1d.", resultado_ula.value, dado_memoria_lido, inst_atual->rt);
+        sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", resultado_ula.value, dado_memoria_lido);
     }
 }
 
 void estagio_WB() {
+    
     if (inst_atual == NULL || inst_atual->type == OTHER) return;
 
     if (ctrl_atual.wrtReg) {
@@ -123,27 +143,11 @@ void estagio_WB() {
         registers[reg_escrita_destino] = valor_final;
 
         if (inst_atual->opcode == R_TYPE_OPCODE) {
-            switch (inst_atual->funct) {
-                case ADD_FUNCT:
-                    sprintf(bufferInformation, " Operação ADD (soma) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
-                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
-                    break;
-                case SUB_FUNCT:
-                    sprintf(bufferInformation, " Operação SUB (subtração) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
-                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
-                    break;
-                case AND_FUNCT:
-                    sprintf(bufferInformation, " Operação AND (e / &) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
-                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
-                    break;
-                case OR_FUNCT:
-                    sprintf(bufferInformation, " Operação OR (ou / |) do registrador %1d (valor: %04d) com o registrador: %1d (valor: %04d).", inst_atual->rs, dado_rs, inst_atual->rt, dado_rt);
-                    sprintf(bufferInformation2, " Resultado escrito no registrador %1d (resultado: %04d).", reg_escrita_destino, valor_final);
-                    break;
-                default: break;
-            }
+            sprintf(bufferInformation, " [WB] Escrito no registrador $%1d o resultado: %04d.", reg_escrita_destino, valor_final);
         } else if (inst_atual->opcode != LW_OPCODE) {
-            sprintf(bufferInformation, " Executada operacao na ULA e escrito no registrador: $%1d o valor: %04d.", reg_escrita_destino, valor_final);
+            sprintf(bufferInformation, " [WB] Executada op na ULA e escrito no registrador: $%1d o valor: %04d.", reg_escrita_destino, valor_final);
+        } else {
+            sprintf(bufferInformation, " [WB] Escrito no registrador $%1d o valor carregado: %04d.", reg_escrita_destino, valor_final);
         }
     }
 }
