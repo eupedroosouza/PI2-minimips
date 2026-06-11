@@ -10,6 +10,7 @@
 
 BackState *lastState = NULL;
 
+
 void saveLastState() {
     BackState *backState = malloc(sizeof(BackState));
     if (backState == NULL) {
@@ -21,10 +22,10 @@ void saveLastState() {
     for (int i = 0; i < 8; i++) {
         backState->registers[i] = registers[i];
     }
-    for (int i = 0; i < memData.size; i++) {
-        backState->memData.data[i] = memData.data[i];
+    for (int i = 0; i < memory.MemDatasize; i++) {
+        backState->memData.data[i] = memory.data[i];
     }
-    backState->memData.size = memData.size;
+    backState->memData.size = memory.MemDatasize;
     lastState = backState;
 }
 
@@ -52,8 +53,8 @@ void back() {
         registers[i] = lastState->registers[i];
     }
 
-    for (int i = 0; i < memData.size; i++) {
-        memData.data[i] = lastState->memData.data[i];
+    for (int i = 0; i < memory.MemDatasize; i++) {
+        memory.data[i] = lastState->memData.data[i];
     }
     println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
