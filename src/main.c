@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 #include "reset.h"
 #include "stats.h"
@@ -23,8 +25,7 @@
 
 bool debug = false;
 
-MemInstruction memInstruction;
-MemData memData;
+Memory memory;
 
 PC pc;
 Register registers[8];
