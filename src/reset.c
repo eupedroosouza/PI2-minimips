@@ -8,9 +8,9 @@ PipelineRegisters pipeline;
 
 void resetInstructions() {
     for (int i = 0; i < MEM_SIZE; i++) {
-        memInstruction.instructions[i] = emptyInstruction;
+        memory.instructions[i] = emptyInstruction;
     }
-    memInstruction.size = 0;
+    memory.MemDatasize = 0;
 }
 
 void resetRegisters() {
@@ -31,7 +31,7 @@ void resetRegisters() {
 
 void resetData() {
     for (int i = 0; i < MEM_SIZE; i++) {
-        memData.data[i] = 0;
+        memory.data[i] = 0;
     }
-    memData.size = 0;
+    memory.MemDatasize = 0;
 }
