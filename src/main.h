@@ -3,8 +3,7 @@
 
 extern bool debug;
 
-extern MemInstruction memInstruction;
-extern MemData memData;
+extern Memory memory;
 
 extern PC pc;
 extern Register registers[8];
