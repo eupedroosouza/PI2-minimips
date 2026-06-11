@@ -278,7 +278,7 @@ void createInstructionTable(char memInstructionTable[260][512]) {
     strcpy(memInstructionTable[1], "│  "BOLD_WHITE"#  │      Binário     │ Hexa │         Assembly        │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr"RESET"│");
     strcpy(memInstructionTable[2], "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     for (int i = 0; i < MEM_SIZE; i++) {
-        viewInstruction(&memInstruction.instructions[i], i, memInstructionTable[i + 3]);
+        viewInstruction(&memory.instructions[i], i, memInstructionTable[i + 3]);
     }
     strcpy(memInstructionTable[259],
       "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
@@ -301,7 +301,7 @@ void createDataMemTable(char table[260][255]) {
     sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
     for (int i = 0; i < 256; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memData.data[i]);
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memory.data[i]);
     }
     sprintf(table[259], "└─────┴───────┘");
 }
