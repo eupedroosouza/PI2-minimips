@@ -15,6 +15,7 @@
 // Acessa o registrador de pipeline global definido no projeto
 extern PipelineRegisters pipeline;
 
+
 // VARIÁVEIS GLOBAIS qnd for terminado a implementaçao dos registradores de pipeline, essas ficaram obsoletas
 static const Instruction *inst_atual = NULL;
 static Control ctrl_atual;
@@ -64,7 +65,7 @@ void clock() {
 
 void estagio_IF() {
     // Busca a instrução na memória utilizando o PC atual
-    const Instruction *inst = (pc < memInstruction.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
+    const Instruction *inst = (pc < memory.size) ? &memory.instructions[pc] : &emptyInstruction;
     
     // manda a intruçao pros registradores de pipeline 
     pipeline.if_id.IR = *inst;
@@ -119,16 +120,16 @@ void estagio_MEM() {
 
     if (ctrl_atual.wrtMem) {
         if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
-            memData.data[resultado_ula.value] = dado_rt;
-            if (resultado_ula.value >= memData.size) {
-                memData.size = resultado_ula.value + 1;
+            memory.data[resultado_ula.value] = dado_rt;
+            if (resultado_ula.value >= memory.MemDatasize) {
+                memory.MemDatasize = resultado_ula.value + 1;
             }
         }
         sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", resultado_ula.value, dado_rt);
     } 
     else if (inst_atual->opcode == LW_OPCODE) {
         if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
-            dado_memoria_lido = memData.data[resultado_ula.value];
+            dado_memoria_lido = memory.data[resultado_ula.value];
         }
         sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", resultado_ula.value, dado_memoria_lido);
     }
