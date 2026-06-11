@@ -8,6 +8,8 @@
 #include "main.h"
 #include "view.h"
 
+
+
 void loadDataOnMem() {
     char caminho_arquivo_dat[1000];
 
@@ -33,12 +35,12 @@ void loadDataOnMem() {
         linha[strcspn(linha, "\r\n")] = 0;
 
         if (strlen(linha) > 0) {
-            memData.data[i] = (int8_t) strtol(linha, NULL, 10);
+            memory.data[i] = (int8_t) strtol(linha, NULL, 10);
             i++;
         }
     }
 
-    memData.size =  i;
+    memory.MemDatasize =  i;
     fclose(arquivo);
 
     if (debug) {
@@ -66,8 +68,8 @@ void saveMemData() {
     }
 
 
-    for (int i = 0; i < memData.size; i++) {
-        fprintf(arquivo, "%d\n", memData.data[i]);
+    for (int i = 0; i < memory.MemDatasize; i++) {
+        fprintf(arquivo, "%d\n", memory.data[i]);
     }
 
     fclose(arquivo);
