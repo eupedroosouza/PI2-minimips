@@ -43,12 +43,11 @@ typedef struct {
 typedef struct {
     Instruction instructions[256];
     uint8_t size;
-} MemInstruction;
+    int8_t data[256]; // mem de dados
+    int MemDatasize;   // tamanho da mem de dados
+} Memory;
 
-typedef struct {
-    int8_t data[256];
-    int size;
-} MemData;
+
 
 // --- REGISTRADORES INTERMEDIÁRIOS (PIPELINE) ---
 
@@ -56,6 +55,17 @@ typedef struct {
     Instruction IR;        
     uint8_t pc;            
 } IF_ID; // busca de instrução
+
+typedef struct {
+    bool jump;
+    bool branch;
+    int regDst;
+    int ulaSource;
+    int memToReg;
+    bool wrtReg;
+    bool wrtMem;
+    int ulaControl;
+} Control;
 
 typedef struct {
     Instruction IR;        
@@ -96,19 +106,8 @@ typedef struct state {
     PC pc;
     Register registers[8];
     PipelineRegisters pipelineRegisters;
-    MemData memData;
+    Memory memData;
 } BackState;
-
-typedef struct {
-    bool jump;
-    bool branch;
-    int regDst;
-    int ulaSource;
-    int memToReg;
-    bool wrtReg;
-    bool wrtMem;
-    int ulaControl;
-} Control;
 
 typedef struct {
     int8_t value;
