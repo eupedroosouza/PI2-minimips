@@ -62,10 +62,9 @@ void clock() {
 }
 
 
-
 void estagio_IF() {
     // Busca a instrução na memória utilizando o PC atual
-    const Instruction *inst = (pc < memory.size) ? &memory.instructions[pc] : &emptyInstruction;
+    const Instruction *inst = (pc < memdata.size) ? &memInstruction.instructions[pc] : &emptyInstruction;
     
     // manda a intruçao pros registradores de pipeline 
     pipeline.if_id.IR = *inst;
@@ -144,16 +143,16 @@ int8_t dado_memoria_lido = 0;
 
     if (pipeline.ex_mem.ctrl.wrtMem) {
         if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) {
-            memory.data[pipeline.ex_mem.ulaOut] = pipeline.ex_mem.B;
-            if (pipeline.ex_mem.ulaOut >= memory.MemDatasize) {
-                memory.MemDatasize = pipeline.ex_mem.ulaOut + 1;
+            memdata.data[pipeline.ex_mem.ulaOut] = pipeline.ex_mem.B;
+            if (pipeline.ex_mem.ulaOut >= memdata.size) {
+                memdata.size = pipeline.ex_mem.ulaOut + 1;
             }
         }
         sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", pipeline.ex_mem.ulaOut, pipeline.ex_mem.B);
     } 
     else if (pipeline.ex_mem.IR.opcode == LW_OPCODE) {
         if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) {
-            dado_memoria_lido = memory.data[pipeline.ex_mem.ulaOut];
+            dado_memoria_lido = memdata.data[pipeline.ex_mem.ulaOut];
         }
         sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", pipeline.ex_mem.ulaOut, dado_memoria_lido);
     }
