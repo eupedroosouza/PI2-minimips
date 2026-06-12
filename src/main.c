@@ -25,11 +25,11 @@
 
 bool debug = false;
 
-Memory memory;
-
 PC pc;
 Register registers[8];
 
+MemInstruction memInstruction;
+MemData memdata;
 
 int main(const int argCount, char *args[]) {
     if (argCount >= 1) {
