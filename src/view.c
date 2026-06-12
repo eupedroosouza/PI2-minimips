@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "stats.h"
 
+
 const char *memToRegStr[2] = {"mem", "ula"};
 const char *ulaSourceStr[2] = {"registrador", "imediato"};
 const char *typeStr[4] = {"I", "J", "R", "O"};
@@ -278,7 +279,7 @@ void createInstructionTable(char memInstructionTable[260][512]) {
     strcpy(memInstructionTable[1], "│  "BOLD_WHITE"#  │      Binário     │ Hexa │         Assembly        │  Type  │ OP │  RS │  RT │  RD │Funct│  Imm │ Addr"RESET"│");
     strcpy(memInstructionTable[2], "├─────┼──────────────────┼──────┼─────────────────────────┼────────┼────┼─────┼─────┼─────┼─────┼──────┼─────┤");
     for (int i = 0; i < MEM_SIZE; i++) {
-        viewInstruction(&memory.instructions[i], i, memInstructionTable[i + 3]);
+        viewInstruction(&memInstruction.instructions[i], i, memInstructionTable[i + 3]);
     }
     strcpy(memInstructionTable[259],
       "└─────┴──────────────────┴──────┴─────────────────────────┴────────┴────┴─────┴─────┴─────┴─────┴──────┴─────┘");
@@ -301,7 +302,7 @@ void createDataMemTable(char table[260][255]) {
     sprintf(table[1], "│  "BOLD_WHITE"#"RESET"  │ "BOLD_WHITE"Valor"RESET" │");
     sprintf(table[2], "├─────┼───────┤");
     for (int i = 0; i < 256; i++) {
-        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memory.data[i]);
+        sprintf(table[i + 3], "│ %03d │  %03d  │", i, memdata.data[i]);
     }
     sprintf(table[259], "└─────┴───────┘");
 }
