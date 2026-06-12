@@ -12,6 +12,9 @@
 #include "view.h"
 #include "stats.h"
 
+// Acessa o registrador de pipeline global definido no projeto
+extern PipelineRegisters pipeline;
+
 
 // VARIÁVEIS GLOBAIS qnd for terminado a implementaçao dos registradores de pipeline, essas ficaram obsoletas
 // static const Instruction *inst_atual = NULL;
@@ -37,7 +40,7 @@ void clock() {
     // bufferInformation[0] = '\0';
     // bufferInformation2[0] = '\0';
 
-    
+    // execução dos estágios em ordem. Cada estágio lê os dados do ciclo anterior antes de serem sobrescritos
     estagio_WB();   
     estagio_MEM();  
     estagio_EX();   
@@ -58,10 +61,10 @@ void clock() {
     showClockInformation(bufferInformation, bufferInformation2);
 }
 
-
+// Busca a instrução na memória utilizando o PC atual
 void estagio_IF() {
-    // Busca a instrução na memória utilizando o PC atual
-    const Instruction *inst = &memInstruction.instructions[pc];
+ 
+    const Instruction *inst = &memInstruction.instructions[pc];    
     
     // manda a intruçao pros registradores de pipeline 
     pipeline.if_id.IR = *inst;
@@ -76,9 +79,11 @@ void estagio_IF() {
 }
 
 void estagio_ID() {
+
     // le os registradores de pipeline q vieram do if
+    // sinais são criados p/ a instrução que acabou de ser decodificada.
     Instruction inst = pipeline.if_id.IR;
-    Control ctrl = makeControl(&inst);
+    Control ctrl = makeControl(&inst); // sinal de controle, substituindo sinal global
     
     if (inst.type == OTHER) {
         // Se for uma instrução inválida limpa o registrador de saída para evitar lixo no EX
@@ -96,7 +101,7 @@ void estagio_ID() {
     pipeline.id_ex.B = registers[inst.rt]; // Valor lido de RT
     pipeline.id_ex.imm = inst.imm;         // Valor imediato estendido
     pipeline.id_ex.pc = pipeline.if_id.pc;
-    pipeline.id_ex.ctrl = ctrl;
+    pipeline.id_ex.ctrl = ctrl;            // sinal de controle armazenado no pipeline
 
   
 }
@@ -124,7 +129,7 @@ void estagio_EX() {
     pipeline.ex_mem.ulaOut = resultado.value;
     pipeline.ex_mem.B = pipeline.id_ex.B;
     pipeline.ex_mem.ula_equal = resultado.equal;
-    pipeline.ex_mem.ctrl = pipeline.id_ex.ctrl;
+    pipeline.ex_mem.ctrl = pipeline.id_ex.ctrl; // sinal de controle
 
     pipeline.ex_mem.reg_escrita_destino =
         pipeline.id_ex.ctrl.regDst
@@ -132,43 +137,60 @@ void estagio_EX() {
             : pipeline.id_ex.IR.rt;
 }
 
+// acessa a memória de dados
 void estagio_MEM() {
 
-int8_t dado_memoria_lido = 0;
+int8_t dado_memoria_lido = 0; // variável temporária
 
  if (pipeline.ex_mem.IR.type == OTHER) return;
 
-    if (pipeline.ex_mem.ctrl.wrtMem) {
-        if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) {
-            memData.data[pipeline.ex_mem.ulaOut] = pipeline.ex_mem.B;
-            if (pipeline.ex_mem.ulaOut >= memData.size) {
-                memData.size = pipeline.ex_mem.ulaOut + 1;
+    // SW
+    if (pipeline.ex_mem.ctrl.wrtMem) {  // se o estado anterior manda sinal para salvar na memória
+
+        if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) { // condição para salvar
+            memdata.data[pipeline.ex_mem.ulaOut] = pipeline.ex_mem.B; // grava na memória de dados o valor armazenado em B
+
+            if (pipeline.ex_mem.ulaOut >= memdata.size) { // tamanho da memória expande para guardar nova posição
+                memdata.size = pipeline.ex_mem.ulaOut + 1;
             }
         }
         sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", pipeline.ex_mem.ulaOut, pipeline.ex_mem.B);
     } 
+    // FIM DO SW
+
+    // LW
     else if (pipeline.ex_mem.IR.opcode == LW_OPCODE) {
         if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) {
-            dado_memoria_lido = memData.data[pipeline.ex_mem.ulaOut];
+            dado_memoria_lido = memdata.data[pipeline.ex_mem.ulaOut]; // Lê da memória o valor no endereço ulaOut e guarda em dado_memoria_lido.
         }
         sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", pipeline.ex_mem.ulaOut, dado_memoria_lido);
     }
+    // FIM DO LW
 
+    // Salva nos registradores do pipeline MEM_WB o que será necessário para o próximo estágio
     pipeline.mem_wb.IR = pipeline.ex_mem.IR; // recebe instrução do registrador anterior
     pipeline.mem_wb.memData = dado_memoria_lido;
     pipeline.mem_wb.ulaOut = pipeline.ex_mem.ulaOut;
-    pipeline.mem_wb.ctrl = pipeline.ex_mem.ctrl;
+    pipeline.mem_wb.ctrl = pipeline.ex_mem.ctrl; // sinal de controle
     pipeline.mem_wb.reg_escrita_destino = pipeline.ex_mem.reg_escrita_destino;
 }
 
+
+// escreve resultado final no banco de registradores
 void estagio_WB() {
 
     
     if (pipeline.mem_wb.IR.type == OTHER) return;
 
-    if (pipeline.mem_wb.ctrl.wrtReg) {
-    int8_t valor_final =  pipeline.mem_wb.ctrl.memToReg ? pipeline.mem_wb.memData : pipeline.mem_wb.ulaOut;        
+    // executa WB
+    if (pipeline.mem_wb.ctrl.wrtReg) { // se a função do estagio anterior escreve nos regs
+
+    // Escolhe qual valor será escrito
+    // Se memToReg = 1: usa o valor vindo da memória (lw).
+    // Se memToReg = 0: usa o resultado da ULA (add, sub, addi, etc.).
+    int8_t valor_final =  pipeline.mem_wb.ctrl.memToReg ? pipeline.mem_wb.memData : pipeline.mem_wb.ulaOut; 
     
+    // grava o valor final no banco de registradores
     registers[pipeline.mem_wb.reg_escrita_destino] = valor_final;
 
         if (pipeline.mem_wb.IR.opcode == R_TYPE_OPCODE) {
