@@ -115,8 +115,8 @@ void estagio_EX() {
 }
 
 void estagio_MEM() {
-    
-    if (inst_atual == NULL || inst_atual->type == OTHER) return;
+
+ if (inst_atual == NULL || inst_atual->type == OTHER) return;
 
     if (ctrl_atual.wrtMem) {
         if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
@@ -127,21 +127,29 @@ void estagio_MEM() {
         }
         sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", resultado_ula.value, dado_rt);
     } 
-    else if (inst_atual->opcode == LW_OPCODE) {
+    else if (pipeline.mem_wb.IR.opcode == LW_OPCODE) {
         if (resultado_ula.value >= 0 && resultado_ula.value < 256) {
             dado_memoria_lido = memory.data[resultado_ula.value];
         }
         sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", resultado_ula.value, dado_memoria_lido);
     }
+
+    pipeline.mem_wb.IR = pipeline.ex_mem.IR; // recebe instrução do registrador anterior
+    pipeline.mem_wb.memData = dado_memoria_lido;
+    pipeline.mem_wb.ulaOut = pipeline.ex_mem.ulaOut;
+    pipeline.mem_wb.ctrl = pipeline.ex_mem.ctrl;
+    pipeline.mem_wb.reg_escrita_destino = pipeline.ex_mem.reg_escrita_destino;
 }
 
 void estagio_WB() {
+
     
     if (inst_atual == NULL || inst_atual->type == OTHER) return;
 
-    if (ctrl_atual.wrtReg) {
-        int8_t valor_final = ctrl_atual.memToReg ? resultado_ula.value : dado_memoria_lido;
-        registers[reg_escrita_destino] = valor_final;
+    if (pipeline.mem_wb.ctrl.wrtReg) {
+    int8_t valor_final =  pipeline.mem_wb.ctrl.memToReg ? pipeline.mem_wb.memData : pipeline.mem_wb.ulaOut;        
+    
+    registers[pipeline.mem_wb.reg_escrita_destino] = valor_final;
 
         if (inst_atual->opcode == R_TYPE_OPCODE) {
             sprintf(bufferInformation, " [WB] Escrito no registrador $%1d o resultado: %04d.", reg_escrita_destino, valor_final);
@@ -151,4 +159,5 @@ void estagio_WB() {
             sprintf(bufferInformation, " [WB] Escrito no registrador $%1d o valor carregado: %04d.", reg_escrita_destino, valor_final);
         }
     }
+
 }
