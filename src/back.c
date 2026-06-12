@@ -23,10 +23,11 @@ void saveLastState() {
     for (int i = 0; i < 8; i++) {
         backState->registers[i] = registers[i];
     }
-    for (int i = 0; i < memdata.size ; i++) {
-        backState->memdata.data[i] = memdata.data[i];
+    for (int i = 0; i < memData.size ; i++) {
+        backState->memdata.data[i] = memData.data[i];
     }
-    backState->memdata.size = memdata.size;
+    backState->memdata.size = memData.size;
+    backState->pipeline = pipeline;
     lastState = backState;
 }
 
@@ -54,9 +55,10 @@ void back() {
         registers[i] = lastState->registers[i];
     }
 
-    for (int i = 0; i < memdata.size; i++) {
-        memdata.data[i] = lastState->memdata.data[i];
+    for (int i = 0; i < memData.size; i++) {
+        memData.data[i] = lastState->memdata.data[i];
     }
+    pipeline = lastState->pipeline;
     println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
     BackState *aux = lastState;

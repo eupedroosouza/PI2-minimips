@@ -6,7 +6,10 @@ extern bool debug;
 extern PC pc;
 extern Register registers[8];
 
-extern MemData memdata;
+// Acessa o registrador de pipeline global definido no projeto
+extern PipelineRegisters pipeline;
+
+extern MemData memData;
 extern MemInstruction memInstruction;
 
 

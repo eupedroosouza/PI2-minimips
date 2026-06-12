@@ -108,7 +108,7 @@ typedef struct state {
     struct state *previous;
     PC pc;
     Register registers[8];
-    PipelineRegisters pipelineRegisters;
+    PipelineRegisters pipeline;
     MemData memdata;
 } BackState;
 

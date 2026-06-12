@@ -100,7 +100,7 @@ void loadInstructionsOnMem() {
 
             i++;
         }
-        memdata.size = i;
+        memInstruction.size = i;
 
         fclose(arquivo); // Fecha arquivo
 
@@ -109,7 +109,7 @@ void loadInstructionsOnMem() {
             viewInstructions();
         }
 
-        println("Foram carregadas %d instruções na memória de instrução.", memdata.size);
+        println("Foram carregadas %d instruções na memória de instrução.", memData.size);
         invalidateLastState();
     } //fim do else
 }

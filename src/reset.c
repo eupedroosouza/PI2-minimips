@@ -4,14 +4,12 @@
 #include "encoding.h"
 #include "main.h"
 
-PipelineRegisters pipeline;
-
 
 void resetInstructions() {
     for (int i = 0; i < MEM_SIZE; i++) {
         memInstruction.instructions[i] = emptyInstruction;
     }
-    memdata.size = 0;
+    memInstruction.size = 0;
 }
 
 void resetRegisters() {
@@ -32,7 +30,7 @@ void resetRegisters() {
 
 void resetData() {
     for (int i = 0; i < MEM_SIZE; i++) {
-        memdata.data[i] = 0;
+        memData.data[i] = 0;
     }
-    memdata.size = 0;
+    memData.size = 0;
 }

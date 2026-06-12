@@ -28,8 +28,10 @@ bool debug = false;
 PC pc;
 Register registers[8];
 
+PipelineRegisters pipeline;
+
 MemInstruction memInstruction;
-MemData memdata;
+MemData memData;
 
 int main(const int argCount, char *args[]) {
     if (argCount >= 1) {
