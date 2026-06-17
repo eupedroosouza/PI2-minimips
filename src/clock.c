@@ -148,10 +148,10 @@ int8_t dado_memoria_lido = 0; // variável temporária
     if (pipeline.ex_mem.ctrl.wrtMem) {  // se o estado anterior manda sinal para salvar na memória
 
         if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) { // condição para salvar
-            memdata.data[pipeline.ex_mem.ulaOut] = pipeline.ex_mem.B; // grava na memória de dados o valor armazenado em B
+            memData.data[pipeline.ex_mem.ulaOut] = pipeline.ex_mem.B; // grava na memória de dados o valor armazenado em B
 
-            if (pipeline.ex_mem.ulaOut >= memdata.size) { // tamanho da memória expande para guardar nova posição
-                memdata.size = pipeline.ex_mem.ulaOut + 1;
+            if (pipeline.ex_mem.ulaOut >= memData.size) { // tamanho da memória expande para guardar nova posição
+                memData.size = pipeline.ex_mem.ulaOut + 1;
             }
         }
         sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", pipeline.ex_mem.ulaOut, pipeline.ex_mem.B);
@@ -161,7 +161,7 @@ int8_t dado_memoria_lido = 0; // variável temporária
     // LW
     else if (pipeline.ex_mem.IR.opcode == LW_OPCODE) {
         if (pipeline.ex_mem.ulaOut >= 0 && pipeline.ex_mem.ulaOut < 256) {
-            dado_memoria_lido = memdata.data[pipeline.ex_mem.ulaOut]; // Lê da memória o valor no endereço ulaOut e guarda em dado_memoria_lido.
+            dado_memoria_lido = memData.data[pipeline.ex_mem.ulaOut]; // Lê da memória o valor no endereço ulaOut e guarda em dado_memoria_lido.
         }
         sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", pipeline.ex_mem.ulaOut, dado_memoria_lido);
     }
