@@ -8,6 +8,7 @@
 #include "colors.h"
 #include "data.h"
 #include "instruction.h"
+#include "interface.h"
 #include "main.h"
 #include "utils.h"
 #include "view.h"
@@ -87,7 +88,7 @@ void menu() {
                 break;
             }
             case 9: {
-                clock();
+                execution();
                 break;
             }
             case 10: {

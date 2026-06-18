@@ -5,6 +5,7 @@
 #include <string.h>
 
 
+#include "interface.h"
 #include "reset.h"
 #include "stats.h"
 
@@ -72,7 +73,7 @@ int main(const int argCount, char *args[]) {
     resetInstructions();
     // End-reset
 
-    menu();
+    menu2();
 
     return 0;
 }
