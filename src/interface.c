@@ -17,12 +17,12 @@
 void printOption(WINDOW *win, const int option, const int offset, const int select, const char *msg) {
     const bool selected = select == option;
     wattron(win, COLOR_PAIR(1));
-    mvwprintw(win, option + offset, 1, " %1d ", option);
+    mvwprintw(win, option, 1, " %1d ", option + offset);
     wattroff(win, COLOR_PAIR(1));
     if (selected) {
         wattron(win, COLOR_PAIR(1));
     }
-    mvwprintw(win, option + offset, 4, msg);
+    mvwprintw(win, option, 4, msg);
     if (selected) {
         wattroff(win, COLOR_PAIR(1));
     }
