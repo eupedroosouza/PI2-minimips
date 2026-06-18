@@ -35,6 +35,9 @@ void showRegisters() {
     for (int i = 0; i < 13; i++) {
         println(table[i]);
     }
+    printf("Pressione qualquer tecla para continuar!");
+    int vd = 0;
+    scanf("%d", &vd);
 }
 
 // End Registers
@@ -199,6 +202,10 @@ void showStatistics() {
     println("│ BEQ       │ %-13d │ 3   │ %-17d │", stats.executedInstructionsPerClass.beq, cycles_beq);
     println("│ J         │ %-13d │ 3   │ %-17d │", stats.executedInstructionsPerClass.j, cycles_j);
     println("└───────────┴───────────────┴─────┴───────────────────┘");
+
+    printf("Pressione qualquer tecla para continuar!");
+    int vd = 0;
+    scanf("%d", &vd);
 }
 // End-Statistics
 
@@ -338,6 +345,10 @@ void showMems() {
     }
 
     println("└─────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n");
+
+    printf("Pressione qualquer tecla para continuar!");
+    int vd = 0;
+    scanf("%d", &vd);
 }
 
 // Case 5 do menu. Função que escreve todos os dados do programa na tela
@@ -362,6 +373,10 @@ void printAllProgramData() {
         printf("│ %s │ %s │ %s │\n", i < 13 ? registerTable[i] : "                 ", memDataTable[i], memInstructionTable[i]);
     }
     println("└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘");
+
+    printf("Pressione qualquer tecla para continuar!");
+    int vd = 0;
+    scanf("%d", &vd);
 }
 
 
