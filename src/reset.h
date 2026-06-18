@@ -1,13 +1,11 @@
-#ifndef RESET_H
-#define RESET_H
+#pragma once
 
+#include "types.h"
 
 void resetInstructions();
 
 
-void resetRegisters();
+void resetRegisters(PipelineRegisters *pipeline);
 
 
 void resetData();
-
-#endif

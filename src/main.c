@@ -17,9 +17,8 @@
 
 
 #include "colors.h"
-#include "encoding.h"
 #include "instruction.h"
-#include "menu.h"
+#include  "interface.h"
 #include  "types.h"
 #include  "utils.h"
 
@@ -59,20 +58,18 @@ int main(const int argCount, char *args[]) {
     }
 #endif
 
-    // header
-    println(
-        "                    "BOLD_WHITE"Simulador Mini-MIPS 8 bits pipeline - Versão 0.0.1"RESET"\n            Autores:  Pedro S. Moreira, Willian A. Correa, William N. A. Paiva\n\n                             Engenharia de Computação\n               Universidade Federal do Pampa (Unipampa) - Campus Bagé");
-   initStatistics();
+    initStatistics();
     // Create empty Instruction
     decodeInstruction(&emptyInstruction, "0000000000000000");
 
     // Reset (do that to prevents incorrect data (trash data) on not loaded data)
-    resetRegisters();
+    resetRegisters(&pipeline);
     resetData();
     resetInstructions();
     // End-reset
 
-    menu();
+    // start menu based on curses
+    menu2();
 
     return 0;
 }

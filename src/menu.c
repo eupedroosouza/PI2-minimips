@@ -107,7 +107,7 @@ void menu() {
             }
 
             case 13: {
-                resetRegisters();
+                resetRegisters(&pipeline);
                 break;
             }
 
