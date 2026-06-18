@@ -1,12 +1,33 @@
 #include "interface.h"
 
 #include <curses.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include "back.h"
+#include "data.h"
+#include "instruction.h"
+#include "reset.h"
+#include "view.h"
 
 #define WIDTH 207
 #define HEIGHT 49
+
+
+void printOption(WINDOW *win, const int option, const int offset, const int select, const char *msg) {
+    const bool selected = select == option;
+    wattron(win, COLOR_PAIR(1));
+    mvwprintw(win, option + offset, 1, " %1d ", option);
+    wattroff(win, COLOR_PAIR(1));
+    if (selected) {
+        wattron(win, COLOR_PAIR(1));
+    }
+    mvwprintw(win, option + offset, 4, msg);
+    if (selected) {
+        wattroff(win, COLOR_PAIR(1));
+    }
+}
+
 
 void menu2() {
     (void) initscr();
@@ -28,57 +49,6 @@ void menu2() {
     // create selection box
     WINDOW *selWin = newwin(36, 52, 8, (WIDTH - 46) / 2);
     box(selWin, 0, 0);
-    // selections
-    // 1
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 1, 1, " 1 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 1, 4, " Carregar memória de instruções (.mem)");
-    // 2
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 2, 1, " 2 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 2, 4, " Carregar memória de dados (.dat)");
-    // 3
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 3, 1, " 3 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 3, 4, " Exibir o simulador (registradores, memórias)");
-    // 4
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 4, 1, " 4 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 4, 4, " Salvar instruçôes em Assembly (.asm)");
-    // 5
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 5, 1, " 5 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 5, 4, " Salvar memória de dados (.dat)");
-    // 6
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 6, 1, " 6 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 6, 4, " Modo de execução");
-    // 7
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 7, 1, " 7 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 7, 4, " Redefinir memória de instruções");
-    // 8
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 8, 1, " 8 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 8, 4, " Redefinir registradores");
-    // 9
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 9, 1, " 9 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 9, 4, " Redefinir memória de dados");
-    // 0
-    wattron(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 10, 1, " 0 ");
-    wattroff(selWin, COLOR_PAIR(1));
-    mvwprintw(selWin, 10, 4, " Encerrar o simulador");
 
     // help usage
     mvwprintw(win, 43, 83, "Use ");
@@ -88,35 +58,101 @@ void menu2() {
     wattron(win, COLOR_PAIR(1));
     mvwprintw(win, 43, 91, " ↑ ");
     wattroff(win, COLOR_PAIR(1));
-    mvwprintw(win, 43, 94, " para navegar ou digite o número!");
+    mvwprintw(win, 43, 94, " e pressione ");
+    mvwprintw(win, 43, 107, " ↵ ");
 
     refresh();
     wrefresh(win);
     wrefresh(selWin);
 
-    int select = 0;
+    int select = 1;
     while (1) {
-        
-
+        printOption(selWin, 1, 0, select, " Carregar memória de instruções (.mem)");
+        printOption(selWin, 2, 0, select, " Carregar memória de dados (.dat)");
+        printOption(selWin, 3, 0, select, " Exibir o simulador (registradores, memórias)");
+        printOption(selWin, 4, 0, select, " Salvar instruçôes em Assembly (.asm)");
+        printOption(selWin, 5, 0, select, " Salvar memória de dados (.dat)");
+        printOption(selWin, 6, 0, select, " Modo de execução");
+        printOption(selWin, 7, 0, select, " Estatísticas");
+        printOption(selWin, 8, 0, select, " Redefinir memória de instruções");
+        printOption(selWin, 9, 0, select, " Redefinir registradores");
+        printOption(selWin, 10, 0, select, " Redefinir memória de dados");
+        printOption(selWin, 11, -11, select, " Encerrar o simulador");
+        refresh();
+        wrefresh(win);
+        wrefresh(selWin);
+        const int ch = getch();
+        // out of switch to pass break to for (no switch)
+        if (ch == KEY_ENTER) {
+            break;
+        }
+        switch (ch) {
+            case KEY_UP: {
+                if (select > 0) {
+                    select--;
+                }
+                break;
+            }
+            case KEY_DOWN: {
+                if (select < 11) {
+                    select++;
+                }
+                break;
+            }
+            default: break;
+        }
     }
-    getch();
 
     delwin(selWin);
     delwin(win);
     endwin();
-}
 
-void printOption(WINDOW *win, const int option, const int select, const char *msg) {
-    const bool selected = select == option;
-    wattron(win, COLOR_PAIR(1));
-    mvwprintw(win, option, 1, " %1d ", option);
-    wattroff(win, COLOR_PAIR(1));
-    if (selected) {
-        wattron(win, COLOR_PAIR(1));
-    }
-    mvwprintw(win, option, 4, msg);
-    if (selected) {
-        wattroff(win, COLOR_PAIR(1));
+    switch (select) {
+        case 1: {
+            loadInstructionsOnMem();
+            break;
+        }
+        case 2: {
+            loadDataOnMem();
+            break;
+        }
+        case 3: {
+            printAllProgramData();
+            break;
+        }
+        case 4: {
+            saveInstructionOnAssembly();
+            break;
+        }
+        case 5: {
+            saveMemData();
+            break;
+        }
+        case 6: {
+            execution();
+            break;
+        }
+        case 7: {
+            showStatistics();
+            break;
+        }
+        case 8: {
+            resetInstructions();
+            break;
+        }
+        case 9: {
+            resetRegisters();
+            break;
+        }
+        case 10: {
+            resetData();
+            break;
+        }
+        case 11: {
+            exit(0);
+            return;
+        }
+        default: break;
     }
 }
 
