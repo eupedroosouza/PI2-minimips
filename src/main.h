@@ -12,5 +12,5 @@ extern Register registers[8];
 extern MemData memData;
 extern MemInstruction memInstruction;
 
-
+extern Instruction emptyInstruction;
 

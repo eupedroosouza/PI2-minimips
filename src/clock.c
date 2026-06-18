@@ -125,6 +125,20 @@ void estagio_EX(PipelineRegisters *pipeline) {
             pipeline->id_ex.ctrl.ulaControl
         );
 
+      // Se for um Branch e a ULA confirmar que são iguais
+    if (pipeline->id_ex.ctrl.branch && resultado.equal) {
+        pc = pipeline->id_ex.pc + 1 + pipeline->id_ex.imm; // Atualiza o PC global
+        pipeline->id_ex.IR = emptyInstruction;             // Limpa o estágio ID
+        pipeline->if_id.IR = emptyInstruction;             // Limpa o estágio IF
+    }
+    // Se for um Jum
+    else if (pipeline->id_ex.ctrl.jump) {
+        pc = pipeline->id_ex.IR.addr;                      // PC vai direto pro endereço do J
+        pipeline->id_ex.IR = emptyInstruction;             // Limpa o estágio ID
+        pipeline->if_id.IR = emptyInstruction;             // Limpa o estágio IF
+    }
+
+
     pipeline->ex_mem.IR = pipeline->id_ex.IR;
     pipeline->ex_mem.ulaOut = resultado.value;
     pipeline->ex_mem.B = pipeline->id_ex.B;
