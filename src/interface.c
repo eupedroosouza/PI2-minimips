@@ -2,9 +2,9 @@
 
 #include <curses.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include "back.h"
+#include "clock.h"
 #include "data.h"
 #include "instruction.h"
 #include "main.h"
@@ -74,7 +74,7 @@ void menu2() {
         while (1) {
             printOption(selWin, 1, 0, select, "Carregar memória de instruções (.mem)");
             printOption(selWin, 2, 0, select, "Carregar memória de dados (.dat)");
-            printOption(selWin, 3, 0, select, "Exibir o simulador (registradores, memórias)");
+            printOption(selWin, 3, 0, select, "Exibir o simulador");
             printOption(selWin, 4, 0, select, "Salvar instruçôes em Assembly (.asm)");
             printOption(selWin, 5, 0, select, "Salvar memória de dados (.dat)");
             printOption(selWin, 6, 0, select, "Modo de execução");
@@ -156,7 +156,6 @@ void menu2() {
             }
             case 11: {
                 exit(0);
-                return;
             }
             default: break;
         }
@@ -212,7 +211,7 @@ void execution() {
                 break;
             }
             case 83: {
-                clock();
+                clock(&pipeline);
                 break;
             }
             case 66: {

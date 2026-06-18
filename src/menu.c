@@ -74,7 +74,7 @@ void menu() {
                 println("A execução do programa vai iniciar em 3 segundos... Aguarde!");
                 SLEEP_MS(3000);
                 while (1) {
-                    clock();
+                    clock(&pipeline);
                     execs++;
                     if (_kbhit()) {
                         const char usedKey = (char) _getch();

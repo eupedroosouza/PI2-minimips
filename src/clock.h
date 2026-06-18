@@ -1,3 +1,5 @@
 #pragma once
 
-void clock();
+#include "types.h"
+
+void clock(PipelineRegisters *pipeline);
