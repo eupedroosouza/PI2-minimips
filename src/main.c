@@ -1,5 +1,6 @@
 #include "main.h"
 
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,30 +34,7 @@ MemInstruction memInstruction;
 MemData memData;
 
 int main(const int argCount, char *args[]) {
-    if (argCount >= 1) {
-        for (int i = 0; i < argCount; i++) {
-            if (strcmp(args[i], "--debug") == 0) {
-                debug = true;
-            }
-        }
-    }
-
-
-#ifdef _WIN32
-    // Configura o terminal para usar UTF-8  no Windows (corrige os ascentos).
-    SetConsoleOutputCP(CP_UTF8);
-    // Configura o terminal para aceitar caracteres ANSI no Windows.
-    const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut != INVALID_HANDLE_VALUE) {
-        DWORD dwMode = 0;
-        if (GetConsoleMode(hOut, &dwMode)) {
-            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-            if (!SetConsoleMode(hOut, dwMode)) {
-                printf("Erro ao habilitar suporte ANSI no Windows.\n");
-            }
-        }
-    }
-#endif
+    setlocale(LC_ALL, "");
 
     initStatistics();
     // Create empty Instruction
