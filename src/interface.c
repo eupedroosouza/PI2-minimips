@@ -15,14 +15,7 @@
 #define WIDTH 207
 #define HEIGHT 49
 
-WINDOW * createWindow() {
-    (void) initscr();
-    keypad(stdscr, TRUE); // enable use special keys
-    cbreak();
-    noecho(); // no send clicked button
-    start_color(); // start clock supports
-    curs_set(FALSE); // remove cursor
-    init_pair(1, COLOR_BLACK, COLOR_WHITE);
+WINDOW *createWindow() {
     WINDOW *win = newwin(HEIGHT, WIDTH, (LINES - HEIGHT) / 2, (COLS - WIDTH) / 2); // centralized window
     box(win, 0, 0); // border
     return win;
@@ -42,19 +35,71 @@ void printOption(WINDOW *win, const int option, const int offset, const int sele
     }
 }
 
+WINDOW *textInputUI(const char *msg, char *buffer) {
+    WINDOW *win = createWindow();
+
+    wattron(win, A_BOLD);
+    mvwprintw(win, 2, 2, msg);
+    wattroff(win, A_BOLD);
+
+    mvwprintw(win, 3, 2, "> ");
+    refresh();
+    wrefresh(win);
+
+    int idx = 0;
+    wmove(win, 3, 4);
+    while (idx < 127) {
+        const int ch = getch();
+
+        if (ch == 27) {
+            // ESC
+            buffer[0] = '\0';
+            break;
+        }
+        if (ch == '\n' || ch == '\r') {
+            buffer[idx] = '\0';
+            break;
+        }
+        if (ch == KEY_BACKSPACE || ch == 127 || ch == '\b') {
+            if (idx > 0) {
+                idx--;
+                mvwaddch(win, 3, 4 + idx, ' ');
+                wmove(win, 3, 4 + idx);
+            }
+        } else if (ch >= 32 && ch <= 126) {
+            buffer[idx] = ch;
+            mvwaddch(win, 3, 4 + idx, ch);
+            idx++;
+        }
+
+        refresh();
+        wrefresh(win);
+    }
+
+    if (strlen(buffer) == 0) {
+        delwin(win);
+        return NULL;
+    }
+
+    return win;
+}
+
+void finalTextInputUI(WINDOW *win, const char *msg) {
+    mvwprintw(win, 4, 2, "> %s", msg);
+    mvwprintw(win, 5, 2, "Pressione qualquer tecla para continuar.");
+    refresh();
+    wrefresh(win);
+
+    getch();
+
+    delwin(win);
+}
+
+
 
 void menu2() {
     while (1) {
-        (void) initscr();
-        keypad(stdscr, TRUE); // enable use special keys
-        noecho(); // no send clicked button
-        start_color(); // start clock supports
-        curs_set(FALSE); // remove cursor
-
-        init_pair(1, COLOR_BLACK, COLOR_WHITE); // black letter, white background
-
-        WINDOW *win = newwin(HEIGHT, WIDTH, (LINES - HEIGHT) / 2, (COLS - WIDTH) / 2); // centralized window
-        box(win, 0, 0); // border
+        WINDOW *win = createWindow(); // centralized window
 
         // title of simulator
         wattron(win, A_BOLD);
@@ -124,7 +169,6 @@ void menu2() {
 
         delwin(selWin);
         delwin(win);
-        endwin();
 
         switch (select) {
             case 1: {
@@ -176,54 +220,14 @@ void menu2() {
 }
 
 void loadInstructionsUI() {
-    WINDOW *win = createWindow();
-
-    wattron(win, A_BOLD);
-    mvwprintw(win, 2, 2, "Digite o caminho do arquivo que contém a memória de instrução .mem:");
-    wattroff(win, A_BOLD);
-
-    mvwprintw(win, 3, 2, "> ");
-    refresh();
-    wrefresh(win);
-
-    int idx = 0;
     char fileName[128];
-    wmove(win, 3, 4);
-    // mvwgetnstr(win, 3, col, fileName, sizeof(fileName) - 1);
-    while (idx < 127) {
-        const int ch = getch();
-
-        if (ch == 27) { // ESC
-            fileName[0] = '\0';
-            goto end_win;
-        }
-        if (ch == '\n' || ch == '\r') {
-            fileName[idx] = '\0';
-            break;
-        }
-        if (ch == KEY_BACKSPACE || ch == 127 || ch == '\b') {
-            if (idx > 0) {
-                idx--;
-                mvwaddch(win, 3, 4 + idx, ' ');
-                wmove(win, 3, 4 + idx);
-            }
-        }
-
-        else if (ch >= 32 && ch <= 126) {
-            fileName[idx] = ch;
-            mvwaddch(win, 3, 4 + idx, ch);
-            idx++;
-        }
-
-        refresh();
-        wrefresh(win);
+    WINDOW *win = textInputUI("Digite o caminho do arquivo que contém a memória de instrução .mem:", fileName);
+    if (win == NULL) {
+        return;
     }
 
     char msg[256];
     FILE *arquivo = fopen(fileName, "r"); // Abre arquivo .mem para leitura
-    if (strlen(fileName) == 0) {
-        goto end_win;
-    }
     if (arquivo == NULL) {
         sprintf(msg, "Erro ao ler arquivo!");
     } else {
@@ -244,43 +248,19 @@ void loadInstructionsUI() {
         invalidateLastState();
     }
 
-    mvwprintw(win, 4, 2, "> %s", msg);
-    mvwprintw(win, 5, 2, "Pressione qualquer tecla para continuar.");
-    refresh();
-    wrefresh(win);
-
-    getch();
-
-    end_win:
-    delwin(win);
+    finalTextInputUI(win, msg);
 }
 
 void loadDataUI() {
-    WINDOW *win = createWindow();
-
-    wattron(win, A_BOLD);
-    mvwprintw(win, 2, 2, "Digite o caminho do arquivo .dat: ");
-    wattroff(win, A_BOLD);
-
-    mvwprintw(win, 3, 2, "> ");
-    refresh();
-    wrefresh(win);
-
-    echo();
-    nocbreak();
-
     char fileName[128];
-    mvwgetnstr(win, 3, 4, fileName, sizeof(fileName) - 1);
-
-    noecho();
-    cbreak();
+    WINDOW *win = textInputUI("Digite o caminho do arquivo .dat: ", fileName);
+    if (win == NULL) {
+        return;
+    }
 
     char msg[256];
     FILE *arquivo = fopen(fileName, "r");
-
-    if (strlen(fileName) == 0) {
-        sprintf(msg, "Não há nada para abrir!");
-    } else if (arquivo == NULL) {
+    if (arquivo == NULL) {
         sprintf(msg, "Erro ao ler arquivo!");
     } else {
         resetData();
@@ -296,46 +276,24 @@ void loadDataUI() {
             }
         }
 
-        memData.size =  i;
+        memData.size = i;
         fclose(arquivo);
         sprintf(msg, "A memória de dados foi carregada.");
     }
 
-    mvwprintw(win, 4, 2, "> %s", msg);
-    mvwprintw(win, 5, 2, "Pressione qualquer tecla para continuar.");
-    refresh();
-    wrefresh(win);
-
-    getch();
-
-    delwin(win);
+   finalTextInputUI(win, msg);
 }
 
 void saveInstructionOnAssemblyUI() {
-    WINDOW *win = createWindow();
-
-    wattron(win, A_BOLD);
-    mvwprintw(win, 2, 2, "Digite o diretório para salvar o arquivo .asm: ");
-    wattroff(win, A_BOLD);
-
-    mvwprintw(win, 3, 2, "> ");
-    refresh();
-    wrefresh(win);
-
-    echo();
-    nocbreak();
-
     char fileName[128];
-    mvwgetnstr(win, 3, 4, fileName, sizeof(fileName) - 1);
-
-    noecho();
-    cbreak();
+    WINDOW *win = textInputUI("Digite o diretório para salvar o arquivo .asm:", fileName);
+    if (win == NULL) {
+        return;
+    }
 
     char msg[256];
     FILE *arquivoDestino = fopen(fileName, "w");
-    if (strlen(fileName) == 0) {
-        sprintf(msg, "Não há nada para abrir!");
-    } else if (arquivoDestino == NULL) {
+    if (arquivoDestino == NULL) {
         printf("\nErro ao abrir arquivo!");
     } else {
         for (int i = 0; i < 256; i++) {
@@ -345,43 +303,21 @@ void saveInstructionOnAssemblyUI() {
         sprintf(msg, "As instruções em Assembly foram salvas em: %s.", fileName);
     }
 
-    mvwprintw(win, 4, 2, "> %s", msg);
-    mvwprintw(win, 5, 2, "Pressione qualquer tecla para continuar.");
-    refresh();
-    wrefresh(win);
-
-    getch();
-
-    delwin(win);
+    finalTextInputUI(win, msg);
 }
 
 
 void saveMemDataUI() {
-    WINDOW *win = createWindow();
-
-    wattron(win, A_BOLD);
-    mvwprintw(win, 2, 2, "Digite o caminho para salvar o arquivo .dat: ");
-    wattroff(win, A_BOLD);
-
-    mvwprintw(win, 3, 2, "> ");
-    refresh();
-    wrefresh(win);
-
-    echo();
-    nocbreak();
-
     char fileName[128];
-    mvwgetnstr(win, 3, 4, fileName, sizeof(fileName) - 1);
-
-    noecho();
-    cbreak();
+    WINDOW *win = textInputUI("Digite o caminho para salvar o arquivo .dat: ", fileName);
+    if (win == NULL) {
+        return;
+    }
 
     char msg[256];
     FILE *arquivo = fopen(fileName, "w");
-    if (strlen(fileName) == 0) {
-        sprintf(msg, "Não há nada para abrir!");
-    } else if (arquivo == NULL) {
-        printf("\nErro ao abrir arquivo!");
+    if (arquivo == NULL) {
+        sprintf(msg, "\nErro ao abrir arquivo!");
     } else {
         for (int i = 0; i < MEM_SIZE; i++) {
             fprintf(arquivo, "%d\n", memData.data[i]);
@@ -391,14 +327,7 @@ void saveMemDataUI() {
         sprintf(msg, "A memória de dados foi salva em: %s.", fileName);
     }
 
-    mvwprintw(win, 4, 2, "> %s", msg);
-    mvwprintw(win, 5, 2, "Pressione qualquer tecla para continuar.");
-    refresh();
-    wrefresh(win);
-
-    getch();
-
-    delwin(win);
+    finalTextInputUI(win, msg);
 }
 
 void execution() {

@@ -72,18 +72,18 @@ void menu() {
                 int execs = 0;
                 println("Pressione 'P' para parar a execução do programa quando quiser.");
                 println("A execução do programa vai iniciar em 3 segundos... Aguarde!");
-                SLEEP_MS(3000);
-                while (1) {
-                    clock(&pipeline);
-                    execs++;
-                    if (_kbhit()) {
-                        const char usedKey = (char) _getch();
-                        if (usedKey == 'p' || usedKey == 'P') {
-                            println("Pausando a execução do programa...");
-                            break;
-                        }
-                    }
-                }
+                // SLEEP_MS(3000);
+                // while (1) {
+                //     clock(&pipeline);
+                //     execs++;
+                //     if (_kbhit()) {
+                //         const char usedKey = (char) _getch();
+                //         if (usedKey == 'p' || usedKey == 'P') {
+                //             println("Pausando a execução do programa...");
+                //             break;
+                //         }
+                //     }
+                // }
                 println("\nForam executadas %d instruções.", execs);
                 break;
             }

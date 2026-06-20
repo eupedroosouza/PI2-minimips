@@ -4,18 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <curses.h>
 
 
 #include "reset.h"
 #include "stats.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
-#endif
-
 
 #include "colors.h"
 #include "instruction.h"
@@ -36,6 +29,15 @@ MemData memData;
 int main(const int argCount, char *args[]) {
     setlocale(LC_ALL, "");
 
+    // init ncurses
+    (void) initscr();
+    keypad(stdscr, TRUE); // enable use special keys
+    cbreak();
+    noecho(); // no send clicked button
+    start_color(); // start clock supports
+    curs_set(FALSE); // remove cursor
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);  // black letter, white background
+
     initStatistics();
     // Create empty Instruction
     decodeInstruction(&emptyInstruction, "0000000000000000");
@@ -49,6 +51,7 @@ int main(const int argCount, char *args[]) {
     // start menu based on curses
     menu2();
 
+    endwin();
+
     return 0;
 }
-
