@@ -13,7 +13,7 @@
 #include "stats.h"
 
 // Acessa o registrador de pipeline global definido no projeto
-extern PipelineRegisters pipeline;
+// extern PipelineRegisters pipeline;
 
 
 // VARIÁVEIS GLOBAIS qnd for terminado a implementaçao dos registradores de pipeline, essas ficaram obsoletas
