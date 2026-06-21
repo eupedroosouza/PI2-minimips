@@ -1,5 +1,7 @@
 #include "control.h"
 
+#include <stdio.h>
+
 Control makeControl(const Instruction *instruction) {
     Control control;
     // Initial values

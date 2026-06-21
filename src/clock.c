@@ -96,6 +96,10 @@ void estagio_ID(PipelineRegisters *pipeline) {
     pipeline->ID.imm = inst.imm; // Valor imediato estendido
     pipeline->ID.PCP1 = pipeline->IF.PCP1;
     pipeline->ID.ctrl = makeControl(&inst); // sinal de controle armazenado no pipeline
+    printf("type: %d\n", inst.type);
+    printf("reg dst: %d\n", pipeline->ID.ctrl.regDst);
+    printf("rs: %d\n", pipeline->ID.RS);
+    printf("rd: %d\n", pipeline->ID.RD);
 
     printf("<< end id >>\n");
 }
@@ -107,13 +111,13 @@ void estagio_EX(PipelineRegisters *pipeline) {
     const int8_t operando2 = pipeline->ID.ctrl.ulaSource ? pipeline->ID.imm : pipeline->ID.B;
     const ULAOut resultado = ula(pipeline->ID.A, operando2, pipeline->ID.ctrl.ulaControl);
 
-    printf("ula source op 2 is %d and value %d", pipeline->ID.ctrl.ulaSource, operando2);
-    printf("ula result is %d and equal %d", resultado.value, resultado.equal);
+    printf("ula source op 2 is %d and value %d\n", pipeline->ID.ctrl.ulaSource, operando2);
+    printf("ula result is %d and equal %d\n", resultado.value, resultado.equal);
 
     pipeline->EX_MEM.ulaOut = resultado.value;
     pipeline->EX_MEM.B = pipeline->ID.B;
     pipeline->EX_MEM.RD = pipeline->ID.ctrl.regDst ? pipeline->ID.RS : pipeline->ID.RD;
-    printf("rd mux is %d and value %d ", pipeline->ID.ctrl.regDst,
+    printf("rd mux is %d and value %d\n ", pipeline->ID.ctrl.regDst,
            (pipeline->ID.ctrl.regDst ? pipeline->ID.RS : pipeline->ID.RD));
     pipeline->EX_MEM.ctrl = pipeline->ID.ctrl; // sinal de controle
 
@@ -134,7 +138,7 @@ void estagio_MEM(PipelineRegisters *pipeline) {
 
     // Salva nos registradores do pipeline MEM_WB o que será necessário para o próximo estágio
     pipeline->MEM_WEB.MEM = memData.data[pipeline->EX_MEM.ulaOut];
-    printf("read %d from address: %d", memData.data[pipeline->EX_MEM.ulaOut], pipeline->EX_MEM.ulaOut);
+    printf("read %d from address: %d\n", memData.data[pipeline->EX_MEM.ulaOut], pipeline->EX_MEM.ulaOut);
     pipeline->MEM_WEB.ulaOut = pipeline->EX_MEM.ulaOut;
     pipeline->MEM_WEB.ctrl = pipeline->EX_MEM.ctrl; // sinal de controle
     pipeline->MEM_WEB.RD = pipeline->EX_MEM.RD;

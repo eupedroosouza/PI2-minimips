@@ -181,14 +181,7 @@ void menu2() {
             case 3: {
                 endwin();
                 printAllProgramData();
-                // init ncurses
-                (void) initscr();
-                keypad(stdscr, TRUE); // enable use special keys
-                cbreak();
-                noecho(); // no send clicked button
-                start_color(); // start clock supports
-                curs_set(FALSE); // remove cursor
-                init_pair(1, COLOR_BLACK, COLOR_WHITE);  // black letter, white background
+
                 break;
             }
             case 4: {
@@ -200,7 +193,31 @@ void menu2() {
                 break;
             }
             case 6: {
-                execution();
+                endwin();
+
+                // temporary exec mode
+                while (1) {
+                    printf("select:\n[0] - step\n[1] - back step\n[2] - exit\n");
+                    int op;
+                    scanf("%d", &op);
+                    if (op == 0) {
+                        clock(&pipeline);
+                    } else if (op ==  1) {
+                        back();
+                    } else if (op ==  2) {
+                        break;
+                    }
+                }
+
+
+                // init ncurses
+                (void) initscr();
+                keypad(stdscr, TRUE); // enable use special keys
+                cbreak();
+                noecho(); // no send clicked button
+                start_color(); // start clock supports
+                curs_set(FALSE); // remove cursor
+                init_pair(1, COLOR_BLACK, COLOR_WHITE);  // black letter, white background
                 break;
             }
             case 7: {
