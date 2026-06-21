@@ -10,7 +10,7 @@
 #include "colors.h"
 #include "main.h"
 
-const char *boolStr[2] = {RED"F"RESET, GREEN"V"RESET};
+const char *boolStr[2] = {"F", "V"};
 
 void println(char *msg, ...) {
     va_list args;

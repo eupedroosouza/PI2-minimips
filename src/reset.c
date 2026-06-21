@@ -25,7 +25,8 @@ void resetRegisters(PipelineRegisters *pipeline) {
     pc = 0;
 
     // regs reset
-    pipeline->IF = (IF_ID){0};
+    pipeline->IF.IR = emptyInstruction;
+    pipeline->IF.PCP1 = 0;
     pipeline->ID = (ID_EX){0};
     pipeline->EX_MEM = (EX_MEM){0};
     pipeline->MEM_WEB = (MEM_WB){0};

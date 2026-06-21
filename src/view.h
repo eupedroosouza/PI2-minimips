@@ -1,6 +1,7 @@
 #pragma once
 #include "types.h"
 
+extern  const char *typeStr[4];
 
 // Registers
 

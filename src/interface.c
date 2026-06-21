@@ -6,14 +6,18 @@
 
 #include "back.h"
 #include "clock.h"
+#include "control.h"
 #include "data.h"
 #include "instruction.h"
 #include "main.h"
 #include "reset.h"
+#include "utils.h"
 #include "view.h"
+#include "ula.h"
 
 #define WIDTH 207
 #define HEIGHT 49
+
 
 WINDOW *createWindow() {
     WINDOW *win = newwin(HEIGHT, WIDTH, (LINES - HEIGHT) / 2, (COLS - WIDTH) / 2); // centralized window
@@ -356,11 +360,199 @@ void saveMemDataUI() {
     finalTextInputUI(win, msg);
 }
 
+void instructionUI(WINDOW *win, const int base, const int idx, Instruction *instruction) {
+    mvwaddch(win, base, 0, ACS_LTEE);
+    mvwhline(win, base, 1, ACS_HLINE, 108);
+    mvwaddch(win, base, 6, ACS_TTEE);
+    mvwaddch(win, base, 25, ACS_TTEE);
+    mvwaddch(win, base, 32, ACS_TTEE);
+    mvwaddch(win, base, 58, ACS_TTEE);
+    mvwaddch(win, base, 67, ACS_TTEE);
+    mvwaddch(win, base, 72, ACS_TTEE);
+    mvwaddch(win, base, 78, ACS_TTEE);
+    mvwaddch(win, base, 84, ACS_TTEE);
+    mvwaddch(win, base, 90, ACS_TTEE);
+    mvwaddch(win, base, 96, ACS_TTEE);
+    mvwaddch(win, base, 103, ACS_TTEE);
+    mvwaddch(win, base, 109, ACS_RTEE);
+    const int l1 = base + 1;
+    mvwaddch(win, l1, 0, ACS_VLINE);
+    mvwprintw(win, l1, 3, "#");
+    mvwprintw(win, l1, 13, "Binário");
+    mvwprintw(win, l1, 27, "Hexa");
+    mvwprintw(win, l1, 41, "Assembly");
+    mvwprintw(win, l1, 61, "Tipo");
+    mvwprintw(win, l1, 69, "OP");
+    mvwprintw(win, l1, 75, "RS");
+    mvwprintw(win, l1, 81, "RT");
+    mvwprintw(win, l1, 87, "RD");
+    mvwprintw(win, l1, 91, "Funct");
+    mvwprintw(win, l1, 99, "Imm");
+    mvwprintw(win, l1, 104, "Addr");
+    mvwaddch(win, l1, 6, ACS_VLINE);
+    mvwaddch(win, l1, 25, ACS_VLINE);
+    mvwaddch(win, l1, 32, ACS_VLINE);
+    mvwaddch(win, l1, 58, ACS_VLINE);
+    mvwaddch(win, l1, 67, ACS_VLINE);
+    mvwaddch(win, l1, 72, ACS_VLINE);
+    mvwaddch(win, l1, 78, ACS_VLINE);
+    mvwaddch(win, l1, 84, ACS_VLINE);
+    mvwaddch(win, l1, 90, ACS_VLINE);
+    mvwaddch(win, l1, 96, ACS_VLINE);
+    mvwaddch(win, l1, 103, ACS_VLINE);
+    mvwaddch(win, l1, 109, ACS_VLINE);
+    const int l2 = l1 + 1;
+    mvwaddch(win, l2, 0, ACS_LTEE);
+    mvwhline(win, l2, 1, ACS_HLINE, 108);
+    mvwaddch(win, l2, 6, ACS_PLUS);
+    mvwaddch(win, l2, 25, ACS_PLUS);
+    mvwaddch(win, l2, 32, ACS_PLUS);
+    mvwaddch(win, l2, 58, ACS_PLUS);
+    mvwaddch(win, l2, 67, ACS_PLUS);
+    mvwaddch(win, l2, 72, ACS_PLUS);
+    mvwaddch(win, l2, 78, ACS_PLUS);
+    mvwaddch(win, l2, 84, ACS_PLUS);
+    mvwaddch(win, l2, 90, ACS_PLUS);
+    mvwaddch(win, l2, 96, ACS_PLUS);
+    mvwaddch(win, l2, 103, ACS_PLUS);
+    mvwaddch(win, l2, 109, ACS_RTEE);
+    const int l3 = l2 + 1;
+    char strIdx[4];
+    if (idx == -1) {
+        strcpy(strIdx, " - ");
+    } else {
+        snprintf(strIdx, sizeof(strIdx), "%03d", idx);
+    }
+    mvwprintw(win, l3, 2, "%s", strIdx);
+    mvwprintw(win, l3, 8, "%s", instruction->stringedInstruction);
+    mvwprintw(win, l3, 27, "%s", instruction->hexa);
+    mvwprintw(win, l3, 34, "%s", instruction->asmInstruction);
+    mvwprintw(win, l3, 59 + (8 - strlen(typeStr[instruction->type])) / 2, "%s", typeStr[instruction->type]);
+    char opcode[128];
+    char rs[128];
+    char rt[128];
+    char rd[128];
+    char funct[128];
+    char imm[128];
+    char addr[128];
+    if (instruction->type == OTHER) {
+        strcpy(opcode, " -");
+        strcpy(rs, "-");
+        strcpy(rt, "-");
+        strcpy(rd, "-");
+        strcpy(funct, "-");
+        strcpy(imm, "  - ");
+        strcpy(addr, " - ");
+    } else {
+        sprintf(opcode, "%02d", instruction->opcode);
+        if (instruction->type == J) {
+            strcpy(rs, "-");
+            strcpy(rt, "-");
+            sprintf(addr, "%03d", instruction->addr);
+        } else {
+            sprintf(rs, "%1d", instruction->rs);
+            sprintf(rt, "%1d", instruction->rt);
+            strcpy(addr, " - ");
+        }
+        if (instruction->type == R) {
+            sprintf(rd, "%1d", instruction->rd);
+            sprintf(funct, "%1d", instruction->funct);
+        } else {
+            strcpy(funct, "-");
+            strcpy(rd, "-");
+        }
+        if (instruction->type == I) {
+            sprintf(imm, "%04d", instruction->imm);
+        } else {
+            strcpy(imm, "  - ");
+        }
+    }
+    mvwprintw(win, l3, 69, "%s", opcode);
+    mvwprintw(win, l3, 75, "%s", rs);
+    mvwprintw(win, l3, 81, "%s", rt);
+    mvwprintw(win, l3, 87, "%s", rd);
+    mvwprintw(win, l3, 93, "%s", funct);
+    mvwprintw(win, l3, 98, "%s", imm);
+    mvwprintw(win, l3, 105, "%s", addr);
+    mvwaddch(win, l3, 0, ACS_VLINE);
+    mvwaddch(win, l3, 6, ACS_VLINE);
+    mvwaddch(win, l3, 25, ACS_VLINE);
+    mvwaddch(win, l3, 32, ACS_VLINE);
+    mvwaddch(win, l3, 58, ACS_VLINE);
+    mvwaddch(win, l3, 67, ACS_VLINE);
+    mvwaddch(win, l3, 72, ACS_VLINE);
+    mvwaddch(win, l3, 78, ACS_VLINE);
+    mvwaddch(win, l3, 84, ACS_VLINE);
+    mvwaddch(win, l3, 90, ACS_VLINE);
+    mvwaddch(win, l3, 96, ACS_VLINE);
+    mvwaddch(win, l3, 103, ACS_VLINE);
+    mvwaddch(win, l3, 109, ACS_VLINE);
+    const int l4 = l3 + 1;
+    mvwaddch(win, l4, 0, ACS_LTEE);
+    mvwhline(win, l4, 1, ACS_HLINE, 108);
+    mvwaddch(win, l4, 6, ACS_BTEE);
+    mvwaddch(win, l4, 25, ACS_BTEE);
+    mvwaddch(win, l4, 32, ACS_BTEE);
+    mvwaddch(win, l4, 58, ACS_BTEE);
+    mvwaddch(win, l4, 67, ACS_BTEE);
+    mvwaddch(win, l4, 72, ACS_BTEE);
+    mvwaddch(win, l4, 78, ACS_BTEE);
+    mvwaddch(win, l4, 84, ACS_BTEE);
+    mvwaddch(win, l4, 90, ACS_BTEE);
+    mvwaddch(win, l4, 96, ACS_BTEE);
+    mvwaddch(win, l4, 103, ACS_BTEE);
+    mvwaddch(win, l4, 109, ACS_RTEE);
+}
 
-void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx,
+void controlUI(WINDOW *win, const int base, Control *control) {
+    mvwaddch(win, base, 0, ACS_LTEE);
+    mvwhline(win, base, 1, ACS_HLINE, 108);
+    mvwaddch(win, base, 7, ACS_TTEE);
+    mvwaddch(win, base, 16, ACS_TTEE);
+    mvwaddch(win, base, 26, ACS_TTEE);
+    mvwaddch(win, base, 40, ACS_TTEE);
+    mvwaddch(win, base, 77, ACS_TTEE);
+    mvwaddch(win, base, 88, ACS_TTEE);
+    mvwaddch(win, base, 98, ACS_TTEE);
+    mvwaddch(win, base, 109, ACS_RTEE);
+    const int l1 = base + 1;
+    mvwaddch(win, l1, 0, ACS_VLINE);
+    mvwprintw(win, l1, 2, "Jump");
+    mvwaddch(win, l1, 7, ACS_VLINE);
+    mvwprintw(win, l1, 9, "Branch");
+    mvwaddch(win, l1, 16, ACS_VLINE);
+    mvwprintw(win, l1, 18, "Reg Dst");
+    mvwaddch(win, l1, 26, ACS_VLINE);
+    mvwprintw(win, l1, 28, "Mem para Reg");
+    mvwaddch(win, l1, 40, ACS_VLINE);
+    mvwprintw(win, l1, 54, "Ula Fonte");
+    mvwaddch(win, l1, 77, ACS_VLINE);
+    mvwprintw(win, l1, 79, "Ula Ctrl");
+    mvwaddch(win, l1, 88, ACS_VLINE);
+    mvwprintw(win, l1, 90, "Esc Reg");
+    mvwaddch(win, l1, 98, ACS_VLINE);
+    mvwprintw(win, l1, 101, "Esc Mem");
+    mvwaddch(win, l1, 109, ACS_VLINE);
+    const int l2 = l1 + 1;
+    mvwaddch(win, l2, 0, ACS_LTEE);
+    mvwhline(win, l2, 1, ACS_HLINE, 108);
+    mvwaddch(win, l2, 7, ACS_PLUS);
+    mvwaddch(win, l2, 16, ACS_PLUS);
+    mvwaddch(win, l2, 26, ACS_PLUS);
+    mvwaddch(win, l2, 40, ACS_PLUS);
+    mvwaddch(win, l2, 77, ACS_PLUS);
+    mvwaddch(win, l2, 88, ACS_PLUS);
+    mvwaddch(win, l2, 98, ACS_PLUS);
+    mvwaddch(win, l2, 109, ACS_RTEE);
+}
+
+void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
+                      const int *memInstIdx,
                       const int *memDataIdx) {
     werase(ifWin);
     wsyncup(ifWin);
+    werase(idWin);
+    wsyncup(idWin);
     werase(regWin);
     wsyncup(regWin);
     werase(memInstWin);
@@ -370,13 +562,111 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
 
     // if
     box(ifWin, 0, 0);
-
     // header
     mvwaddch(ifWin, 2, 0, ACS_LTEE);
-    mvwhline(ifWin, 2, 1, ACS_HLINE, 30);
-    mvwaddch(ifWin, 2, 32 - 1, ACS_RTEE);
-    mvwprintw(ifWin, 1, 7, "Busca de Instrução");
+    mvwhline(ifWin, 2, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 2, 41, ACS_RTEE);
+    mvwaddch(ifWin, 2, 10, ACS_TTEE);
+    mvwaddch(ifWin, 2, 29, ACS_TTEE);
+    mvwprintw(ifWin, 1, 12, "Busca de Instrução");
+    // end header
+    // first line
+    mvwprintw(ifWin, 3, 2, "Inc. PC");
+    mvwaddch(ifWin, 3, 10, ACS_VLINE);
+    mvwprintw(ifWin, 3, 16, "Fonte PC");
+    mvwaddch(ifWin, 3, 29, ACS_VLINE);
+    mvwprintw(ifWin, 3, 32, "Novo PC");
+    mvwaddch(ifWin, 4, 0, ACS_LTEE);
+    mvwhline(ifWin, 4, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 4, 10, ACS_PLUS);
+    mvwaddch(ifWin, 4, 29, ACS_PLUS);
+    mvwaddch(ifWin, 4, 41, ACS_RTEE);
+    // end first line
+    // first data
+    mvwprintw(ifWin, 5, 5, "%s", boolStr[1]); // todo: change with the real value after hazard processing
+    mvwaddch(ifWin, 5, 10, ACS_VLINE);
+    char pcSource[256];
+    int pcSourceOffset = 0;
+    // this needs change
+    const int8_t operando2 = pipeline.ID.ctrl.ulaSource ? pipeline.ID.imm : pipeline.ID.B;
+    const ULAOut resultado = ula(pipeline.ID.A, operando2, pipeline.ID.ctrl.ulaControl);
+    const int branch = pipeline.EX_MEM.ctrl.branch && resultado.equal;
+    int newPc = 0;
+    if (branch == 0) {
+        sprintf(pcSource, "PC +1");
+        newPc = pc + 1;
+    } else if (branch == 1) {
+        sprintf(pcSource, "Branch");
+        newPc = pipeline.ID.imm + pipeline.ID.PCP1;
+    }
+    if (pipeline.EX_MEM.ctrl.jump) {
+        newPc = pipeline.IF.IR.addr;
+        sprintf(pcSource, "Jump");
+    }
+    pcSourceOffset = (18 - strlen(pcSource)) / 2;
+    mvwprintw(ifWin, 5, 12 + pcSourceOffset, "%s", pcSource);
+    mvwaddch(ifWin, 5, 29, ACS_VLINE);
+    mvwprintw(ifWin, 5, 34, "%03d", newPc);
+    mvwaddch(ifWin, 6, 0, ACS_LTEE);
+    mvwhline(ifWin, 6, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 6, 10, ACS_BTEE);
+    mvwaddch(ifWin, 6, 29, ACS_BTEE);
+    mvwaddch(ifWin, 6, 41, ACS_RTEE);
+    // end data
+    // separator
+    mvwaddch(ifWin, 7, 0, ACS_LTEE);
+    mvwhline(ifWin, 7, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 7, 10, ACS_TTEE);
+    mvwaddch(ifWin, 7, 41, ACS_RTEE);
+    // end seperator
+    // second line
+    mvwprintw(ifWin, 8, 5, "PC");
+    mvwaddch(ifWin, 8, 10, ACS_VLINE);
+    mvwprintw(ifWin, 8, 13, "Instrução (lida da memória)");
+    // end second line
+    // second data
+    mvwaddch(ifWin, 9, 0, ACS_LTEE);
+    mvwhline(ifWin, 9, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 9, 10, ACS_PLUS);
+    mvwaddch(ifWin, 9, 41, ACS_RTEE);
+    mvwprintw(ifWin, 10, 4, "%03d", pc);
+    mvwaddch(ifWin, 10, 10, ACS_VLINE);
+    const Instruction *inst = &memInstruction.instructions[pc];
+    const int instOffset = (30 - strlen(inst->asmInstruction)) / 2;
+    mvwprintw(ifWin, 10, 11 + instOffset, "%s", inst->asmInstruction);
+    mvwaddch(ifWin, 11, 0, ACS_LTEE);
+    mvwhline(ifWin, 11, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 11, 10, ACS_BTEE);
+    mvwaddch(ifWin, 11, 41, ACS_RTEE);
+    // end second data
     // end if
+
+    // id
+    box(idWin, 0, 0);
+    // header
+    mvwaddch(idWin, 2, 0, ACS_LTEE);
+    mvwhline(idWin, 2, 1, ACS_HLINE, 108);
+    mvwaddch(idWin, 2, 109, ACS_RTEE);
+    mvwprintw(idWin, 1, 42, "Decodificação de Instrução");
+    // end header
+    // ri
+    mvwprintw(idWin, 3, 54, "RI");
+    instructionUI(idWin, 4, -1, &pipeline.IF.IR);
+    // end ri
+    // pc+1
+    mvwaddch(idWin, 8, 11, ACS_TTEE);
+    mvwprintw(idWin, 9, 3, "PC + 1");
+    mvwaddch(idWin, 9, 11, ACS_VLINE);
+    mvwaddch(idWin, 10, 0, ACS_LTEE);
+    mvwhline(idWin, 10, 1, ACS_HLINE, 108);
+    mvwaddch(idWin, 10, 11, ACS_BTEE);
+    mvwaddch(idWin, 10, 109, ACS_RTEE);
+    mvwprintw(idWin, 9, 58, "%03d", pipeline.IF.PCP1);
+    // end pc+1
+    // controle
+    mvwprintw(idWin, 11, 51, "Controle");
+    Control control = makeControl(&pipeline.IF.IR);
+    controlUI(idWin, 12, &control);
 
     // registers
     box(regWin, 0, 0);
@@ -386,12 +676,12 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     mvwhline(regWin, 2, 1, ACS_HLINE, 29);
     mvwaddch(regWin, 2, 16, ACS_TTEE);
     mvwaddch(regWin, 2, 30, ACS_RTEE);
-
     // pc
     mvwprintw(regWin, 3, 7, "$pc");
     mvwaddch(regWin, 3, 16, ACS_VLINE);
     mvwprintw(regWin, 3, 22, "%04d", pc);
-
+    // end pc
+    // general purpose
     int regBase = 4;
     for (int i = 0; i < REG_SIZE; i++) {
         mvwprintw(regWin, regBase, 8, "$%d", i);
@@ -399,9 +689,10 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
         mvwprintw(regWin, regBase, 22, "%04d", registers[i]);
         regBase++;
     }
+    // end general purpose
     // end registers
-    //
-    // // mem inst
+
+    // mem inst
     box(memInstWin, 0, 0);
     mvwaddch(memInstWin, 0, 0, ACS_LTEE);
     mvwaddch(memInstWin, 0, 16, ACS_BTEE);
@@ -412,7 +703,8 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     mvwaddch(memInstWin, 2, 6, ACS_TTEE);
     mvwaddch(memInstWin, 2, 30, ACS_RTEE);
     mvwprintw(memInstWin, 1, 5, "Memória de Instruções");
-    // insts
+    // end header
+    // instructions
     int memInstBase = 3;
     for (int i = 0; i < 13; i++) {
         const int idx = *memInstIdx + i;
@@ -425,6 +717,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     mvwhline(memInstWin, 16, 1, ACS_HLINE, 30);
     mvwaddch(memInstWin, 16, 6, ACS_BTEE);
     mvwaddch(memInstWin, 16, 30, ACS_RTEE);
+    // end instructions
     // footer
     wattron(memInstWin, COLOR_PAIR(1));
     mvwprintw(memInstWin, 17, 13, " ↓ ");
@@ -432,9 +725,11 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     wattron(memInstWin, COLOR_PAIR(1));
     mvwprintw(memInstWin, 17, 17, " ↑ ");
     wattroff(memInstWin, COLOR_PAIR(1));
+    // end footer
+    // end mem inst
 
 
-    // // end mem data
+    // mem data
     box(memDataWin, 0, 0);
     mvwaddch(memDataWin, 0, 0, ACS_LTEE);
     mvwaddch(memDataWin, 0, 30, ACS_RTEE);
@@ -444,6 +739,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     mvwaddch(memDataWin, 2, 16, ACS_TTEE);
     mvwaddch(memDataWin, 2, 30, ACS_RTEE);
     mvwprintw(memDataWin, 1, 7, "Memória de Dados");
+    // end header
     // data
     int memDataBase = 3;
     for (int i = 0; i < 13; i++) {
@@ -457,6 +753,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     mvwhline(memDataWin, 16, 1, ACS_HLINE, 30);
     mvwaddch(memDataWin, 16, 16, ACS_BTEE);
     mvwaddch(memDataWin, 16, 30, ACS_RTEE);
+    // end data
     // footer
     wattron(memDataWin, COLOR_PAIR(1));
     mvwprintw(memDataWin, 17, 8, " CTRL ");
@@ -468,9 +765,9 @@ void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW 
     wattron(memDataWin, COLOR_PAIR(1));
     mvwprintw(memDataWin, 17, 21, " ↑ ");
     wattroff(memDataWin, COLOR_PAIR(1));
-
-
     mvwaddch(memDataWin, 18, 0, ACS_BTEE);
+    // end footer
+    // end mem data
 }
 
 
@@ -501,7 +798,8 @@ void execution() {
     // end buttons
 
     // sub windows
-    WINDOW *ifWin = derwin(win, 20, 32, (HEIGHT - 20) / 2, 2);
+    WINDOW *ifWin = derwin(win, 20, 42, 1, 2);
+    WINDOW *idWin = derwin(win, 20, 110, 1, 46);
     WINDOW *regWin = derwin(win, 13, 31, 0, 176);
     WINDOW *memInstWin = derwin(win, 19, 31, 12, 176);
     WINDOW *memDataWin = derwin(win, 19, 31, 30, 176);
@@ -510,7 +808,7 @@ void execution() {
     int memInstIdx = 0;
     int memDataIdx = 0;
 
-    refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+    refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
 
     touchwin(win);
     wrefresh(win);
@@ -536,40 +834,41 @@ void execution() {
             case 'S':
             case 's': {
                 clock(&pipeline);
-                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             case 'B':
             case 'b': {
                 back();
+                refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             case KEY_UP: {
                 if (memInstIdx > 0) {
                     memInstIdx--;
                 }
-                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             case KEY_DOWN: {
                 if ((memInstIdx + 13) < MEM_SIZE) {
                     memInstIdx++;
                 }
-                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             case CTL_UP: {
                 if (memDataIdx > 0) {
                     memDataIdx--;
                 }
-                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             case CTL_DOWN: {
                 if ((memDataIdx + 13) < MEM_SIZE) {
                     memDataIdx++;
                 }
-                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             default: break;
