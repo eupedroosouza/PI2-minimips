@@ -193,31 +193,32 @@ void menu2() {
                 break;
             }
             case 6: {
-                endwin();
-
-                // temporary exec mode
-                while (1) {
-                    printf("select:\n[0] - step\n[1] - back step\n[2] - exit\n");
-                    int op;
-                    scanf("%d", &op);
-                    if (op == 0) {
-                        clock(&pipeline);
-                    } else if (op ==  1) {
-                        back();
-                    } else if (op ==  2) {
-                        break;
-                    }
-                }
-
-
-                // init ncurses
-                (void) initscr();
-                keypad(stdscr, TRUE); // enable use special keys
-                cbreak();
-                noecho(); // no send clicked button
-                start_color(); // start clock supports
-                curs_set(FALSE); // remove cursor
-                init_pair(1, COLOR_BLACK, COLOR_WHITE);  // black letter, white background
+                execution();
+                // endwin();
+                //
+                // // temporary exec mode
+                // while (1) {
+                //     printf("select:\n[0] - step\n[1] - back step\n[2] - exit\n");
+                //     int op;
+                //     scanf("%d", &op);
+                //     if (op == 0) {
+                //         clock(&pipeline);
+                //     } else if (op ==  1) {
+                //         back();
+                //     } else if (op ==  2) {
+                //         break;
+                //     }
+                // }
+                //
+                //
+                // // init ncurses
+                // (void) initscr();
+                // keypad(stdscr, TRUE); // enable use special keys
+                // cbreak();
+                // noecho(); // no send clicked button
+                // start_color(); // start clock supports
+                // curs_set(FALSE); // remove cursor
+                // init_pair(1, COLOR_BLACK, COLOR_WHITE);  // black letter, white background
                 break;
             }
             case 7: {
@@ -355,8 +356,127 @@ void saveMemDataUI() {
     finalTextInputUI(win, msg);
 }
 
+
+void refreshExecution(WINDOW *ifWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx,
+                      const int *memDataIdx) {
+    werase(ifWin);
+    wsyncup(ifWin);
+    werase(regWin);
+    wsyncup(regWin);
+    werase(memInstWin);
+    wsyncup(memInstWin);
+    werase(memDataWin);
+    wsyncup(memDataWin);
+
+    // if
+    box(ifWin, 0, 0);
+
+    // header
+    mvwaddch(ifWin, 2, 0, ACS_LTEE);
+    mvwhline(ifWin, 2, 1, ACS_HLINE, 30);
+    mvwaddch(ifWin, 2, 32 - 1, ACS_RTEE);
+    mvwprintw(ifWin, 1, 7, "Busca de Instrução");
+    // end if
+
+    // registers
+    box(regWin, 0, 0);
+    mvwprintw(regWin, 1, 9, "Registradores");
+    mvwaddch(regWin, 0, 0, ACS_TTEE);
+    mvwaddch(regWin, 2, 0, ACS_LTEE);
+    mvwhline(regWin, 2, 1, ACS_HLINE, 29);
+    mvwaddch(regWin, 2, 16, ACS_TTEE);
+    mvwaddch(regWin, 2, 30, ACS_RTEE);
+
+    // pc
+    mvwprintw(regWin, 3, 7, "$pc");
+    mvwaddch(regWin, 3, 16, ACS_VLINE);
+    mvwprintw(regWin, 3, 22, "%04d", pc);
+
+    int regBase = 4;
+    for (int i = 0; i < REG_SIZE; i++) {
+        mvwprintw(regWin, regBase, 8, "$%d", i);
+        mvwaddch(regWin, regBase, 16, ACS_VLINE);
+        mvwprintw(regWin, regBase, 22, "%04d", registers[i]);
+        regBase++;
+    }
+    // end registers
+    //
+    // // mem inst
+    box(memInstWin, 0, 0);
+    mvwaddch(memInstWin, 0, 0, ACS_LTEE);
+    mvwaddch(memInstWin, 0, 16, ACS_BTEE);
+    mvwaddch(memInstWin, 0, 30, ACS_RTEE);
+    // header
+    mvwaddch(memInstWin, 2, 0, ACS_LTEE);
+    mvwhline(memInstWin, 2, 1, ACS_HLINE, 30);
+    mvwaddch(memInstWin, 2, 6, ACS_TTEE);
+    mvwaddch(memInstWin, 2, 30, ACS_RTEE);
+    mvwprintw(memInstWin, 1, 5, "Memória de Instruções");
+    // insts
+    int memInstBase = 3;
+    for (int i = 0; i < 13; i++) {
+        const int idx = *memInstIdx + i;
+        mvwprintw(memInstWin, memInstBase, 2, "%03d", idx);
+        mvwaddch(memInstWin, memInstBase, 6, ACS_VLINE);
+        mvwprintw(memInstWin, memInstBase, 8, "%s", memInstruction.instructions[idx].asmInstruction);
+        memInstBase++;
+    }
+    mvwaddch(memInstWin, 16, 0, ACS_LTEE);
+    mvwhline(memInstWin, 16, 1, ACS_HLINE, 30);
+    mvwaddch(memInstWin, 16, 6, ACS_BTEE);
+    mvwaddch(memInstWin, 16, 30, ACS_RTEE);
+    // footer
+    wattron(memInstWin, COLOR_PAIR(1));
+    mvwprintw(memInstWin, 17, 13, " ↓ ");
+    wattroff(memInstWin, COLOR_PAIR(1));
+    wattron(memInstWin, COLOR_PAIR(1));
+    mvwprintw(memInstWin, 17, 17, " ↑ ");
+    wattroff(memInstWin, COLOR_PAIR(1));
+
+
+    // // end mem data
+    box(memDataWin, 0, 0);
+    mvwaddch(memDataWin, 0, 0, ACS_LTEE);
+    mvwaddch(memDataWin, 0, 30, ACS_RTEE);
+    // header
+    mvwaddch(memDataWin, 2, 0, ACS_LTEE);
+    mvwhline(memDataWin, 2, 1, ACS_HLINE, 30);
+    mvwaddch(memDataWin, 2, 16, ACS_TTEE);
+    mvwaddch(memDataWin, 2, 30, ACS_RTEE);
+    mvwprintw(memDataWin, 1, 7, "Memória de Dados");
+    // data
+    int memDataBase = 3;
+    for (int i = 0; i < 13; i++) {
+        const int idx = *memDataIdx + i;
+        mvwprintw(memDataWin, memDataBase, 7, "%03d", idx);
+        mvwaddch(memDataWin, memDataBase, 16, ACS_VLINE);
+        mvwprintw(memDataWin, memDataBase, 22, "%04d", memData.data[idx]);
+        memDataBase++;
+    }
+    mvwaddch(memDataWin, 16, 0, ACS_LTEE);
+    mvwhline(memDataWin, 16, 1, ACS_HLINE, 30);
+    mvwaddch(memDataWin, 16, 16, ACS_BTEE);
+    mvwaddch(memDataWin, 16, 30, ACS_RTEE);
+    // footer
+    wattron(memDataWin, COLOR_PAIR(1));
+    mvwprintw(memDataWin, 17, 8, " CTRL ");
+    wattroff(memDataWin, COLOR_PAIR(1));
+    mvwprintw(memDataWin, 17, 15, "+");
+    wattron(memDataWin, COLOR_PAIR(1));
+    mvwprintw(memDataWin, 17, 17, " ↓ ");
+    wattroff(memDataWin, COLOR_PAIR(1));
+    wattron(memDataWin, COLOR_PAIR(1));
+    mvwprintw(memDataWin, 17, 21, " ↑ ");
+    wattroff(memDataWin, COLOR_PAIR(1));
+
+
+    mvwaddch(memDataWin, 18, 0, ACS_BTEE);
+}
+
+
 void execution() {
     WINDOW *win = createWindow();
+    keypad(win, TRUE);
 
     // buttons
     wattron(win, COLOR_PAIR(1));
@@ -375,61 +495,84 @@ void execution() {
     mvwprintw(win, 47, 22, " Step Back");
 
     wattron(win, COLOR_PAIR(1));
-    mvwprintw(win, 47, 33, " ESC ");
+    mvwprintw(win, 47, 33, " Q ");
     wattroff(win, COLOR_PAIR(1));
-    mvwprintw(win, 47, 38, " Sair");
+    mvwprintw(win, 47, 36, " Sair");
     // end buttons
 
-    // if
+    // sub windows
     WINDOW *ifWin = derwin(win, 20, 32, (HEIGHT - 20) / 2, 2);
-    box(ifWin, 0, 0);
+    WINDOW *regWin = derwin(win, 13, 31, 0, 176);
+    WINDOW *memInstWin = derwin(win, 19, 31, 12, 176);
+    WINDOW *memDataWin = derwin(win, 19, 31, 30, 176);
 
-    // header
-    mvwaddch(ifWin, 2, 0, ACS_LTEE);
-    mvwhline(ifWin, 2, 1, ACS_HLINE, 32 - 2);
-    mvwaddch(ifWin, 2, 32 - 1, ACS_RTEE);
-    mvwprintw(ifWin, 1, 7, "Busca de Instrução");
+    // 14
+    int memInstIdx = 0;
+    int memDataIdx = 0;
 
+    refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
 
-
-    // end if
-
-    // registers
-    WINDOW *regWin = derwin(win, 20, 30, 0, 177);
-    box(regWin, 0, 0);
-
-    wrefresh(regWin);
-
-
-    wrefresh(ifWin);
-
-    refresh();
+    touchwin(win);
     wrefresh(win);
 
     // buttons interactions (hehe)
     while (1) {
         const int ch = wgetch(win);
-        // out of switch to break the while (not switch)
-        if (ch == 27) {
-            break;
-        }
+        mvwprintw(win, 1, 1, " ch: %d ", ch);
         switch (ch) {
-            case 82: {
+            case 'Q':
+            case 'q': {
+                delwin(ifWin);
+                delwin(regWin);
+                werase(win);
+                wrefresh(win);
+                delwin(win);
+                return;
+            }
+            case 'R':
+            case 'r': {
                 break;
             }
-            case 83: {
+            case 'S':
+            case 's': {
                 clock(&pipeline);
+                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
-            case 66: {
+            case 'B':
+            case 'b': {
                 back();
+                break;
+            }
+            case KEY_UP: {
+                if (memInstIdx > 0) {
+                    memInstIdx--;
+                }
+                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                break;
+            }
+            case KEY_DOWN: {
+                if ((memInstIdx + 13) < MEM_SIZE) {
+                    memInstIdx++;
+                }
+                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                break;
+            }
+            case CTL_UP: {
+                if (memDataIdx > 0) {
+                    memDataIdx--;
+                }
+                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                break;
+            }
+            case CTL_DOWN: {
+                if ((memDataIdx + 13) < MEM_SIZE) {
+                    memDataIdx++;
+                }
+                refreshExecution(ifWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
             default: break;
         }
     }
-
-    delwin(regWin);
-    delwin(ifWin);
-    delwin(win);
 }
