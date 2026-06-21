@@ -25,195 +25,142 @@
 // static int8_t dado_memoria_lido = 0;
 // static unsigned int reg_escrita_destino = 0;
 
-static char bufferInformation[1000];
-static char bufferInformation2[1000];
-
 void estagio_IF(PipelineRegisters *pipeline);
+
 void estagio_ID(PipelineRegisters *pipeline);
+
 void estagio_EX(PipelineRegisters *pipeline);
+
 void estagio_MEM(PipelineRegisters *pipeline);
+
 void estagio_WB(PipelineRegisters *pipeline);
 
 void clock(PipelineRegisters *pipeline) {
     saveLastState();
 
-    // bufferInformation[0] = '\0';
-    // bufferInformation2[0] = '\0';
-
-    // execução dos estágios em ordem. Cada estágio lê os dados do ciclo anterior antes de serem sobrescritos
-    estagio_WB(pipeline);   
-    estagio_MEM(pipeline);  
-    estagio_EX(pipeline);   
-    estagio_ID(pipeline);   
-    estagio_IF(pipeline);   
-
-   // tem q modifica dpois  n fiz isso pq precisa q todo o clock ja esteja utilizando os registradpres de pipeline, provavel q de erro
-    // if (pipeline.mem_wb.IR != NULL && inst_atual->type != OTHER) {
-    //     if (ctrl_atual.jump) {
-    //         pc = inst_atual->addr;
-    //     } else if (ctrl_atual.branch && resultado_ula.equal) {
-    //         pc = pc + inst_atual->imm;
-    //     }
-    //     showClock(inst_atual, &ctrl_atual);
-    // }
-
-    showClockPc();
-    showClockInformation(bufferInformation, bufferInformation2);
+    estagio_WB(pipeline);
+    estagio_MEM(pipeline);
+    estagio_EX(pipeline);
+    estagio_ID(pipeline);
+    estagio_IF(pipeline);
 }
 
 // Busca a instrução na memória utilizando o PC atual
 void estagio_IF(PipelineRegisters *pipeline) {
- 
-    const Instruction *inst = &memInstruction.instructions[pc];    
-    
-    // manda a intruçao pros registradores de pipeline 
-    pipeline->if_id.IR = *inst;
-    pipeline->if_id.pc = pc; 
-    
+    printf("<< start if >>\n");
+    // manda a intruçao pros registradores de pipeline
+    const Instruction IF = pipeline->IF.IR;
+    printf("current if_ir: %s\n", pipeline->IF.IR.asmInstruction);
+    const Instruction *inst = &memInstruction.instructions[pc];
+    printf("pc: %d\n", pc);
+    printf("new if_ir: %s\n", inst->asmInstruction);
+    pipeline->IF.IR = *inst;
+    pipeline->IF.PCP1 = pc + 1;
+    printf("pc + 1: %d\n", pipeline->IF.PCP1);
+
     if (inst->type != OTHER) {
         computeInstructionStats(inst);
     }
 
-    // Incrementa o PC para a próxima busca
-    pc++;
+    // let's define new pc
+    // select calculated branch address or pc + 1 (pcp1)
+    // hmmmm, call ULA it's necessary? seems so, to anticipate
+    const int8_t operando2 = pipeline->ID.ctrl.ulaSource ? pipeline->ID.imm : pipeline->ID.B;
+    const ULAOut resultado = ula(pipeline->ID.A, operando2, pipeline->ID.ctrl.ulaControl);
+    const int branch = pipeline->EX_MEM.ctrl.branch && resultado.equal;
+    printf("select a branch: %d\n", branch);
+    if (branch == 0) {
+        pc = pc + 1;
+    } else if (branch == 1) {
+        pc = pipeline->ID.imm + pipeline->ID.PCP1;
+    }
+    // select calculated address based on branch address or pc+1 and or even jump
+    printf("select a jump: %d\n", pipeline->EX_MEM.ctrl.jump);
+    if (pipeline->EX_MEM.ctrl.jump) {
+        pc = IF.addr;
+    }
+    printf("new pc: %d\n", pc);
+    printf("<< end if >>\n");
 }
 
 void estagio_ID(PipelineRegisters *pipeline) {
-
+    printf("<< start id >>\n");
     // le os registradores de pipeline q vieram do if
     // sinais são criados p/ a instrução que acabou de ser decodificada.
-    Instruction inst = pipeline->if_id.IR;
-    Control ctrl = makeControl(&inst); // sinal de controle, substituindo sinal global
-    
-    if (inst.type == OTHER) {
-        // Se for uma instrução inválida limpa o registrador de saída para evitar lixo no EX
-        pipeline->id_ex.IR = emptyInstruction;
-        pipeline->id_ex.A = 0;
-        pipeline->id_ex.B = 0;
-        pipeline->id_ex.imm = 0;
-        return;
-    }
+    const Instruction inst = pipeline->IF.IR;
+    printf("decoding inst %s\n", inst.asmInstruction);
+    pipeline->ID.A = registers[inst.rs]; // Valor lido de RS
+    pipeline->ID.B = registers[inst.rt]; // Valor lido de RT
+    pipeline->ID.RS = inst.rs;
+    pipeline->ID.RD = inst.rd;
+    pipeline->ID.imm = inst.imm; // Valor imediato estendido
+    pipeline->ID.PCP1 = pipeline->IF.PCP1;
+    pipeline->ID.ctrl = makeControl(&inst); // sinal de controle armazenado no pipeline
 
-    
-  
-    pipeline->id_ex.IR = inst;
-    pipeline->id_ex.A = registers[inst.rs]; // Valor lido de RS
-    pipeline->id_ex.B = registers[inst.rt]; // Valor lido de RT
-    pipeline->id_ex.imm = inst.imm;         // Valor imediato estendido
-    pipeline->id_ex.pc = pipeline->if_id.pc;
-    pipeline->id_ex.ctrl = ctrl;            // sinal de controle armazenado no pipeline
-
-  
+    printf("<< end id >>\n");
 }
 
 
-
 void estagio_EX(PipelineRegisters *pipeline) {
+    printf("<< start ex >>\n");
 
-    if (pipeline->id_ex.IR.type == OTHER)
-        return;
+    const int8_t operando2 = pipeline->ID.ctrl.ulaSource ? pipeline->ID.imm : pipeline->ID.B;
+    const ULAOut resultado = ula(pipeline->ID.A, operando2, pipeline->ID.ctrl.ulaControl);
 
-    int8_t operando2 =
-        pipeline->id_ex.ctrl.ulaSource
-            ? pipeline->id_ex.imm
-            : pipeline->id_ex.B;
+    printf("ula source op 2 is %d and value %d", pipeline->ID.ctrl.ulaSource, operando2);
+    printf("ula result is %d and equal %d", resultado.value, resultado.equal);
 
-    ULAOut resultado =
-        ula(
-            pipeline->id_ex.A,
-            operando2,
-            pipeline->id_ex.ctrl.ulaControl
-        );
+    pipeline->EX_MEM.ulaOut = resultado.value;
+    pipeline->EX_MEM.B = pipeline->ID.B;
+    pipeline->EX_MEM.RD = pipeline->ID.ctrl.regDst ? pipeline->ID.RS : pipeline->ID.RD;
+    printf("rd mux is %d and value %d ", pipeline->ID.ctrl.regDst,
+           (pipeline->ID.ctrl.regDst ? pipeline->ID.RS : pipeline->ID.RD));
+    pipeline->EX_MEM.ctrl = pipeline->ID.ctrl; // sinal de controle
 
-      // Se for um Branch e a ULA confirmar que são iguais
-    if (pipeline->id_ex.ctrl.branch && resultado.equal) {
-        pc = pipeline->id_ex.pc + 1 + pipeline->id_ex.imm; // Atualiza o PC global
-        pipeline->id_ex.IR = emptyInstruction;             // Limpa o estágio ID
-        pipeline->if_id.IR = emptyInstruction;             // Limpa o estágio IF
-    }
-    // Se for um Jum
-    else if (pipeline->id_ex.ctrl.jump) {
-        pc = pipeline->id_ex.IR.addr;                      // PC vai direto pro endereço do J
-        pipeline->id_ex.IR = emptyInstruction;             // Limpa o estágio ID
-        pipeline->if_id.IR = emptyInstruction;             // Limpa o estágio IF
-    }
-
-
-    pipeline->ex_mem.IR = pipeline->id_ex.IR;
-    pipeline->ex_mem.ulaOut = resultado.value;
-    pipeline->ex_mem.B = pipeline->id_ex.B;
-    pipeline->ex_mem.ula_equal = resultado.equal;
-    pipeline->ex_mem.ctrl = pipeline->id_ex.ctrl; // sinal de controle
-
-    pipeline->ex_mem.reg_escrita_destino =
-        pipeline->id_ex.ctrl.regDst
-            ? pipeline->id_ex.IR.rd
-            : pipeline->id_ex.IR.rt;
+    printf("<< end ex >>\n");
 }
 
 // acessa a memória de dados
 void estagio_MEM(PipelineRegisters *pipeline) {
-
-int8_t dado_memoria_lido = 0; // variável temporária
-
- if (pipeline->ex_mem.IR.type == OTHER) return;
-
     // SW
-    if (pipeline->ex_mem.ctrl.wrtMem) {  // se o estado anterior manda sinal para salvar na memória
 
-        if (pipeline->ex_mem.ulaOut >= 0 && pipeline->ex_mem.ulaOut < 256) { // condição para salvar
-            memData.data[pipeline->ex_mem.ulaOut] = pipeline->ex_mem.B; // grava na memória de dados o valor armazenado em B
-
-            if (pipeline->ex_mem.ulaOut >= memData.size) { // tamanho da memória expande para guardar nova posição
-                memData.size = pipeline->ex_mem.ulaOut + 1;
-            }
-        }
-        sprintf(bufferInformation2, " [MEM] Escrita no endereco: %04d o valor: %04d.", pipeline->ex_mem.ulaOut, pipeline->ex_mem.B);
-    } 
+    printf("<< start mem >>\n");
+    printf("wrt mem:  %d\n", pipeline->MEM_WEB.ctrl.wrtMem);
+    if (pipeline->EX_MEM.ctrl.wrtMem) {
+        printf("written to mem %d on address %d'\n", pipeline->EX_MEM.B, pipeline->EX_MEM.ulaOut);
+        memData.data[pipeline->EX_MEM.ulaOut] = pipeline->EX_MEM.B;
+    }
     // FIM DO SW
 
-    // LW
-    else if (pipeline->ex_mem.IR.opcode == LW_OPCODE) {
-        if (pipeline->ex_mem.ulaOut >= 0 && pipeline->ex_mem.ulaOut < 256) {
-            dado_memoria_lido = memData.data[pipeline->ex_mem.ulaOut]; // Lê da memória o valor no endereço ulaOut e guarda em dado_memoria_lido.
-        }
-        sprintf(bufferInformation2, " [MEM] Leitura no endereco: %04d (lido: %04d).", pipeline->ex_mem.ulaOut, dado_memoria_lido);
-    }
-    // FIM DO LW
-
     // Salva nos registradores do pipeline MEM_WB o que será necessário para o próximo estágio
-    pipeline->mem_wb.IR = pipeline->ex_mem.IR; // recebe instrução do registrador anterior
-    pipeline->mem_wb.memData = dado_memoria_lido;
-    pipeline->mem_wb.ulaOut = pipeline->ex_mem.ulaOut;
-    pipeline->mem_wb.ctrl = pipeline->ex_mem.ctrl; // sinal de controle
-    pipeline->mem_wb.reg_escrita_destino = pipeline->ex_mem.reg_escrita_destino;
+    pipeline->MEM_WEB.MEM = memData.data[pipeline->EX_MEM.ulaOut];
+    printf("read %d from address: %d", memData.data[pipeline->EX_MEM.ulaOut], pipeline->EX_MEM.ulaOut);
+    pipeline->MEM_WEB.ulaOut = pipeline->EX_MEM.ulaOut;
+    pipeline->MEM_WEB.ctrl = pipeline->EX_MEM.ctrl; // sinal de controle
+    pipeline->MEM_WEB.RD = pipeline->EX_MEM.RD;
+
+    printf("<< end mem >>\n");
 }
 
 
 // escreve resultado final no banco de registradores
 void estagio_WB(PipelineRegisters *pipeline) {
-
-    
-    if (pipeline->mem_wb.IR.type == OTHER) return;
+    printf("<< start wb >>\n");
+    printf("wrt reg:  %d\n", pipeline->MEM_WEB.ctrl.wrtReg);
 
     // executa WB
-    if (pipeline->mem_wb.ctrl.wrtReg) { // se a função do estagio anterior escreve nos regs
+    if (pipeline->MEM_WEB.ctrl.wrtReg) {
+        // se a função do estagio anterior escreve nos regs
 
-    // Escolhe qual valor será escrito
-    // Se memToReg = 1: usa o valor vindo da memória (lw).
-    // Se memToReg = 0: usa o resultado da ULA (add, sub, addi, etc.).
-    int8_t valor_final =  pipeline->mem_wb.ctrl.memToReg ? pipeline->mem_wb.memData : pipeline->mem_wb.ulaOut; 
-    
-    // grava o valor final no banco de registradores
-    registers[pipeline->mem_wb.reg_escrita_destino] = valor_final;
-
-        if (pipeline->mem_wb.IR.opcode == R_TYPE_OPCODE) {
-            sprintf(bufferInformation, " [WB] Escrito no registrador $%1d o resultado: %04d.", pipeline->mem_wb.reg_escrita_destino, valor_final);
-        } else if (pipeline->mem_wb.IR.opcode != LW_OPCODE) {
-            sprintf(bufferInformation, " [WB] Executada op na ULA e escrito no registrador: $%1d o valor: %04d.", pipeline->mem_wb.reg_escrita_destino, valor_final);
-        } else {
-            sprintf(bufferInformation, " [WB] Escrito no registrador $%1d o valor carregado: %04d.", pipeline->mem_wb.reg_escrita_destino, valor_final);
-        }
+        // Escolhe qual valor será escrito
+        // Se memToReg = 0: usa o valor vindo da memória (lw).
+        // Se memToReg = 1: usa o resultado da ULA (add, sub, addi, etc.).
+        registers[pipeline->MEM_WEB.RD] = pipeline->MEM_WEB.ctrl.memToReg
+                                              ? pipeline->MEM_WEB.ulaOut
+                                              : pipeline->MEM_WEB.MEM;
+        printf("written %d from %d on reg dst %d\n",
+               (pipeline->MEM_WEB.ctrl.memToReg ? pipeline->MEM_WEB.ulaOut : pipeline->MEM_WEB.MEM),
+               pipeline->MEM_WEB.ctrl.memToReg, pipeline->MEM_WEB.RD);
     }
-
+    printf("<< end wb >>\n");
 }

@@ -96,7 +96,6 @@ void finalTextInputUI(WINDOW *win, const char *msg) {
 }
 
 
-
 void menu2() {
     while (1) {
         WINDOW *win = createWindow(); // centralized window
@@ -180,7 +179,16 @@ void menu2() {
                 break;
             }
             case 3: {
+                endwin();
                 printAllProgramData();
+                // init ncurses
+                (void) initscr();
+                keypad(stdscr, TRUE); // enable use special keys
+                cbreak();
+                noecho(); // no send clicked button
+                start_color(); // start clock supports
+                curs_set(FALSE); // remove cursor
+                init_pair(1, COLOR_BLACK, COLOR_WHITE);  // black letter, white background
                 break;
             }
             case 4: {
@@ -281,7 +289,7 @@ void loadDataUI() {
         sprintf(msg, "A memória de dados foi carregada.");
     }
 
-   finalTextInputUI(win, msg);
+    finalTextInputUI(win, msg);
 }
 
 void saveInstructionOnAssemblyUI() {
@@ -331,15 +339,7 @@ void saveMemDataUI() {
 }
 
 void execution() {
-    (void) initscr();
-    noecho(); // no send clicked button
-    start_color(); // start clock supports
-    curs_set(FALSE); // remove cursor
-
-    init_pair(1, COLOR_BLACK, COLOR_WHITE); // black letter, white background
-
-    WINDOW *win = newwin(HEIGHT, WIDTH, (LINES - HEIGHT) / 2, (COLS - WIDTH) / 2); // centralized window
-    box(win, 0, 0); // border
+    WINDOW *win = createWindow();
 
     // buttons
     wattron(win, COLOR_PAIR(1));
@@ -363,9 +363,31 @@ void execution() {
     mvwprintw(win, 47, 38, " Sair");
     // end buttons
 
+    // if
+    WINDOW *ifWin = derwin(win, 20, 32, (HEIGHT - 20) / 2, 2);
+    box(ifWin, 0, 0);
+
+    // header
+    mvwaddch(ifWin, 2, 0, ACS_LTEE);
+    mvwhline(ifWin, 2, 1, ACS_HLINE, 32 - 2);
+    mvwaddch(ifWin, 2, 32 - 1, ACS_RTEE);
+    mvwprintw(ifWin, 1, 7, "Busca de Instrução");
+
+
+
+    // end if
+
+    // registers
+    WINDOW *regWin = derwin(win, 20, 30, 0, 177);
+    box(regWin, 0, 0);
+
+    wrefresh(regWin);
+
+
+    wrefresh(ifWin);
+
     refresh();
     wrefresh(win);
-
 
     // buttons interactions (hehe)
     while (1) {
@@ -390,6 +412,7 @@ void execution() {
         }
     }
 
+    delwin(regWin);
+    delwin(ifWin);
     delwin(win);
-    endwin();
 }

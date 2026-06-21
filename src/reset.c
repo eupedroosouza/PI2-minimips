@@ -25,10 +25,10 @@ void resetRegisters(PipelineRegisters *pipeline) {
     pc = 0;
 
     // regs reset
-    pipeline->if_id = (IF_ID){0};
-    pipeline->id_ex = (ID_EX){0};
-    pipeline->ex_mem = (EX_MEM){0};
-    pipeline->mem_wb = (MEM_WB){0};
+    pipeline->IF = (IF_ID){0};
+    pipeline->ID = (ID_EX){0};
+    pipeline->EX_MEM = (EX_MEM){0};
+    pipeline->MEM_WEB = (MEM_WB){0};
 }
 
 void resetData() {

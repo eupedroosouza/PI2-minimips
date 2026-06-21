@@ -50,13 +50,19 @@ typedef struct {
     int size;
 } MemData;
 
+typedef struct {
+    int8_t value;
+    bool equal;
+    bool overflow;
+} ULAOut;
+
 
 
 // --- REGISTRADORES INTERMEDIÁRIOS (PIPELINE) ---
 
 typedef struct {
     Instruction IR;        
-    uint8_t pc;            
+    uint8_t PCP1; // pc plus 1 (pc + 1)
 } IF_ID; // busca de instrução
 
 typedef struct {
@@ -71,36 +77,34 @@ typedef struct {
 } Control;
 
 typedef struct {
-    Instruction IR;        
-    int8_t A;               
-    int8_t B;               
+    int8_t A;
+    int8_t B;
+    uint8_t RS;
+    uint8_t RD;
     int8_t imm;             
-    uint8_t pc;             // PC que veio do IF_ID necessário para o cálculo do BEQ
+    uint8_t PCP1;             // PC que veio do IF_ID necessário para o cálculo do BEQ
     Control ctrl;           // Sinais de controle da instrução
 } ID_EX; // decodificação da instrução
 
 typedef struct {
-    Instruction IR;        
-    int8_t ulaOut;          
-    int8_t B;              
-    bool ula_equal;         // Guarda a flag equal  para o BEQ
+    int8_t ulaOut;
+    int8_t B;
+    uint8_t RD;
     Control ctrl;           // Sinais de controle para as fases de MEM e WB
-    unsigned int reg_escrita_destino; //Lembra em qual registrador salvar no final
 } EX_MEM; // acesso à memória de dados
 
 typedef struct {
-    Instruction IR;        
-    int8_t memData;         
+    int8_t MEM;
     int8_t ulaOut;          
     Control ctrl;           //Sinais de controle para a fase de WB
-    unsigned int reg_escrita_destino; //Lembra em qual registrador salvar no final
+    uint8_t RD;
 } MEM_WB; // escrita no banco de registradores
 
 typedef struct {
-    IF_ID if_id;
-    ID_EX id_ex;
-    EX_MEM ex_mem;
-    MEM_WB mem_wb;
+    IF_ID IF;
+    ID_EX ID;
+    EX_MEM EX_MEM;
+    MEM_WB MEM_WEB;
 } PipelineRegisters; // Variável global unificada
 
 // Estado (útil para a função de back)
@@ -109,11 +113,6 @@ typedef struct state {
     PC pc;
     Register registers[8];
     PipelineRegisters pipeline;
-    MemData memdata;
+    MemData memData;
 } BackState;
 
-typedef struct {
-    int8_t value;
-    bool equal;
-    bool overflow;
-} ULAOut;
