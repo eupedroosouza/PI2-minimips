@@ -6,6 +6,8 @@ WINDOW *textInputUI(const char *msg, char *buffer);
 
 void finalTextInputUI(WINDOW *win, const char *msg);
 
+void confirmationUI(const char *msg);
+
 void menu2();
 
 void loadInstructionsUI();

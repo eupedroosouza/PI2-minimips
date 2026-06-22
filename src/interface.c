@@ -99,6 +99,18 @@ void finalTextInputUI(WINDOW *win, const char *msg) {
     delwin(win);
 }
 
+void confirmationUI(const char *msg) {
+    WINDOW *win = createWindow();
+    mvwprintw(win, 2, 2, "> %s", msg);
+    mvwprintw(win, 3, 2, "Pressione qualquer tecla para continuar.");
+    refresh();
+    wrefresh(win);
+
+    getch();
+
+    delwin(win);
+}
+
 
 void menu2() {
     while (1) {
@@ -231,14 +243,17 @@ void menu2() {
             }
             case 8: {
                 resetInstructions();
+                confirmationUI("A memória de instruções foi redefinida.");
                 break;
             }
             case 9: {
                 resetRegisters(&pipeline);
+                confirmationUI("Os registradores foram redefinidos.");
                 break;
             }
             case 10: {
                 resetData();
+                confirmationUI("A memória de dados foi redefinida.");
                 break;
             }
             case 11: {
