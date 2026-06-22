@@ -92,7 +92,7 @@ void estagio_ID(PipelineRegisters *pipeline) {
     pipeline->ID.A = registers[inst.rs]; // Valor lido de RS
     pipeline->ID.B = registers[inst.rt]; // Valor lido de RT
     pipeline->ID.RS = inst.rs;
-    pipeline->ID.RD = inst.rd;
+    pipeline->ID.RD = inst.rt;
     pipeline->ID.imm = inst.imm; // Valor imediato estendido
     pipeline->ID.PCP1 = pipeline->IF.PCP1;
     pipeline->ID.ctrl = makeControl(&inst); // sinal de controle armazenado no pipeline
