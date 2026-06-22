@@ -744,16 +744,11 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *regWin, WINDOW *memI
     // end data
     // footer
     wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 8, " CTRL ");
-    wattroff(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 15, "+");
-    wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 17, " ↓ ");
+    mvwprintw(memDataWin, 17, 13, " U ");
     wattroff(memDataWin, COLOR_PAIR(1));
     wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 21, " ↑ ");
+    mvwprintw(memDataWin, 17, 17, " J ");
     wattroff(memDataWin, COLOR_PAIR(1));
-    mvwaddch(memDataWin, 18, 0, ACS_BTEE);
     // end footer
     // end mem data
 }
@@ -845,14 +840,16 @@ void execution() {
                 refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
-            case CTL_UP: {
+            case 'U':
+            case 'u': {
                 if (memDataIdx > 0) {
                     memDataIdx--;
                 }
                 refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
-            case CTL_DOWN: {
+            case 'J':
+            case 'j': {
                 if ((memDataIdx + 13) < MEM_SIZE) {
                     memDataIdx++;
                 }
@@ -864,7 +861,8 @@ void execution() {
     }
 }
 
-void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx, const int *memDataIdx) {
+void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx,
+                         const int *memDataIdx) {
     werase(regWin);
     wsyncup(regWin);
     werase(memInstWin);
@@ -960,16 +958,11 @@ void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
     // end data
     // footer
     wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 8, " CTRL ");
-    wattroff(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 15, "+");
-    wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 17, " ↓ ");
+    mvwprintw(memDataWin, 17, 13, " U ");
     wattroff(memDataWin, COLOR_PAIR(1));
     wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 21, " ↑ ");
+    mvwprintw(memDataWin, 17, 17, " J ");
     wattroff(memDataWin, COLOR_PAIR(1));
-    mvwaddch(memDataWin, 18, 0, ACS_BTEE);
     // end footer
     // end mem data
 }
@@ -1021,14 +1014,16 @@ void allProgramUI() {
                 refreshAllProgramUI(regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
-            case CTL_UP: {
+            case 'U':
+            case 'u': {
                 if (memDataIdx > 0) {
                     memDataIdx--;
                 }
                 refreshAllProgramUI(regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
-            case CTL_DOWN: {
+            case 'J':
+            case 'j': {
                 if ((memDataIdx + 13) < MEM_SIZE) {
                     memDataIdx++;
                 }
