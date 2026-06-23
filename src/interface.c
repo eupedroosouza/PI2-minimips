@@ -940,6 +940,161 @@ void execution() {
 
     touchwin(win);
     wrefresh(win);
+    
+
+        // <<< ESTÁGIOS DO PIPELINE >>>
+    // JANELA GLOBAL DOS ESTÁGIOS DO PIPELINE
+    WINDOW *pipeline_stage_window = newwin (24, 169, 25, 13);
+    refresh();
+
+    box (pipeline_stage_window, 0, 0);
+
+    mvwprintw (pipeline_stage_window, 1, 70, "Estágios do Pipeline");
+
+    // linha horizontal
+    mvwhline (pipeline_stage_window, 2, 1, ACS_HLINE, 170);
+    // ajusta as bordas da linha
+    mvwaddch(pipeline_stage_window, 2, 0, ACS_LTEE);
+    mvwaddch (pipeline_stage_window, 2, 168, ACS_RTEE);
+
+    wrefresh(pipeline_stage_window);
+    // FIM DA JANELA GLOBAL DOS ESTÁGIOS DO PIPELINE
+
+
+    // ESTÁGIO IF
+    WINDOW *pipeline_stage_IF = newwin (20, 33, 28, 15);
+    refresh ();
+
+    box (pipeline_stage_IF, 0, 0);
+
+    mvwprintw (pipeline_stage_IF, 1, 15, "IF");
+    // linha
+    mvwhline (pipeline_stage_IF, 2, 1, ACS_HLINE, 31);
+    // ajusta as bordas da linha
+    mvwaddch(pipeline_stage_IF, 2, 0, ACS_LTEE);
+    mvwaddch (pipeline_stage_IF, 2, 32, ACS_RTEE);
+
+    // DADOS
+    // PC
+    mvwprintw (pipeline_stage_IF, 3, 2, "PC: ");
+    // instrução
+    mvwprintw (pipeline_stage_IF, 4, 2, "Instrução: ");
+
+    wrefresh (pipeline_stage_IF);
+    // FIM ESTÁGIO IF
+
+
+    // ESTÁGIO ID
+    WINDOW *pipeline_stage_ID = newwin (20, 33, 28, 48);
+    refresh ();
+
+    box (pipeline_stage_ID, 0, 0);
+
+    mvwprintw (pipeline_stage_ID, 1, 15, "ID");
+    // linha
+    mvwhline (pipeline_stage_ID, 2, 1, ACS_HLINE, 31);
+    // ajusta as bordas da linha
+    mvwaddch(pipeline_stage_ID, 2, 0, ACS_LTEE);
+    mvwaddch (pipeline_stage_ID, 2, 32, ACS_RTEE);
+
+    // DADOS
+    // regisradores
+    mvwprintw (pipeline_stage_ID, 3, 2, "RD: "); // numero dos regs
+    mvwprintw (pipeline_stage_ID, 4, 2, "RS: "); // numero dos regs
+    mvwprintw (pipeline_stage_ID, 5, 2, "RT: "); // numero dos regs
+    mvwprintw (pipeline_stage_ID, 6, 2, "A (Valor lido em RS): ");
+    mvwprintw (pipeline_stage_ID, 7, 2, "B (Valor lido em RT): ");
+    // imediato
+    mvwprintw (pipeline_stage_ID, 8, 2, "Imediato: ");
+    // SINAIS DE CONTROLE
+    wattron (pipeline_stage_ID, A_REVERSE);
+    mvwprintw (pipeline_stage_ID, 10, 1, "      SINAIS DE CONTROLE       ");
+    wattroff (pipeline_stage_ID, A_REVERSE);
+    mvwprintw (pipeline_stage_ID, 11, 2, "RegDst: ");
+    mvwprintw (pipeline_stage_ID, 12, 2, "ALUSrc: ");
+    mvwprintw (pipeline_stage_ID, 13, 2, "Branch: ");
+    mvwprintw (pipeline_stage_ID, 14, 2, "Jump: ");
+    mvwprintw (pipeline_stage_ID, 15, 2, "MemWrite: ");
+    mvwprintw (pipeline_stage_ID, 16, 2, "MemToReg: ");
+    mvwprintw (pipeline_stage_ID, 17, 2, "RegWrite: ");
+    mvwprintw (pipeline_stage_ID, 18, 2, "ULAControl: ");
+
+    wrefresh (pipeline_stage_ID);
+
+    // FIM ESTÁGIO ID
+
+
+    // ESTÁGIO EX
+    WINDOW *pipeline_stage_EX = newwin (20, 33, 28, 81);
+    refresh ();
+
+    box (pipeline_stage_EX, 0, 0);
+
+    mvwprintw (pipeline_stage_EX, 1, 15, "EX");
+    // linha
+    mvwhline (pipeline_stage_EX, 2, 1, ACS_HLINE, 31);
+    // ajusta as bordas da linha
+    mvwaddch(pipeline_stage_EX, 2, 0, ACS_LTEE);
+    mvwaddch (pipeline_stage_EX, 2, 32, ACS_RTEE);
+
+    // dados
+    mvwprintw (pipeline_stage_EX, 3, 2, "Operando A: "); 
+    mvwprintw (pipeline_stage_EX, 4, 2, "Operando B (ou imediato): ");
+    mvwprintw (pipeline_stage_EX, 5, 2, "ULAOut (Resultado da ULA): ");
+    mvwprintw (pipeline_stage_EX, 6, 2, "Equal: ");
+    mvwprintw (pipeline_stage_EX, 7, 2, "Reg destino calculado: ");
+
+    wrefresh (pipeline_stage_EX);
+    // FIM ESTÁGIO EX
+
+
+    // ESTÁGIO MEM
+    WINDOW *pipeline_stage_MEM = newwin (20, 33, 28, 114);
+    refresh ();
+
+    box (pipeline_stage_MEM, 0, 0);
+
+    mvwprintw (pipeline_stage_MEM, 1, 15, "MEM");
+    // linha
+    mvwhline (pipeline_stage_MEM, 2, 1, ACS_HLINE, 31);
+    // ajusta as bordas da linha
+    mvwaddch(pipeline_stage_MEM, 2, 0, ACS_LTEE);
+    mvwaddch (pipeline_stage_MEM, 2, 32, ACS_RTEE);
+
+    mvwprintw (pipeline_stage_MEM, 3, 2, "ULAOut (endereço de mem): ");
+    mvwprintw (pipeline_stage_MEM, 4, 2, "SW (dado para escrita): ");
+    mvwprintw (pipeline_stage_MEM, 5, 2, "LW (dado lido): ");
+    mvwprintw (pipeline_stage_MEM, 6, 2, "MemWrite: ");
+    mvwprintw (pipeline_stage_MEM, 7, 2, "MemToReg: ");
+    mvwprintw (pipeline_stage_MEM, 8, 2, "RegWrite: ");
+
+    wrefresh (pipeline_stage_MEM);
+    // FIM ESTÁGIO MEM
+
+
+    // ESTÁGIO WB
+    WINDOW *pipeline_stage_WB = newwin (20, 33, 28, 147);
+    refresh ();
+
+    box (pipeline_stage_WB, 0, 0);
+
+    mvwprintw (pipeline_stage_WB, 1, 15, "WB");
+    // linha
+    mvwhline (pipeline_stage_WB, 2, 1, ACS_HLINE, 31);
+    // ajusta as bordas da linha
+    mvwaddch(pipeline_stage_WB, 2, 0, ACS_LTEE);
+    mvwaddch (pipeline_stage_WB, 2, 32, ACS_RTEE);
+
+    mvwprintw (pipeline_stage_WB, 3, 2, "Registrador destino: ");
+    mvwprintw (pipeline_stage_WB, 4, 2, "Valor final: ");
+    mvwprintw (pipeline_stage_WB, 5, 2, "Origem do valor: ");
+    mvwprintw (pipeline_stage_WB, 6, 2, "ULA: ");
+    mvwprintw (pipeline_stage_WB, 7, 2, "Memória: ");
+    mvwprintw (pipeline_stage_WB, 8, 2, "RegWrite: ");
+
+    wrefresh (pipeline_stage_WB);
+    // FIM ESTÁGIO WB
+    // <<< FIM DOS ESTÁGIOS DO PIPELINE >>>
 
     // buttons interactions (hehe)
     while (1) {
