@@ -492,6 +492,154 @@ void instructionUI(WINDOW *win, const int base, const int idx, const Instruction
     mvwaddch(win, l4, 109, ACS_RTEE);
 }
 
+void instructionHeaderUI(WINDOW *win, const int base) {
+    mvwaddch(win, base, 0, ACS_LTEE);
+    mvwhline(win, base, 1, ACS_HLINE, 108);
+    mvwaddch(win, base, 6, ACS_TTEE);
+    mvwaddch(win, base, 25, ACS_TTEE);
+    mvwaddch(win, base, 32, ACS_TTEE);
+    mvwaddch(win, base, 58, ACS_TTEE);
+    mvwaddch(win, base, 67, ACS_TTEE);
+    mvwaddch(win, base, 72, ACS_TTEE);
+    mvwaddch(win, base, 78, ACS_TTEE);
+    mvwaddch(win, base, 84, ACS_TTEE);
+    mvwaddch(win, base, 90, ACS_TTEE);
+    mvwaddch(win, base, 96, ACS_TTEE);
+    mvwaddch(win, base, 103, ACS_TTEE);
+    mvwaddch(win, base, 109, ACS_RTEE);
+    const int l1 = base + 1;
+    mvwaddch(win, l1, 0, ACS_VLINE);
+    mvwprintw(win, l1, 3, "#");
+    mvwprintw(win, l1, 13, "Binário");
+    mvwprintw(win, l1, 27, "Hexa");
+    mvwprintw(win, l1, 41, "Assembly");
+    mvwprintw(win, l1, 61, "Tipo");
+    mvwprintw(win, l1, 69, "OP");
+    mvwprintw(win, l1, 75, "RS");
+    mvwprintw(win, l1, 81, "RT");
+    mvwprintw(win, l1, 87, "RD");
+    mvwprintw(win, l1, 91, "Funct");
+    mvwprintw(win, l1, 99, "Imm");
+    mvwprintw(win, l1, 104, "Addr");
+    mvwaddch(win, l1, 6, ACS_VLINE);
+    mvwaddch(win, l1, 25, ACS_VLINE);
+    mvwaddch(win, l1, 32, ACS_VLINE);
+    mvwaddch(win, l1, 58, ACS_VLINE);
+    mvwaddch(win, l1, 67, ACS_VLINE);
+    mvwaddch(win, l1, 72, ACS_VLINE);
+    mvwaddch(win, l1, 78, ACS_VLINE);
+    mvwaddch(win, l1, 84, ACS_VLINE);
+    mvwaddch(win, l1, 90, ACS_VLINE);
+    mvwaddch(win, l1, 96, ACS_VLINE);
+    mvwaddch(win, l1, 103, ACS_VLINE);
+    mvwaddch(win, l1, 109, ACS_VLINE);
+    const int l2 = l1 + 1;
+    mvwaddch(win, l2, 0, ACS_LTEE);
+    mvwhline(win, l2, 1, ACS_HLINE, 108);
+    mvwaddch(win, l2, 6, ACS_PLUS);
+    mvwaddch(win, l2, 25, ACS_PLUS);
+    mvwaddch(win, l2, 32, ACS_PLUS);
+    mvwaddch(win, l2, 58, ACS_PLUS);
+    mvwaddch(win, l2, 67, ACS_PLUS);
+    mvwaddch(win, l2, 72, ACS_PLUS);
+    mvwaddch(win, l2, 78, ACS_PLUS);
+    mvwaddch(win, l2, 84, ACS_PLUS);
+    mvwaddch(win, l2, 90, ACS_PLUS);
+    mvwaddch(win, l2, 96, ACS_PLUS);
+    mvwaddch(win, l2, 103, ACS_PLUS);
+    mvwaddch(win, l2, 109, ACS_RTEE);
+}
+
+void instructionDataUI(WINDOW *win, const int base, const int idx, Instruction *instruction) {
+    char strIdx[4];
+    if (idx == -1) {
+        strcpy(strIdx, " - ");
+    } else {
+        snprintf(strIdx, sizeof(strIdx), "%03d", idx);
+    }
+    mvwprintw(win, base, 2, "%s", strIdx);
+    mvwprintw(win, base, 8, "%s", instruction->stringedInstruction);
+    mvwprintw(win, base, 27, "%s", instruction->hexa);
+    mvwprintw(win, base, 34, "%s", instruction->asmInstruction);
+    mvwprintw(win, base, 59 + (8 - strlen(typeStr[instruction->type])) / 2, "%s", typeStr[instruction->type]);
+    char opcode[128];
+    char rs[128];
+    char rt[128];
+    char rd[128];
+    char funct[128];
+    char imm[128];
+    char addr[128];
+    if (instruction->type == OTHER) {
+        strcpy(opcode, " -");
+        strcpy(rs, "-");
+        strcpy(rt, "-");
+        strcpy(rd, "-");
+        strcpy(funct, "-");
+        strcpy(imm, "  - ");
+        strcpy(addr, " - ");
+    } else {
+        sprintf(opcode, "%02d", instruction->opcode);
+        if (instruction->type == J) {
+            strcpy(rs, "-");
+            strcpy(rt, "-");
+            sprintf(addr, "%03d", instruction->addr);
+        } else {
+            sprintf(rs, "%1d", instruction->rs);
+            sprintf(rt, "%1d", instruction->rt);
+            strcpy(addr, " - ");
+        }
+        if (instruction->type == R) {
+            sprintf(rd, "%1d", instruction->rd);
+            sprintf(funct, "%1d", instruction->funct);
+        } else {
+            strcpy(funct, "-");
+            strcpy(rd, "-");
+        }
+        if (instruction->type == I) {
+            sprintf(imm, "%04d", instruction->imm);
+        } else {
+            strcpy(imm, "  - ");
+        }
+    }
+    mvwprintw(win, base, 69, "%s", opcode);
+    mvwprintw(win, base, 75, "%s", rs);
+    mvwprintw(win, base, 81, "%s", rt);
+    mvwprintw(win, base, 87, "%s", rd);
+    mvwprintw(win, base, 93, "%s", funct);
+    mvwprintw(win, base, 98, "%s", imm);
+    mvwprintw(win, base, 105, "%s", addr);
+    mvwaddch(win, base, 0, ACS_VLINE);
+    mvwaddch(win, base, 6, ACS_VLINE);
+    mvwaddch(win, base, 25, ACS_VLINE);
+    mvwaddch(win, base, 32, ACS_VLINE);
+    mvwaddch(win, base, 58, ACS_VLINE);
+    mvwaddch(win, base, 67, ACS_VLINE);
+    mvwaddch(win, base, 72, ACS_VLINE);
+    mvwaddch(win, base, 78, ACS_VLINE);
+    mvwaddch(win, base, 84, ACS_VLINE);
+    mvwaddch(win, base, 90, ACS_VLINE);
+    mvwaddch(win, base, 96, ACS_VLINE);
+    mvwaddch(win, base, 103, ACS_VLINE);
+    mvwaddch(win, base, 109, ACS_VLINE);
+}
+
+void instructionFooter(WINDOW *win, const int base) {
+    mvwaddch(win, base, 0, ACS_LTEE);
+    mvwhline(win, base, 1, ACS_HLINE, 108);
+    mvwaddch(win, base, 6, ACS_BTEE);
+    mvwaddch(win, base, 25, ACS_BTEE);
+    mvwaddch(win, base, 32, ACS_BTEE);
+    mvwaddch(win, base, 58, ACS_BTEE);
+    mvwaddch(win, base, 67, ACS_BTEE);
+    mvwaddch(win, base, 72, ACS_BTEE);
+    mvwaddch(win, base, 78, ACS_BTEE);
+    mvwaddch(win, base, 84, ACS_BTEE);
+    mvwaddch(win, base, 90, ACS_BTEE);
+    mvwaddch(win, base, 96, ACS_BTEE);
+    mvwaddch(win, base, 103, ACS_BTEE);
+    mvwaddch(win, base, 109, ACS_RTEE);
+}
+
 void controlUI(WINDOW *win, const int base, Control *control) {
     mvwaddch(win, base, 0, ACS_LTEE);
     mvwhline(win, base, 1, ACS_HLINE, 108);
@@ -870,7 +1018,6 @@ void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
     // registers
     box(regWin, 0, 0);
     mvwprintw(regWin, 1, 9, "Registradores");
-    mvwaddch(regWin, 0, 0, ACS_TTEE);
     mvwaddch(regWin, 2, 0, ACS_LTEE);
     mvwhline(regWin, 2, 1, ACS_HLINE, 29);
     mvwaddch(regWin, 2, 16, ACS_TTEE);
@@ -893,36 +1040,25 @@ void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
 
     // mem inst
     box(memInstWin, 0, 0);
-    mvwaddch(memInstWin, 0, 0, ACS_LTEE);
-    mvwaddch(memInstWin, 0, 16, ACS_BTEE);
-    mvwaddch(memInstWin, 0, 30, ACS_RTEE);
     // header
-    mvwaddch(memInstWin, 2, 0, ACS_LTEE);
-    mvwhline(memInstWin, 2, 1, ACS_HLINE, 30);
-    mvwaddch(memInstWin, 2, 6, ACS_TTEE);
-    mvwaddch(memInstWin, 2, 30, ACS_RTEE);
-    mvwprintw(memInstWin, 1, 5, "Memória de Instruções");
+    instructionHeaderUI(memInstWin, 2);
+    mvwprintw(memInstWin, 1, 45, "Memória de Instruções");
     // end header
     // instructions
-    int memInstBase = 3;
-    for (int i = 0; i < 13; i++) {
+    int memInstBase = 5;
+    for (int i = 0; i < 39; i++) {
         const int idx = *memInstIdx + i;
-        mvwprintw(memInstWin, memInstBase, 2, "%03d", idx);
-        mvwaddch(memInstWin, memInstBase, 6, ACS_VLINE);
-        mvwprintw(memInstWin, memInstBase, 8, "%s", memInstruction.instructions[idx].asmInstruction);
+        instructionDataUI(memInstWin, memInstBase, idx, &memInstruction.instructions[idx]);
         memInstBase++;
     }
-    mvwaddch(memInstWin, 16, 0, ACS_LTEE);
-    mvwhline(memInstWin, 16, 1, ACS_HLINE, 30);
-    mvwaddch(memInstWin, 16, 6, ACS_BTEE);
-    mvwaddch(memInstWin, 16, 30, ACS_RTEE);
+    instructionFooter(memInstWin, 44);
     // end instructions
     // footer
     wattron(memInstWin, COLOR_PAIR(1));
-    mvwprintw(memInstWin, 17, 13, " ↓ ");
+    mvwprintw(memInstWin, 45, 52, " ↓ ");
     wattroff(memInstWin, COLOR_PAIR(1));
     wattron(memInstWin, COLOR_PAIR(1));
-    mvwprintw(memInstWin, 17, 17, " ↑ ");
+    mvwprintw(memInstWin, 45, 56, " ↑ ");
     wattroff(memInstWin, COLOR_PAIR(1));
     // end footer
     // end mem inst
@@ -930,8 +1066,6 @@ void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
 
     // mem data
     box(memDataWin, 0, 0);
-    mvwaddch(memDataWin, 0, 0, ACS_LTEE);
-    mvwaddch(memDataWin, 0, 30, ACS_RTEE);
     // header
     mvwaddch(memDataWin, 2, 0, ACS_LTEE);
     mvwhline(memDataWin, 2, 1, ACS_HLINE, 30);
@@ -941,24 +1075,24 @@ void refreshAllProgramUI(WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
     // end header
     // data
     int memDataBase = 3;
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 41; i++) {
         const int idx = *memDataIdx + i;
         mvwprintw(memDataWin, memDataBase, 7, "%03d", idx);
         mvwaddch(memDataWin, memDataBase, 16, ACS_VLINE);
         mvwprintw(memDataWin, memDataBase, 22, "%04d", memData.data[idx]);
         memDataBase++;
     }
-    mvwaddch(memDataWin, 16, 0, ACS_LTEE);
-    mvwhline(memDataWin, 16, 1, ACS_HLINE, 30);
-    mvwaddch(memDataWin, 16, 16, ACS_BTEE);
-    mvwaddch(memDataWin, 16, 30, ACS_RTEE);
+    mvwaddch(memDataWin, 44, 0, ACS_LTEE);
+    mvwhline(memDataWin, 44, 1, ACS_HLINE, 30);
+    mvwaddch(memDataWin, 44, 16, ACS_BTEE);
+    mvwaddch(memDataWin, 44, 30, ACS_RTEE);
     // end data
     // footer
     wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 13, " U ");
+    mvwprintw(memDataWin, 45, 13, " U ");
     wattroff(memDataWin, COLOR_PAIR(1));
     wattron(memDataWin, COLOR_PAIR(1));
-    mvwprintw(memDataWin, 17, 17, " J ");
+    mvwprintw(memDataWin, 45, 17, " J ");
     wattroff(memDataWin, COLOR_PAIR(1));
     // end footer
     // end mem data
@@ -974,9 +1108,9 @@ void allProgramUI() {
     wattroff(win, COLOR_PAIR(1));
     mvwprintw(win, 47, 5, " Sair");
 
-    WINDOW *regWin = derwin(win, 13, 31, 0, 176);
-    WINDOW *memInstWin = derwin(win, 19, 31, 12, 176);
-    WINDOW *memDataWin = derwin(win, 19, 31, 30, 176);
+    WINDOW *regWin = derwin(win, 13, 31, 1, 8);
+    WINDOW *memInstWin = derwin(win, 47, 110, 1, 48);
+    WINDOW *memDataWin = derwin(win, 47, 31, 1, 166);
 
     int memInstIdx = 0;
     int memDataIdx = 0;
@@ -988,7 +1122,6 @@ void allProgramUI() {
 
     while (1) {
         const int ch = wgetch(win);
-        mvwprintw(win, 1, 1, " ch: %d ", ch);
         switch (ch) {
             case 'Q':
             case 'q': {
@@ -1005,7 +1138,7 @@ void allProgramUI() {
                 break;
             }
             case KEY_DOWN: {
-                if ((memInstIdx + 13) < MEM_SIZE) {
+                if ((memInstIdx + 39) < MEM_SIZE) {
                     memInstIdx++;
                 }
                 refreshAllProgramUI(regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
@@ -1021,7 +1154,7 @@ void allProgramUI() {
             }
             case 'J':
             case 'j': {
-                if ((memDataIdx + 13) < MEM_SIZE) {
+                if ((memDataIdx + 41) < MEM_SIZE) {
                     memDataIdx++;
                 }
                 refreshAllProgramUI(regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
