@@ -548,6 +548,9 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *regWin, WINDOW *memI
     werase(memDataWin);
     wsyncup(memDataWin);
 
+    CombinationalState C;
+    createCombinational(&C);
+
     // if
     box(ifWin, 0, 0);
     // header
@@ -576,25 +579,19 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *regWin, WINDOW *memI
     char pcSource[256];
     int pcSourceOffset = 0;
     // this needs change
-    const int8_t operando2 = pipeline.ID.ctrl.ulaSource ? pipeline.ID.imm : pipeline.ID.B;
-    const ULAOut resultado = ula(pipeline.ID.A, operando2, pipeline.ID.ctrl.ulaControl);
-    const int branch = pipeline.EX_MEM.ctrl.branch && resultado.equal;
-    int newPc = 0;
+    const int branch = pipeline.EX_MEM.ctrl.branch && C.EX_ulaOut.equal;
     if (branch == 0) {
         sprintf(pcSource, "PC +1");
-        newPc = pc + 1;
     } else if (branch == 1) {
         sprintf(pcSource, "Branch");
-        newPc = pipeline.ID.imm + pipeline.ID.PCP1;
     }
-    if (pipeline.EX_MEM.ctrl.jump) {
-        newPc = pipeline.IF.IR.addr;
+    if (C.ID_control.jump) {
         sprintf(pcSource, "Jump");
     }
     pcSourceOffset = (18 - strlen(pcSource)) / 2;
     mvwprintw(ifWin, 5, 12 + pcSourceOffset, "%s", pcSource);
     mvwaddch(ifWin, 5, 29, ACS_VLINE);
-    mvwprintw(ifWin, 5, 34, "%03d", newPc);
+    mvwprintw(ifWin, 5, 34, "%03d", (C.IF_PC));
     mvwaddch(ifWin, 6, 0, ACS_LTEE);
     mvwhline(ifWin, 6, 1, ACS_HLINE, 40);
     mvwaddch(ifWin, 6, 10, ACS_BTEE);
@@ -816,7 +813,7 @@ void execution() {
             }
             case 'S':
             case 's': {
-                clock(&pipeline);
+                clock();
                 refreshExecution(ifWin, idWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }

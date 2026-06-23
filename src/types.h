@@ -79,7 +79,7 @@ typedef struct {
 typedef struct {
     int8_t A;
     int8_t B;
-    uint8_t RS;
+    uint8_t RT;
     uint8_t RD;
     int8_t imm;             
     uint8_t PCP1;             // PC que veio do IF_ID necessário para o cálculo do BEQ
@@ -116,3 +116,22 @@ typedef struct state {
     MemData memData;
 } BackState;
 
+typedef struct  {
+    PC IF_PC;
+    PC IF_PCP1;
+    Control ID_control;
+    bool ID_IncPC;
+    int8_t ID_A;
+    int8_t ID_B;
+    int8_t ID_imm;
+    uint8_t ID_PCP1;
+    uint8_t ID_RT;
+    uint8_t ID_RD;
+    ULAOut EX_ulaOut;
+    int8_t EX_B;
+    uint8_t EX_RD;
+    int8_t MEM_MEM;
+    int8_t MEM_ulaOut;
+    uint8_t MEM_RD;
+    int8_t WB_DATA;
+} CombinationalState;
