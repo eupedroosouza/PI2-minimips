@@ -11,8 +11,7 @@
 BackState *lastState = NULL;
 
 
-
-void saveLastState(PipelineRegisters *pipeline) {
+void saveLastState() {
     BackState *backState = malloc(sizeof(BackState));
     if (backState == NULL) {
         printf("Não há mais memória para armazenar backs!\n");
@@ -27,7 +26,7 @@ void saveLastState(PipelineRegisters *pipeline) {
         backState->memData.data[i] = memData.data[i];
     }
     backState->memData.size = memData.size;
-    backState->pipeline = *pipeline;
+    backState->pipeline = pipeline;
     lastState = backState;
 }
 
@@ -43,7 +42,7 @@ void invalidateLastState() {
     }
 }
 
-void back(PipelineRegisters *pipeline) {
+void back() {
     if (lastState == NULL) {
         println(
             "Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
@@ -58,7 +57,7 @@ void back(PipelineRegisters *pipeline) {
     for (int i = 0; i < memData.size; i++) {
         memData.data[i] = lastState->memData.data[i];
     }
-    *pipeline = lastState->pipeline;
+    pipeline = lastState->pipeline;
     println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
     BackState *aux = lastState;
