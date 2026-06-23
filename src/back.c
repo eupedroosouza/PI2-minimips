@@ -14,19 +14,20 @@ BackState *lastState = NULL;
 void saveLastState() {
     BackState *backState = malloc(sizeof(BackState));
     if (backState == NULL) {
-        printf("Não há mais memória para armazenar backs!\n");
+        // printf("Não há mais memória para armazenar backs!\n");
         // check if need exit de program
         return;
     }
     backState->pc = pc;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < REG_SIZE; i++) {
         backState->registers[i] = registers[i];
     }
-    for (int i = 0; i < memData.size ; i++) {
+    for (int i = 0; i < MEM_SIZE ; i++) {
         backState->memData.data[i] = memData.data[i];
     }
     backState->memData.size = memData.size;
     backState->pipeline = pipeline;
+    backState->previous = lastState;
     lastState = backState;
 }
 
@@ -44,8 +45,8 @@ void invalidateLastState() {
 
 void back() {
     if (lastState == NULL) {
-        println(
-            "Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
+        // println(
+            // "Você ainda não executou nenhum ciclo (execute ciclos via run [8] ou step [9] para executar a função de voltar).");
         return;
     }
 
@@ -58,7 +59,7 @@ void back() {
         memData.data[i] = lastState->memData.data[i];
     }
     pipeline = lastState->pipeline;
-    println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
+    // println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
 
     BackState *aux = lastState;
     lastState = lastState->previous;

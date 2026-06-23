@@ -1138,7 +1138,7 @@ void allProgramUI() {
                 break;
             }
             case KEY_DOWN: {
-                if ((memInstIdx + 39) < MEM_SIZE) {
+                    if ((memInstIdx + 39) < MEM_SIZE) {
                     memInstIdx++;
                 }
                 refreshAllProgramUI(regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
