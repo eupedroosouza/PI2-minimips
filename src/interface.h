@@ -23,8 +23,8 @@ void saveMemDataUI();
 void instructionUI(WINDOW *win, int base, int idx, const Instruction *instruction);
 
 void instructionHeaderUI(WINDOW *win, int base) ;
-void instructionDataUI(WINDOW *win, int base, int idx, Instruction *instruction);
-void instructionFooter(WINDOW *win, int base);
+void instructionDataUI(WINDOW *win, int base, int idx, const Instruction *instruction);
+void instructionFooterUI(WINDOW *win, int base);
 
 void execution();
 
