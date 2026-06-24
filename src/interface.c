@@ -933,7 +933,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     const int wrtRegOffset = (19 - strlen(wrtRegSource)) / 2;
     mvwprintw(wbWin, 9, 1 + wrtRegOffset, "%s", wrtRegSource);
     char regDataStr[256];
-    if (pipeline.EX_MEM.ctrl.wrtMem) {
+    if (pipeline.EX_MEM.ctrl.wrtReg) {
         sprintf(regDataStr, "%04d",C.WB_DATA);
     } else {
         sprintf(regDataStr, " -  ");
