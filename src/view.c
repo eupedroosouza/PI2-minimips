@@ -161,52 +161,52 @@ void showClockUla(const int input1, const int input2, const int ulaControl, cons
 // End clock
 
 // Statistics
-
-void showStatistics() {
+//
+//void showStatistics() {
     // Cálculo de ciclos individuais por classe de instrução (Padrão MIPS Multiciclo)
-    int cycles_add  = stats.executedInstructionsPerClass.add * 4;
-    int cycles_sub  = stats.executedInstructionsPerClass.sub * 4;
-    int cycles_and  = stats.executedInstructionsPerClass.and_inst * 4;
-    int cycles_or   = stats.executedInstructionsPerClass.or_inst * 4;
-    int cycles_addi = stats.executedInstructionsPerClass.addi * 4;
-    int cycles_lw   = stats.executedInstructionsPerClass.lw * 5;
-    int cycles_sw   = stats.executedInstructionsPerClass.sw * 4;
-    int cycles_beq  = stats.executedInstructionsPerClass.beq * 3;
-    int cycles_j    = stats.executedInstructionsPerClass.j * 3;
+//int cycles_add  = stats.executedInstructionsPerClass.add * 4;
+ //   int cycles_sub  = stats.executedInstructionsPerClass.sub * 4;
+ //   int cycles_and  = stats.executedInstructionsPerClass.and_inst * 4;
+ //   int cycles_or   = stats.executedInstructionsPerClass.or_inst * 4;
+ //   int cycles_addi = stats.executedInstructionsPerClass.addi * 4;
+ //   int cycles_lw   = stats.executedInstructionsPerClass.lw * 5;
+ //   int cycles_sw   = stats.executedInstructionsPerClass.sw * 4;
+ //   int cycles_beq  = stats.executedInstructionsPerClass.beq * 3;
+ //   int cycles_j    = stats.executedInstructionsPerClass.j * 3;
 
     // Totais globais baseados em comportamento multiciclo
-    int totalCycles = cycles_add + cycles_sub + cycles_and + cycles_or + 
-                      cycles_addi + cycles_lw + cycles_sw + cycles_beq + cycles_j;
+ //   int totalCycles = cycles_add + cycles_sub + cycles_and + cycles_or + 
+ //                     cycles_addi + cycles_lw + cycles_sw + cycles_beq + cycles_j;
                       
-    float cpiGlobal = stats.executedInstructions > 0 ? (float)totalCycles / stats.executedInstructions : 0.0f;
+ //   float cpiGlobal = stats.executedInstructions > 0 ? (float)totalCycles / stats.executedInstructions : 0.0f;
 
     // Painel Superior de Resumo Geral (Largura total interna perfeitamente alinhada = 53 caracteres)
-    println("┌─────────────────────────────────────────────────────┐");
-    println("│       " BOLD_WHITE "ESTATÍSTICAS DE DESEMPENHO (monociclo/pipeline)" RESET "       │");
-    println("├─────────────────────────────────────────────────────┤");
-    println("│ Total de Instruções Executadas:%-21d│", stats.executedInstructions);
-    println("│ Total de Ciclos de Clock:      %-21d│", totalCycles);
-    println("│ CPI Global do Programa:        %-21.2f│", cpiGlobal);
-    println("├───────────┬───────────────┬─────┬───────────────────┤");
+ //   println("┌─────────────────────────────────────────────────────┐");
+ //   println("│       " BOLD_WHITE "ESTATÍSTICAS DE DESEMPENHO (monociclo/pipeline)" RESET "       │");
+ //   println("├─────────────────────────────────────────────────────┤");
+ //   println("│ Total de Instruções Executadas:%-21d│", stats.executedInstructions);
+//    println("│ Total de Ciclos de Clock:      %-21d│", totalCycles);
+//    println("│ CPI Global do Programa:        %-21.2f│", cpiGlobal);
+//    println("├───────────┬───────────────┬─────┬───────────────────┤");
     
     // Tabela detalhada por instrução com colunas de CPI e Ciclos Totais
-    println("│ " BOLD_WHITE "Instrução" RESET " │ " BOLD_WHITE "Qtd Executada" RESET " │ " BOLD_WHITE "CPI" RESET " │ " BOLD_WHITE "Ciclos Acumulados" RESET " │");
-    println("├───────────┼───────────────┼─────┼───────────────────┤");
-    println("│ ADD       │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.add, cycles_add);
-    println("│ SUB       │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.sub, cycles_sub);
-    println("│ AND       │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.and_inst, cycles_and);
-    println("│ OR        │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.or_inst, cycles_or);
-    println("│ ADDI      │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.addi, cycles_addi);
-    println("│ LW        │ %-13d │ 5   │ %-17d │", stats.executedInstructionsPerClass.lw, cycles_lw);
-    println("│ SW        │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.sw, cycles_sw);
-    println("│ BEQ       │ %-13d │ 3   │ %-17d │", stats.executedInstructionsPerClass.beq, cycles_beq);
-    println("│ J         │ %-13d │ 3   │ %-17d │", stats.executedInstructionsPerClass.j, cycles_j);
-    println("└───────────┴───────────────┴─────┴───────────────────┘");
+//    println("│ " BOLD_WHITE "Instrução" RESET " │ " BOLD_WHITE "Qtd Executada" RESET " │ " BOLD_WHITE "CPI" RESET " │ " BOLD_WHITE "Ciclos Acumulados" RESET " │");
+//    println("├───────────┼───────────────┼─────┼───────────────────┤");
+//    println("│ ADD       │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.add, cycles_add);
+//    println("│ SUB       │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.sub, cycles_sub);
+//    println("│ AND       │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.and_inst, cycles_and);
+//    println("│ OR        │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.or_inst, cycles_or);
+ //   println("│ ADDI      │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.addi, cycles_addi);
+ //   println("│ LW        │ %-13d │ 5   │ %-17d │", stats.executedInstructionsPerClass.lw, cycles_lw);
+   // println("│ SW        │ %-13d │ 4   │ %-17d │", stats.executedInstructionsPerClass.sw, cycles_sw);
+  //  println("│ BEQ       │ %-13d │ 3   │ %-17d │", stats.executedInstructionsPerClass.beq, cycles_beq);
+  //  println("│ J         │ %-13d │ 3   │ %-17d │", stats.executedInstructionsPerClass.j, cycles_j);
+  //  println("└───────────┴───────────────┴─────┴───────────────────┘");
 
-    printf("Pressione qualquer tecla para continuar!");
-    int vd = 0;
-    scanf("%d", &vd);
-}
+  //  printf("Pressione qualquer tecla para continuar!");
+  //  int vd = 0;
+ //   scanf("%d", &vd);
+//}
 // End-Statistics
 
 // Instruction
