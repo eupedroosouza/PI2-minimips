@@ -34,7 +34,7 @@ void createCombinational(CombinationalState *C) {
     C->ID_RD = inst.rd;
 
     // IF
-    const bool branch = pipeline.EX_MEM.ctrl.branch && C->EX_ulaOut.equal;
+    const bool branch = pipeline.ID.ctrl.branch && C->EX_ulaOut.equal;
     C->IF_PC = branch == 0 ? pc + 1 : pipeline.ID.imm + pipeline.ID.PCP1;
     // do jump at ID stage
     if (C->ID_control.jump) {
