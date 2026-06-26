@@ -52,7 +52,9 @@ void clock() {
     // WB
     if (pipeline.MEM_WEB.ctrl.wrtReg) {
         registers[pipeline.MEM_WEB.RD] = C.WB_DATA;
+        pipeline.wb.IR = pipeline.EX_MEM.IR; // INCERTO
     }
+
 
     // MEM
     if (pipeline.EX_MEM.ctrl.wrtMem) {
@@ -62,12 +64,14 @@ void clock() {
     pipeline.MEM_WEB.MEM = C.MEM_MEM;
     pipeline.MEM_WEB.ulaOut = C.MEM_ulaOut;
     pipeline.MEM_WEB.RD = C.MEM_RD;
+    pipeline.MEM_WEB.IR = pipeline.EX_MEM.IR;
 
     // EX
     pipeline.EX_MEM.ctrl = pipeline.ID.ctrl;
     pipeline.EX_MEM.ulaOut = C.EX_ulaOut.value;
     pipeline.EX_MEM.B = C.EX_B;
     pipeline.EX_MEM.RD = C.EX_RD;
+    pipeline.EX_MEM.IR = pipeline.ID.IR;
 
     // ID
     pipeline.ID.ctrl = C.ID_control;
@@ -77,6 +81,7 @@ void clock() {
     pipeline.ID.RD = C.ID_RD;
     pipeline.ID.imm = C.ID_imm;
     pipeline.ID.PCP1 = C.ID_PCP1;
+    pipeline.ID.IR = pipeline.IF.IR;
 
     //IF
     pipeline.IF.IR = memInstruction.instructions[pc];
