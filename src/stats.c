@@ -58,7 +58,7 @@ void computeInstructionStats(const Instruction *instruction) {
 
 
 void showStatistics() {
-    // Aumentei levemente a janela para caber as novas informações
+    
     int height = 25;
     int width = 62;
     int start_y = (LINES - height) / 2;
@@ -68,20 +68,18 @@ void showStatistics() {
     box(win, 0, 0);
     keypad(win, TRUE);
 
-    // Título principal
+   
     wattron(win, A_BOLD);
     mvwprintw(win, 1, 2, "=== ESTATISTICAS DE DESEMPENHO (PIPELINE) ===");
     wattroff(win, A_BOLD);
 
-    // ================================================================
-    // CÁLCULO DO CPI REAL (Baseado nas instruções que realmente terminaram)
-    // ================================================================
+   
     float cpi = 0.0;
     if (stats.finishedInstructions > 0) {
         cpi = (float)stats.totalCycles / stats.finishedInstructions;
     }
 
-    // Exibição dos novos contadores globais independentes
+   
     mvwprintw(win, 3, 2, "Total de Clocks (Ciclos):    %d", stats.totalCycles);
     mvwprintw(win, 4, 2, "Bolhas (Stalls/Inuteis):     %d", stats.totalBubbles);
     mvwprintw(win, 5, 2, "Instrucoes Iniciadas (IF):   %d", stats.startedInstructions);
@@ -91,10 +89,10 @@ void showStatistics() {
     mvwprintw(win, 7, 2, "CPI Global do Sistema:       %.2f", cpi);
     wattroff(win, A_BOLD);
 
-    // Linha divisória para a tabela
+    
     mvwhline(win, 9, 1, ACS_HLINE, width - 2);
 
-    // Cabeçalho da tabela alinhado
+   
     wattron(win, A_BOLD);
     mvwprintw(win, 10, 2, "Inst.");
     mvwprintw(win, 10, 14, "Qtd. Exec.");
@@ -104,7 +102,7 @@ void showStatistics() {
 
     mvwhline(win, 11, 1, ACS_HLINE, width - 2);
 
-    // Cálculo dos ciclos acumulados teóricos por instrução
+    
     int cycles_add  = stats.executedInstructionsPerClass.add * 4;
     int cycles_sub  = stats.executedInstructionsPerClass.sub * 4;
     int cycles_and  = stats.executedInstructionsPerClass.and_inst * 4;
@@ -115,7 +113,7 @@ void showStatistics() {
     int cycles_beq  = stats.executedInstructionsPerClass.beq * 3;
     int cycles_j    = stats.executedInstructionsPerClass.j * 3;
 
-    // Impressão linha por linha com o alinhamento das colunas ajustado (coluna 42)
+   
     mvwprintw(win, 12, 2, "ADD");  mvwprintw(win, 12, 14, "%-13d", stats.executedInstructionsPerClass.add);      mvwprintw(win, 12, 30, "4"); mvwprintw(win, 12, 42, "%-17d", cycles_add);
     mvwprintw(win, 13, 2, "SUB");  mvwprintw(win, 13, 14, "%-13d", stats.executedInstructionsPerClass.sub);      mvwprintw(win, 13, 30, "4"); mvwprintw(win, 13, 42, "%-17d", cycles_sub);
     mvwprintw(win, 14, 2, "AND");  mvwprintw(win, 14, 14, "%-13d", stats.executedInstructionsPerClass.and_inst); mvwprintw(win, 14, 30, "4"); mvwprintw(win, 14, 42, "%-17d", cycles_and);
@@ -126,13 +124,13 @@ void showStatistics() {
     mvwprintw(win, 19, 2, "BEQ");  mvwprintw(win, 19, 14, "%-13d", stats.executedInstructionsPerClass.beq);      mvwprintw(win, 19, 30, "3"); mvwprintw(win, 19, 42, "%-17d", cycles_beq);
     mvwprintw(win, 20, 2, "J");    mvwprintw(win, 20, 14, "%-13d", stats.executedInstructionsPerClass.j);        mvwprintw(win, 20, 30, "3"); mvwprintw(win, 20, 42, "%-17d", cycles_j);
 
-    // Rodapé de saída
+    
     mvwhline(win, 22, 1, ACS_HLINE, width - 2);
     wattron(win, A_DIM);
     mvwprintw(win, 23, 2, "Pressione qualquer tecla para voltar...");
     wattroff(win, A_DIM);
 
-    // Atualiza a tela, aguarda o clique e limpa a memória
+  
     wrefresh(win);
     wgetch(win);
     delwin(win);
