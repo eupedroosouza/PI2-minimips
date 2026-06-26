@@ -79,6 +79,7 @@ typedef struct {
 typedef struct {
     int8_t A;
     int8_t B;
+    uint8_t RS;
     uint8_t RT;
     uint8_t RD;
     int8_t imm;             
@@ -128,17 +129,21 @@ typedef struct  {
     PC IF_PC;
     PC IF_PCP1;
     bool IF_wrtPC;
+    bool IF_wrtRI;
     bool IF_selRI;
     Control ID_control;
     int8_t ID_A;
     int8_t ID_B;
     int8_t ID_imm;
     uint8_t ID_PCP1;
+    uint8_t ID_RS;
     uint8_t ID_RT;
     uint8_t ID_RD;
     ULAOut EX_ulaOut;
     int8_t EX_B;
     uint8_t EX_RD;
+    uint8_t EX_selA;
+    uint8_t EX_selB;
     int8_t MEM_MEM;
     int8_t MEM_ulaOut;
     uint8_t MEM_RD;

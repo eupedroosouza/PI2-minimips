@@ -16,23 +16,82 @@ void createCombinational(CombinationalState *C) {
     C->MEM_RD = pipeline.EX_MEM.RD;
 
     // EX
-    const int8_t B = pipeline.ID.ctrl.ulaSource ? pipeline.ID.imm : pipeline.ID.B;
-    C->EX_ulaOut = ula(pipeline.ID.A, B, pipeline.ID.ctrl.ulaControl);
+
+    uint8_t selA = 0;
+    if (pipeline.MEM_WEB.ctrl.wrtReg &&
+        pipeline.MEM_WEB.RD != 0 &&
+        pipeline.EX_MEM.RD != pipeline.ID.RS &&
+        pipeline.MEM_WEB.RD == pipeline.ID.RS) {
+        selA = 1;
+    } else if (pipeline.EX_MEM.ctrl.wrtReg &&
+               pipeline.EX_MEM.RD != 0 &&
+               pipeline.EX_MEM.RD == pipeline.ID.RS) {
+        selA = 2;
+    }
+    uint8_t selB = 0;
+    if (pipeline.MEM_WEB.ctrl.wrtReg &&
+        pipeline.MEM_WEB.RD != 0 &&
+        pipeline.EX_MEM.RD != pipeline.ID.RS &&
+        pipeline.MEM_WEB.RD == pipeline.ID.RT) {
+        selB = 1;
+    } else if (pipeline.EX_MEM.ctrl.wrtReg &&
+               pipeline.EX_MEM.RD != 0 &&
+               pipeline.EX_MEM.RD == pipeline.ID.RT) {
+        selB = 2;
+    }
+    int8_t A = 0;
+    switch (selA) {
+        case 0: {
+            A = pipeline.ID.A;
+            break;
+        }
+        case 1: {
+            A = C->WB_DATA;
+            break;
+        }
+        case 2: {
+            A = pipeline.EX_MEM.ulaOut;
+            break;
+        }
+        default: break;
+    }
+    const int8_t PRE_B = pipeline.ID.ctrl.ulaSource ? pipeline.ID.imm : pipeline.ID.B;
+    int8_t B = 0;
+    switch (selB) {
+        case 0: {
+            B = PRE_B;
+            break;
+        }
+        case 1: {
+            B = C->WB_DATA;
+            break;
+        }
+        case 2: {
+            B = pipeline.EX_MEM.ulaOut;
+            break;
+        }
+        default: break;
+    }
+    C->EX_ulaOut = ula(A, B, pipeline.ID.ctrl.ulaControl);
     C->EX_B = pipeline.ID.B;
     C->EX_RD = pipeline.ID.ctrl.regDst ? pipeline.ID.RD : pipeline.ID.RT;
+
 
     // ID
     // Probably, a one type of hazard need do here (block IncPC and decode emptyInstruction)
     const Instruction inst = pipeline.IF.IR;
     C->ID_control = makeControl(&inst);
-    C->ID_A = registers[inst.rs];
-    C->ID_B = registers[inst.rt];
+    // abstracted from circuits (the register can be written and read on one clock in two times, to represents that, we abstracted that here checking if the register which want read is destination register and then anticipate data)
+    C->ID_A = pipeline.MEM_WEB.RD == inst.rs ? C->WB_DATA : registers[inst.rs];
+    C->ID_B = pipeline.MEM_WEB.RD == inst.rt ? C->WB_DATA : registers[inst.rt];
     C->ID_imm = inst.imm;
     C->ID_PCP1 = pipeline.IF.PCP1;
+    C->ID_RS = inst.rs;
     C->ID_RT = inst.rt;
     C->ID_RD = inst.rd;
 
     // IF
+    C->IF_wrtRI = true;
     C->IF_selRI = C->ID_control.branch || C->ID_control.jump || pipeline.ID.ctrl.branch;
     C->IF_wrtPC = !C->IF_selRI || C->ID_control.jump;
     const bool branch = pipeline.ID.ctrl.branch && C->EX_ulaOut.equal;
@@ -40,6 +99,19 @@ void createCombinational(CombinationalState *C) {
     // do jump at ID stage
     if (C->ID_control.jump) {
         C->IF_PC = pipeline.IF.IR.addr;
+    }
+    if (pipeline.ID.ctrl.memToReg == 0 &&
+        (pipeline.ID.RD == C->ID_RS || pipeline.ID.RD == C->ID_RT)) {
+        C->IF_wrtPC = false;
+        C->IF_wrtRI = 0;
+        C->ID_control = makeControl(&emptyInstruction);
+        C->ID_A = 0;
+        C->ID_B = 0;
+        C->ID_imm = 0;
+        C->ID_PCP1 = 0;
+        C->ID_RS = 0;
+        C->ID_RT = 0;
+        C->ID_RD = 0;
     }
     C->IF_PCP1 = C->IF_PC + 1;
 }
@@ -78,6 +150,7 @@ void clock() {
     pipeline.ID.ctrl = C.ID_control;
     pipeline.ID.A = C.ID_A;
     pipeline.ID.B = C.ID_B;
+    pipeline.ID.RS = C.ID_RS;
     pipeline.ID.RT = C.ID_RT;
     pipeline.ID.RD = C.ID_RD;
     pipeline.ID.imm = C.ID_imm;
@@ -85,12 +158,15 @@ void clock() {
     pipeline.ID.IR = pipeline.IF.IR;
 
     //IF
-    pipeline.IF.IR = C.IF_selRI == 0 ? memInstruction.instructions[pc] : emptyInstruction;
+    if (C.IF_wrtRI) {
+        pipeline.IF.IR = C.IF_selRI == 0 ? memInstruction.instructions[pc] : emptyInstruction;
+    }
     pipeline.IF.PCP1 = C.IF_PCP1;
     if (C.IF_wrtPC) {
         pc = C.IF_PC;
     }
 }
+
 //
 
 

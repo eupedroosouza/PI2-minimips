@@ -22,7 +22,7 @@ Control makeControl(const Instruction *instruction) {
                     control.branch = true;
                     control.ulaControl = 6;
                     control.ulaSource = 0;
-                    control.memToReg = 0;
+                    // control.memToReg = 0; probably not necessary (will be use that signal to identify a lw)
                     break;
                 }
                 case LW_OPCODE: {
