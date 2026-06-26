@@ -24,7 +24,6 @@ void createCombinational(CombinationalState *C) {
     // ID
     // Probably, a one type of hazard need do here (block IncPC and decode emptyInstruction)
     const Instruction inst = pipeline.IF.IR;
-    C->ID_IncPC = true;
     C->ID_control = makeControl(&inst);
     C->ID_A = registers[inst.rs];
     C->ID_B = registers[inst.rt];
@@ -34,6 +33,8 @@ void createCombinational(CombinationalState *C) {
     C->ID_RD = inst.rd;
 
     // IF
+    C->IF_selRI = C->ID_control.branch || C->ID_control.jump || pipeline.ID.ctrl.branch;
+    C->IF_wrtPC = !C->IF_selRI || C->ID_control.jump;
     const bool branch = pipeline.ID.ctrl.branch && C->EX_ulaOut.equal;
     C->IF_PC = branch == 0 ? pc + 1 : pipeline.ID.imm + pipeline.ID.PCP1;
     // do jump at ID stage
@@ -84,9 +85,9 @@ void clock() {
     pipeline.ID.IR = pipeline.IF.IR;
 
     //IF
-    pipeline.IF.IR = memInstruction.instructions[pc];
+    pipeline.IF.IR = C.IF_selRI == 0 ? memInstruction.instructions[pc] : emptyInstruction;
     pipeline.IF.PCP1 = C.IF_PCP1;
-    if (C.ID_IncPC) {
+    if (C.IF_wrtPC) {
         pc = C.IF_PC;
     }
 }

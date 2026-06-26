@@ -656,7 +656,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     char pcSource[256];
     int pcSourceOffset = 0;
     // this needs change
-    const int branch = pipeline.EX_MEM.ctrl.branch && C.EX_ulaOut.equal;
+    const int branch = pipeline.ID.ctrl.branch && C.EX_ulaOut.equal;
     if (branch == 0) {
         sprintf(pcSource, "PC +1");
     } else if (branch == 1) {

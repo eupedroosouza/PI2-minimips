@@ -127,8 +127,9 @@ typedef struct state {
 typedef struct  {
     PC IF_PC;
     PC IF_PCP1;
+    bool IF_wrtPC;
+    bool IF_selRI;
     Control ID_control;
-    bool ID_IncPC;
     int8_t ID_A;
     int8_t ID_B;
     int8_t ID_imm;
