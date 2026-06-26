@@ -58,6 +58,10 @@ void computeInstructionStats(const Instruction *instruction) {
 
 
 void showStatistics() {
+
+    WINDOW *winCentral = newwin(49, 207, (LINES - 49) / 2, (COLS - 207) / 2); // centralized window
+    box(winCentral, 0, 0); // border
+    wrefresh (winCentral);
     
     int height = 25;
     int width = 62;
