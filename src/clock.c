@@ -1,5 +1,6 @@
 #include "clock.h"
-
+#include <string.h>  
+#include "stats.h"
 #include "back.h"
 #include "control.h"
 #include "main.h"
@@ -45,18 +46,29 @@ void createCombinational(CombinationalState *C) {
 
 void clock() {
     saveLastState();
-
+    
+    // 1. INCREMENTA O CLOCK TOTAL DO SISTEMA
+    stats.totalCycles++; 
+    
     CombinationalState C;
     createCombinational(&C);
 
-    // WB
+    
+    // WB (Write-Back)
+    
     if (pipeline.MEM_WEB.ctrl.wrtReg) {
         registers[pipeline.MEM_WEB.RD] = C.WB_DATA;
-        pipeline.wb.IR = pipeline.EX_MEM.IR; // INCERTO
+        pipeline.wb.IR = pipeline.EX_MEM.IR; 
+    }
+    
+   
+    if (pipeline.MEM_WEB.ctrl.wrtReg || pipeline.MEM_WEB.ctrl.wrtMem) {
+        stats.finishedInstructions++;
     }
 
-
-    // MEM
+    
+    // MEM (Memory)
+    
     if (pipeline.EX_MEM.ctrl.wrtMem) {
         memData.data[pipeline.EX_MEM.ulaOut] = pipeline.EX_MEM.B;
     }
@@ -66,14 +78,18 @@ void clock() {
     pipeline.MEM_WEB.RD = C.MEM_RD;
     pipeline.MEM_WEB.IR = pipeline.EX_MEM.IR;
 
-    // EX
+    
+    // EX (Execute)
+    
     pipeline.EX_MEM.ctrl = pipeline.ID.ctrl;
     pipeline.EX_MEM.ulaOut = C.EX_ulaOut.value;
     pipeline.EX_MEM.B = C.EX_B;
     pipeline.EX_MEM.RD = C.EX_RD;
     pipeline.EX_MEM.IR = pipeline.ID.IR;
 
-    // ID
+    
+    // ID (Instruction Decode)
+    
     pipeline.ID.ctrl = C.ID_control;
     pipeline.ID.A = C.ID_A;
     pipeline.ID.B = C.ID_B;
@@ -83,11 +99,24 @@ void clock() {
     pipeline.ID.PCP1 = C.ID_PCP1;
     pipeline.ID.IR = pipeline.IF.IR;
 
-    //IF
+    
+    // IF (Instruction Fetch)
+   
     pipeline.IF.IR = memInstruction.instructions[pc];
     pipeline.IF.PCP1 = C.IF_PCP1;
     if (C.ID_IncPC) {
         pc = C.IF_PC;
+    }
+
+    // 3. CONTABILIZA INSTRUÇÕES INICIADAS
+    // Logo após buscar a instrução na memória, verificamos se ela é válida
+    if (strcmp(pipeline.IF.IR.stringedInstruction, "0000000000000000") != 0) {
+        stats.startedInstructions++;
+        // Classifica se é ADD, LW, SW, etc para aparecer na sua tabela
+        computeInstructionStats(&pipeline.IF.IR);
+    } else {
+        // Se for 0000000000000000, é uma bolha
+        stats.totalBubbles++;
     }
 }
 //
