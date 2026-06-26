@@ -53,11 +53,11 @@ void back() {
     }
 
     pc = lastState->pc;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < REG_SIZE; i++) {
         registers[i] = lastState->registers[i];
     }
 
-    for (int i = 0; i < memData.size; i++) {
+    for (int i = 0; i < MEM_SIZE; i++) {
         memData.data[i] = lastState->memData.data[i];
     }
     pipeline = lastState->pipeline;

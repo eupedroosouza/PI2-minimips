@@ -20,7 +20,6 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 
-
 WINDOW *createWindow() {
     WINDOW *win = newwin(HEIGHT, WIDTH, (LINES - HEIGHT) / 2, (COLS - WIDTH) / 2); // centralized window
     box(win, 0, 0); // border
@@ -548,13 +547,14 @@ void controlUI(WINDOW *win, const int base, const Instruction *instruction, cons
     mvwprintw(win, l3, 3, "%s", boolStr[control->jump]);
     mvwprintw(win, l3, 11, "%s", boolStr[control->branch]);
     char regDstBuffer[256];
-    snprintf(regDstBuffer, sizeof(regDstBuffer), "%1d ($%1d)", control->regDst, control->regDst ? instruction->rd : instruction->rt);
+    snprintf(regDstBuffer, sizeof(regDstBuffer), "%1d ($%1d)", control->regDst,
+             control->regDst ? instruction->rd : instruction->rt);
     mvwprintw(win, l3, 19, "%s", regDstBuffer);
     char memToRegBuffer[14];
 
-    const char *memToRegStr[] = {"ULA","MEM"};
-    const char *ulaSourceStr[] = {"Registrador","Imediato"};
-    
+    const char *memToRegStr[] = {"ULA", "MEM"};
+    const char *ulaSourceStr[] = {"Registrador", "Imediato"};
+
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
     const int memToRegOffset = (13 - strlen(memToRegBuffer)) / 2;
 
@@ -565,9 +565,9 @@ void controlUI(WINDOW *win, const int base, const Instruction *instruction, cons
              control->ulaSource, ulaSourceValue);
     const int ulaSourceOffset = (36 - strlen(ulaSourceBuffer)) / 2;
     mvwprintw(win, l3, 41 + ulaSourceOffset, "%s", ulaSourceBuffer);
-    mvwprintw(win, l3, 82, "%02d",  control->ulaControl);
-    mvwprintw(win, l3, 93, "%s",   boolStr[control->wrtReg ? 1 : 0]);
-    mvwprintw(win, l3, 104, "%s",   boolStr[control->wrtMem ? 1 : 0]);
+    mvwprintw(win, l3, 82, "%02d", control->ulaControl);
+    mvwprintw(win, l3, 93, "%s", boolStr[control->wrtReg ? 1 : 0]);
+    mvwprintw(win, l3, 104, "%s", boolStr[control->wrtMem ? 1 : 0]);
     mvwaddch(win, l3, 0, ACS_VLINE);
     mvwaddch(win, l3, 7, ACS_VLINE);
     mvwaddch(win, l3, 16, ACS_VLINE);
@@ -590,7 +590,8 @@ void controlUI(WINDOW *win, const int base, const Instruction *instruction, cons
     mvwaddch(win, l4, 109, ACS_LRCORNER);
 }
 
-void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWin, WINDOW *wbWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx, const int *memDataIdx) {
+void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWin, WINDOW *wbWin, WINDOW *regWin,
+                      WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx, const int *memDataIdx) {
     werase(ifWin);
     wsyncup(ifWin);
     werase(idWin);
@@ -610,20 +611,6 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
 
     CombinationalState C;
     createCombinational(&C);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // CONTEÚDO DAS JANELAS DO MODO DE EXECUÇÃO
@@ -729,7 +716,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     // end pc+1
     // controle
     mvwprintw(idWin, 11, 51, "Controle");
-    controlUI(idWin, 12,&pipeline.IF.IR, &C.ID_control);
+    controlUI(idWin, 12, &pipeline.IF.IR, &C.ID_control);
     mvwaddch(idWin, 16, 0, ACS_LTEE);
     mvwaddch(idWin, 16, 109, ACS_RTEE);
     // end control
@@ -780,8 +767,25 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(exWin, 6, 27, ACS_PLUS);
     mvwaddch(exWin, 6, 41, ACS_TTEE);
 
-    mvwprintw(exWin, 7, 6, "A");
-    mvwprintw(exWin, 7, 18, "%04d", pipeline.ID.A);
+    char aUla[255];
+    switch (C.EX_selA) {
+        case 0: {
+            sprintf(aUla, "A");
+            break;
+        }
+        case 1: {
+            sprintf(aUla, "forward mem");
+            break;
+        }
+        case 2: {
+            sprintf(aUla, "forward ex");
+            break;
+        }
+        default: break;
+    }
+    const int aUlaOffset = (12 - strlen(aUla)) / 2;
+    mvwprintw(exWin, 7, 1 + aUlaOffset, "%s", aUla);
+    mvwprintw(exWin, 7, 18, "%04d",  C.EX_ulaInA);
     mvwprintw(exWin, 7, 30, "Resultado");
     mvwprintw(exWin, 7, 46, "%04d", C.EX_ulaOut.value);
     mvwaddch(exWin, 7, 13, ACS_VLINE);
@@ -796,14 +800,28 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(exWin, 8, 41, ACS_PLUS);
 
     char bUla[255];
-    if (pipeline.ID.ctrl.ulaSource == 0) {
-        sprintf(bUla, "B");
-    }  else {
-        sprintf(bUla, "imediato");
+    switch (C.EX_selB) {
+        case 0: {
+            if (pipeline.ID.ctrl.ulaSource == 0) {
+                sprintf(bUla, "B");
+            } else {
+                sprintf(bUla, "imediato");
+            }
+            break;
+        }
+        case 1: {
+            sprintf(bUla, "forward mem");
+            break;
+        }
+        case 2: {
+            sprintf(bUla, "forward ex");
+            break;
+        }
+        default: break;
     }
     const int bUlaOffset = (12 - strlen(bUla)) / 2;
     mvwprintw(exWin, 9, 1 + bUlaOffset, "%s", bUla);
-    mvwprintw(exWin, 9, 18, "%04d", pipeline.ID.ctrl.ulaSource == 0 ? pipeline.ID.B : pipeline.ID.imm);
+    mvwprintw(exWin, 9, 18, "%04d", C.EX_ulaInB);
     mvwprintw(exWin, 9, 29, "Val. Iguais");
     mvwprintw(exWin, 9, 48, "%s", boolStr[C.EX_ulaOut.equal]);
     mvwaddch(exWin, 9, 13, ACS_VLINE);
@@ -854,11 +872,11 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     // end rd
 
     // Instrução
-    mvwprintw (exWin, 17, 23, "Instrução");
-    mvwhline (exWin, 18, 1, ACS_HLINE, 54); // linha horizontal abaixo de "instrução"
-    mvwaddch (exWin, 18, 0, ACS_LTEE); // fecha linha à esquerda
-    mvwaddch (exWin, 18, 55, ACS_RTEE); // fecha linha à direita
-    mvwprintw (exWin, 19, 20, "%s", pipeline.EX_MEM.IR.asmInstruction); // assembly
+    mvwprintw(exWin, 17, 23, "Instrução");
+    mvwhline(exWin, 18, 1, ACS_HLINE, 54); // linha horizontal abaixo de "instrução"
+    mvwaddch(exWin, 18, 0, ACS_LTEE); // fecha linha à esquerda
+    mvwaddch(exWin, 18, 55, ACS_RTEE); // fecha linha à direita
+    mvwprintw(exWin, 19, 20, "%s", pipeline.EX_MEM.IR.asmInstruction); // assembly
     // instructionDataUI (exWin, 19, 50, &pipeline.EX_MEM.IR);
 
     // end ex
@@ -921,14 +939,14 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwprintw(memWin, 13, 19, "%s", readStr);
 
 
-// Instrução
+    // Instrução
     // mvwhline (memWin, 16, 1, ACS_HLINE, 48); // linha horizontal acima de "instrução"
     // mvwaddch (memWin, 16, 41, ACS_RTEE); // fecha linha à direita
-    mvwprintw (memWin, 15, 17, "Instrução");
-    mvwhline (memWin, 16, 1, ACS_HLINE, 48); // linha horizontal abaixo de "instrução"
-    mvwaddch (memWin, 16, 0, ACS_LTEE); // fecha linha à esquerda
-    mvwaddch (memWin, 16, 41, ACS_RTEE); // fecha linha à direita
-    mvwprintw (memWin, 17, 14, "%s", pipeline.MEM_WEB.IR.asmInstruction); // assembly
+    mvwprintw(memWin, 15, 17, "Instrução");
+    mvwhline(memWin, 16, 1, ACS_HLINE, 48); // linha horizontal abaixo de "instrução"
+    mvwaddch(memWin, 16, 0, ACS_LTEE); // fecha linha à esquerda
+    mvwaddch(memWin, 16, 41, ACS_RTEE); // fecha linha à direita
+    mvwprintw(memWin, 17, 14, "%s", pipeline.MEM_WEB.IR.asmInstruction); // assembly
 
     // emd read
     // end mem
@@ -984,7 +1002,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwprintw(wbWin, 9, 1 + wrtRegOffset, "%s", wrtRegSource);
     char regDataStr[256];
     if (pipeline.EX_MEM.ctrl.wrtReg) {
-        sprintf(regDataStr, "%04d",C.WB_DATA);
+        sprintf(regDataStr, "%04d", C.WB_DATA);
     } else {
         sprintf(regDataStr, " -  ");
     }
@@ -995,17 +1013,17 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(wbWin, 10, 20, ACS_BTEE);
     mvwaddch(wbWin, 10, 41, ACS_RTEE);
 
-// Instrução
-    mvwprintw (wbWin, 11, 17, "Instrução");
-    mvwhline (wbWin, 12, 1, ACS_HLINE, 48); // linha horizontal abaixo de "instrução"
-    mvwaddch (wbWin, 12, 0, ACS_LTEE); // fecha linha à esquerda
-    mvwaddch (wbWin, 12, 41, ACS_RTEE); // fecha linha à direita
-    mvwprintw (wbWin, 13, 14, "%s", pipeline.wb.IR.asmInstruction); // assembly
+    // Instrução
+    mvwprintw(wbWin, 11, 17, "Instrução");
+    mvwhline(wbWin, 12, 1, ACS_HLINE, 48); // linha horizontal abaixo de "instrução"
+    mvwaddch(wbWin, 12, 0, ACS_LTEE); // fecha linha à esquerda
+    mvwaddch(wbWin, 12, 41, ACS_RTEE); // fecha linha à direita
+    mvwprintw(wbWin, 13, 14, "%s", pipeline.wb.IR.asmInstruction); // assembly
 
     // end wb
     // FIM DO WB
 
-    
+
     // registers
     box(regWin, 0, 0);
     mvwprintw(regWin, 1, 9, "Registradores");
@@ -1154,7 +1172,7 @@ void execution() {
 
     touchwin(win);
     wrefresh(win);
-    
+
 
     //     // <<< ESTÁGIOS DO PIPELINE >>>
     // // JANELA GLOBAL DOS ESTÁGIOS DO PIPELINE
@@ -1341,27 +1359,31 @@ void execution() {
                 if (pc > range) {
                     memInstIdx = pc < 243 ? pc : 243;
                 }
-                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx,
+                                 &memDataIdx);
                 break;
             }
             case 'B':
             case 'b': {
                 back();
-                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx,
+                                 &memDataIdx);
                 break;
             }
             case KEY_UP: {
                 if (memInstIdx > 0) {
                     memInstIdx--;
                 }
-                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx,
+                                 &memDataIdx);
                 break;
             }
             case KEY_DOWN: {
                 if ((memInstIdx + 13) < MEM_SIZE) {
                     memInstIdx++;
                 }
-                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx,
+                                 &memDataIdx);
                 break;
             }
             case 'U':
@@ -1369,7 +1391,8 @@ void execution() {
                 if (memDataIdx > 0) {
                     memDataIdx--;
                 }
-                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx,
+                                 &memDataIdx);
                 break;
             }
             case 'J':
@@ -1377,7 +1400,8 @@ void execution() {
                 if ((memDataIdx + 13) < MEM_SIZE) {
                     memDataIdx++;
                 }
-                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
+                refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx,
+                                 &memDataIdx);
                 break;
             }
             default: break;
@@ -1517,7 +1541,7 @@ void allProgramUI() {
                 break;
             }
             case KEY_DOWN: {
-                    if ((memInstIdx + 39) < MEM_SIZE) {
+                if ((memInstIdx + 39) < MEM_SIZE) {
                     memInstIdx++;
                 }
                 refreshAllProgramUI(regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);

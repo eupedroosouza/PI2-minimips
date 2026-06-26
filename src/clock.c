@@ -29,6 +29,7 @@ void createCombinational(CombinationalState *C) {
                pipeline.EX_MEM.RD == pipeline.ID.RS) {
         selA = 2;
     }
+    C->EX_selA = selA;
     uint8_t selB = 0;
     if (pipeline.MEM_WEB.ctrl.wrtReg &&
         pipeline.MEM_WEB.RD != 0 &&
@@ -40,6 +41,8 @@ void createCombinational(CombinationalState *C) {
                pipeline.EX_MEM.RD == pipeline.ID.RT) {
         selB = 2;
     }
+
+    C->EX_selB = selB;
     int8_t A = 0;
     switch (selA) {
         case 0: {
@@ -73,6 +76,8 @@ void createCombinational(CombinationalState *C) {
         }
         default: break;
     }
+    C->EX_ulaInA = A;
+    C->EX_ulaInB = B;
     C->EX_ulaOut = ula(A, B, pipeline.ID.ctrl.ulaControl);
     C->EX_B = pipeline.ID.B;
     C->EX_RD = pipeline.ID.ctrl.regDst ? pipeline.ID.RD : pipeline.ID.RT;
@@ -101,7 +106,7 @@ void createCombinational(CombinationalState *C) {
     if (C->ID_control.jump) {
         C->IF_PC = pipeline.IF.IR.addr;
     }
-    if (pipeline.ID.ctrl.memToReg == 0 &&
+    if (pipeline.ID.ctrl.memToReg == 0 && pipeline.ID.RD  != 0 &&
         (pipeline.ID.RD == C->ID_RS || pipeline.ID.RD == C->ID_RT)) {
         C->IF_wrtPC = false;
         C->IF_wrtRI = 0;
@@ -124,9 +129,9 @@ void clock() {
     createCombinational(&C);
 
     // WB
+    pipeline.wb.IR = pipeline.MEM_WEB.IR;
     if (pipeline.MEM_WEB.ctrl.wrtReg) {
         registers[pipeline.MEM_WEB.RD] = C.WB_DATA;
-        pipeline.wb.IR = pipeline.EX_MEM.IR; // INCERTO
     }
     if (pipeline.MEM_WEB.ctrl.wrtReg || pipeline.MEM_WEB.ctrl.wrtMem) {
         stats.finishedInstructions++;
@@ -147,7 +152,7 @@ void clock() {
     pipeline.EX_MEM.ulaOut = C.EX_ulaOut.value;
     pipeline.EX_MEM.B = C.EX_B;
     pipeline.EX_MEM.RD = C.EX_RD;
-    pipeline.EX_MEM.IR = pipeline.ID.IR;
+    pipeline.EX_MEM.IR = pipeline.IF.IR;
 
     // ID
     pipeline.ID.ctrl = C.ID_control;
@@ -158,7 +163,6 @@ void clock() {
     pipeline.ID.RD = C.ID_RD;
     pipeline.ID.imm = C.ID_imm;
     pipeline.ID.PCP1 = C.ID_PCP1;
-    pipeline.ID.IR = pipeline.IF.IR;
 
     //IF
     if (C.IF_wrtRI) {

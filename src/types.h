@@ -174,6 +174,8 @@ typedef struct  {
     int8_t EX_B;
     uint8_t EX_RD;
     uint8_t EX_selA;
+    int8_t EX_ulaInA;
+    int8_t EX_ulaInB;
     uint8_t EX_selB;
     int8_t MEM_MEM;
     int8_t MEM_ulaOut;
