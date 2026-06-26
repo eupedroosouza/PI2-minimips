@@ -116,6 +116,36 @@ typedef struct {
     WB wb;           // INCERTO
 } PipelineRegisters; // Variável global unificada
 
+typedef struct {
+    int r;
+    int i;
+    int j;
+    int other;
+} StatisticsPerType;
+
+typedef struct {
+    int lw;
+    int sw;
+    int add;
+    int addi;
+    int sub;
+    int and_inst; 
+    int or_inst;
+    int beq;
+    int j;
+    int other; 
+} StatisticsPerClass;
+
+typedef struct {
+    int executedInstructions;   
+    int startedInstructions;    // QUANTIDADE DE INSTRUÇÕES INICIADAS (No estágio IF)
+    int finishedInstructions;   // QUANTIDADE DE INSTRUÇÕES FINALIZADAS (No estágio WB)
+    int totalCycles;            // QUANTIDADE DE CLOCKS EFETUADOS
+    int totalBubbles;           // QUANTIDADE DE BOLHAS DETECTADAS
+    StatisticsPerType executedInstructionsPerType;
+    StatisticsPerClass executedInstructionsPerClass;
+} Statistics;
+
 // Estado (útil para a função de back)
 typedef struct state {
     struct state *previous;
@@ -123,6 +153,7 @@ typedef struct state {
     Register registers[8];
     PipelineRegisters pipeline;
     MemData memData;
+    Statistics stats;
 } BackState;
 
 typedef struct  {

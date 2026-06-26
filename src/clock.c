@@ -1,5 +1,6 @@
 #include "clock.h"
-
+#include <string.h>  
+#include "stats.h"
 #include "back.h"
 #include "control.h"
 #include "main.h"
@@ -118,7 +119,7 @@ void createCombinational(CombinationalState *C) {
 
 void clock() {
     saveLastState();
-
+    stats.totalCycles++; 
     CombinationalState C;
     createCombinational(&C);
 
@@ -127,7 +128,9 @@ void clock() {
         registers[pipeline.MEM_WEB.RD] = C.WB_DATA;
         pipeline.wb.IR = pipeline.EX_MEM.IR; // INCERTO
     }
-
+    if (pipeline.MEM_WEB.ctrl.wrtReg || pipeline.MEM_WEB.ctrl.wrtMem) {
+        stats.finishedInstructions++;
+    }
 
     // MEM
     if (pipeline.EX_MEM.ctrl.wrtMem) {
@@ -164,6 +167,14 @@ void clock() {
     pipeline.IF.PCP1 = C.IF_PCP1;
     if (C.IF_wrtPC) {
         pc = C.IF_PC;
+    }
+     if (strcmp(pipeline.IF.IR.stringedInstruction, "0000000000000000") != 0) {
+        stats.startedInstructions++;
+        // Classifica se é ADD, LW, SW, etc para aparecer na sua tabela
+        computeInstructionStats(&pipeline.IF.IR);
+    } else {
+        // Se for 0000000000000000, é uma bolha
+        stats.totalBubbles++;
     }
 }
 
