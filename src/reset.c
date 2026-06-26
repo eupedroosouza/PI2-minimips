@@ -30,7 +30,6 @@ void resetRegisters(PipelineRegisters *pipeline) {
     pipeline->ID = (ID_EX){0};
     pipeline->EX_MEM = (EX_MEM){0};
     pipeline->MEM_WEB = (MEM_WB){0};
-    initStatistics();
 }
 
 void resetData() {
