@@ -626,7 +626,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwprintw(ifWin, 1, 10, "Busca de Instrução (IF)");
     // end header
     // first line
-    mvwprintw(ifWin, 3, 2, "Inc. PC");
+    mvwprintw(ifWin, 3, 2, "Esc PC");
     mvwaddch(ifWin, 3, 10, ACS_VLINE);
     mvwprintw(ifWin, 3, 16, "Fonte PC");
     mvwaddch(ifWin, 3, 29, ACS_VLINE);
@@ -638,56 +638,73 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(ifWin, 4, 41, ACS_RTEE);
     // end first line
     // first data
-    mvwprintw(ifWin, 5, 5, "%s", boolStr[1]); // todo: change with the real value after hazard processing
+    mvwprintw(ifWin, 5, 5, "%s", boolStr[C.IF_wrtPC]); // todo: change with the real value after hazard processing
     mvwaddch(ifWin, 5, 10, ACS_VLINE);
     char pcSource[256];
     int pcSourceOffset = 0;
     // this needs change
     const int branch = pipeline.ID.ctrl.branch && C.EX_ulaOut.equal;
-    if (branch == 0) {
-        sprintf(pcSource, "PC +1");
-    } else if (branch == 1) {
-        sprintf(pcSource, "Branch");
-    }
-    if (C.ID_control.jump) {
-        sprintf(pcSource, "Jump");
+    if (C.IF_wrtPC) {
+        if (branch == 0) {
+            sprintf(pcSource, "PC +1");
+        } else if (branch == 1) {
+            sprintf(pcSource, "Branch");
+        }
+        if (C.ID_control.jump) {
+            sprintf(pcSource, "Jump");
+        }
+    } else {
+        sprintf(pcSource, "-");
     }
     pcSourceOffset = (18 - strlen(pcSource)) / 2;
     mvwprintw(ifWin, 5, 12 + pcSourceOffset, "%s", pcSource);
     mvwaddch(ifWin, 5, 29, ACS_VLINE);
-    mvwprintw(ifWin, 5, 34, "%03d", (C.IF_PC));
+    char newPc[256];
+    if (C.IF_wrtPC) {
+        sprintf(newPc, "%03d", C.IF_PC);
+    } else {
+        sprintf(newPc, " - ");
+    }
+    mvwprintw(ifWin, 5, 34, "%s", newPc);
     mvwaddch(ifWin, 6, 0, ACS_LTEE);
     mvwhline(ifWin, 6, 1, ACS_HLINE, 40);
-    mvwaddch(ifWin, 6, 10, ACS_BTEE);
+    mvwaddch(ifWin, 6, 10, ACS_PLUS);
     mvwaddch(ifWin, 6, 29, ACS_BTEE);
     mvwaddch(ifWin, 6, 41, ACS_RTEE);
     // end data
-    // separator
-    mvwaddch(ifWin, 7, 0, ACS_LTEE);
-    mvwhline(ifWin, 7, 1, ACS_HLINE, 40);
-    mvwaddch(ifWin, 7, 10, ACS_TTEE);
-    mvwaddch(ifWin, 7, 41, ACS_RTEE);
-    // end seperator
     // second line
-    mvwprintw(ifWin, 8, 5, "PC");
-    mvwaddch(ifWin, 8, 10, ACS_VLINE);
-    mvwprintw(ifWin, 8, 13, "Instrução (lida da memória)");
+    mvwprintw(ifWin, 7, 5, "PC");
+    mvwaddch(ifWin, 7, 10, ACS_VLINE);
+    mvwprintw(ifWin, 7, 13, "Instrução (lida da memória)");
     // end second line
     // second data
-    mvwaddch(ifWin, 9, 0, ACS_LTEE);
-    mvwhline(ifWin, 9, 1, ACS_HLINE, 40);
-    mvwaddch(ifWin, 9, 10, ACS_PLUS);
-    mvwaddch(ifWin, 9, 41, ACS_RTEE);
-    mvwprintw(ifWin, 10, 4, "%03d", pc);
-    mvwaddch(ifWin, 10, 10, ACS_VLINE);
-    const Instruction *inst = &memInstruction.instructions[pc];
+    mvwaddch(ifWin, 8, 0, ACS_LTEE);
+    mvwhline(ifWin, 8, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 8, 10, ACS_PLUS);
+    mvwaddch(ifWin, 8, 41, ACS_RTEE);
+    mvwprintw(ifWin, 9, 4, "%03d", pc);
+    mvwaddch(ifWin, 9, 10, ACS_VLINE);
+    const Instruction *inst = C.IF_selRI == 0 ? &memInstruction.instructions[pc] : &emptyInstruction;
     const int instOffset = (30 - strlen(inst->asmInstruction)) / 2;
-    mvwprintw(ifWin, 10, 11 + instOffset, "%s", inst->asmInstruction);
-    mvwaddch(ifWin, 11, 0, ACS_LTEE);
-    mvwhline(ifWin, 11, 1, ACS_HLINE, 40);
-    mvwaddch(ifWin, 11, 10, ACS_BTEE);
-    mvwaddch(ifWin, 11, 41, ACS_RTEE);
+    mvwprintw(ifWin, 9, 11 + instOffset, "%s", inst->asmInstruction);
+    mvwaddch(ifWin, 10, 0, ACS_LTEE);
+    mvwhline(ifWin, 10, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 10, 10, ACS_PLUS);
+    mvwaddch(ifWin, 10, 41, ACS_RTEE);
     // end second data
+    // second line
+    mvwprintw(ifWin, 11, 3, "EscRI");
+    mvwaddch(ifWin, 11, 10, ACS_VLINE);
+    mvwprintw(ifWin, 11, 26, "%s", boolStr[C.IF_wrtRI]);
+    // end second line
+    // second data
+    // mvwprintw(ifWin, 12, 4, "%03d", pc);
+    // mvwaddch(ifWin, 12, 10, ACS_VLINE);
+    // mvwprintw(ifWin, 12, 11 + instOffset, "%s", "loco");
+    mvwaddch(ifWin, 12, 0, ACS_LTEE);
+    mvwhline(ifWin, 12, 1, ACS_HLINE, 40);
+    mvwaddch(ifWin, 12, 10, ACS_BTEE);
+    mvwaddch(ifWin, 12, 41, ACS_RTEE);
     // end if
 
 
