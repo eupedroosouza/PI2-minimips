@@ -551,6 +551,10 @@ void controlUI(WINDOW *win, const int base, const Instruction *instruction, cons
     snprintf(regDstBuffer, sizeof(regDstBuffer), "%1d ($%1d)", control->regDst, control->regDst ? instruction->rd : instruction->rt);
     mvwprintw(win, l3, 19, "%s", regDstBuffer);
     char memToRegBuffer[14];
+
+    const char *memToRegStr[] = {"ULA","MEM"};
+    const char *ulaSourceStr[] = {"Registrador","Imediato"};
+    
     snprintf(memToRegBuffer, sizeof(memToRegBuffer), "%s (%d)", memToRegStr[control->memToReg], control->memToReg);
     const int memToRegOffset = (13 - strlen(memToRegBuffer)) / 2;
 
