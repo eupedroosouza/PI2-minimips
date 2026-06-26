@@ -1,5 +1,5 @@
 #include "back.h"
-#include "stats.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,8 +27,6 @@ void saveLastState() {
     }
     backState->memData.size = memData.size;
     backState->pipeline = pipeline;
-    backState->stats = stats; 
-    
     backState->previous = lastState;
     lastState = backState;
 }
@@ -62,9 +60,7 @@ void back() {
     }
     pipeline = lastState->pipeline;
     // println(" -> Os valores foram redefinidos para o estado anterior da máquina.");
-    stats = lastState->stats;
 
-    
     BackState *aux = lastState;
     lastState = lastState->previous;
     free(aux);
