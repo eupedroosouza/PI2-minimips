@@ -2,6 +2,8 @@
 #include "types.h"
 
 extern  const char *typeStr[4];
+extern  const char *memToRegStr[2];
+extern  const char *ulaSourceStr[2];
 
 // Registers
 

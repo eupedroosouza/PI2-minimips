@@ -17,6 +17,8 @@
 
 #define WIDTH 207
 #define HEIGHT 49
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
 
 
 WINDOW *createWindow() {
@@ -990,7 +992,13 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
         const int idx = *memInstIdx + i;
         mvwprintw(memInstWin, memInstBase, 2, "%03d", idx);
         mvwaddch(memInstWin, memInstBase, 6, ACS_VLINE);
+        if (idx == pc) {
+            wattron(memInstWin, COLOR_PAIR(1));
+        }
         mvwprintw(memInstWin, memInstBase, 8, "%s", memInstruction.instructions[idx].asmInstruction);
+        if (idx == pc) {
+            wattroff(memInstWin, COLOR_PAIR(1));
+        }
         memInstBase++;
     }
     mvwaddch(memInstWin, 16, 0, ACS_LTEE);
@@ -1267,6 +1275,16 @@ void execution() {
             case 'S':
             case 's': {
                 clock();
+                const int range = memInstIdx + 12;
+                // if (memDataIdx < pc) {
+                //     memDataIdx = pc;
+                // }
+                if (pc < memInstIdx) {
+                    memInstIdx = pc;
+                }
+                if (pc > range) {
+                    memInstIdx = pc < 243 ? pc : 243;
+                }
                 refreshExecution(ifWin, idWin, exWin, memWin, wbWin, regWin, memInstWin, memDataWin, &memInstIdx, &memDataIdx);
                 break;
             }
