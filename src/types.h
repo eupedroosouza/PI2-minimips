@@ -84,6 +84,7 @@ typedef struct {
     int8_t imm;             
     uint8_t PCP1;             // PC que veio do IF_ID necessário para o cálculo do BEQ
     Control ctrl;           // Sinais de controle da instrução
+    Instruction IR;
 } ID_EX; // decodificação da instrução
 
 typedef struct {
@@ -91,6 +92,7 @@ typedef struct {
     int8_t B;
     uint8_t RD;
     Control ctrl;           // Sinais de controle para as fases de MEM e WB
+    Instruction IR;
 } EX_MEM; // acesso à memória de dados
 
 typedef struct {
@@ -98,13 +100,19 @@ typedef struct {
     int8_t ulaOut;          
     Control ctrl;           //Sinais de controle para a fase de WB
     uint8_t RD;
+    Instruction IR;
 } MEM_WB; // escrita no banco de registradores
+
+typedef struct {    // INCERTO
+    Instruction IR;
+} WB;
 
 typedef struct {
     IF_ID IF;
     ID_EX ID;
     EX_MEM EX_MEM;
     MEM_WB MEM_WEB;
+    WB wb;           // INCERTO
 } PipelineRegisters; // Variável global unificada
 
 // Estado (útil para a função de back)
