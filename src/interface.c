@@ -586,9 +586,7 @@ void controlUI(WINDOW *win, const int base, const Instruction *instruction, cons
     mvwaddch(win, l4, 109, ACS_LRCORNER);
 }
 
-void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWin, WINDOW *wbWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin,
-                      const int *memInstIdx,
-                      const int *memDataIdx) {
+void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWin, WINDOW *wbWin, WINDOW *regWin, WINDOW *memInstWin, WINDOW *memDataWin, const int *memInstIdx, const int *memDataIdx) {
     werase(ifWin);
     wsyncup(ifWin);
     werase(idWin);
@@ -609,6 +607,23 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     CombinationalState C;
     createCombinational(&C);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // CONTEÚDO DAS JANELAS DO MODO DE EXECUÇÃO
+    // CONTEÚDO BUSCA DE INSTRUÇÃO
     // if
     box(ifWin, 0, 0);
     // header
@@ -617,7 +632,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(ifWin, 2, 41, ACS_RTEE);
     mvwaddch(ifWin, 2, 10, ACS_TTEE);
     mvwaddch(ifWin, 2, 29, ACS_TTEE);
-    mvwprintw(ifWin, 1, 12, "Busca de Instrução");
+    mvwprintw(ifWin, 1, 10, "Busca de Instrução (IF)");
     // end header
     // first line
     mvwprintw(ifWin, 3, 2, "Inc. PC");
@@ -684,13 +699,15 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     // end second data
     // end if
 
+
     // id
+    // << CONTEÚDO DE DECODIFICAÇÃO DE INSTRUÇÃO >>
     box(idWin, 0, 0);
     // header
     mvwaddch(idWin, 2, 0, ACS_LTEE);
     mvwhline(idWin, 2, 1, ACS_HLINE, 108);
     mvwaddch(idWin, 2, 109, ACS_RTEE);
-    mvwprintw(idWin, 1, 42, "Decodificação de Instrução");
+    mvwprintw(idWin, 1, 39, "Decodificação de Instrução (ID)");
     // end header
     // ri
     mvwprintw(idWin, 3, 54, "RI");
@@ -731,14 +748,16 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(idWin, 22, 55, ACS_BTEE);
     // end registers
     // end id
+    // FIM DO CONTEÚDO DE DECODIFICAÇÃO DE INSTRUÇÃO
 
     // ex
+    // << CONTEÚDO DE EXECUÇÃO >>
     box(exWin, 0, 0);
     // header
     mvwaddch(exWin, 2, 0, ACS_LTEE);
     mvwhline(exWin, 2, 1, ACS_HLINE, 54);
     mvwaddch(exWin, 2, 55, ACS_RTEE);
-    mvwprintw(exWin, 1, 23, "Execução");
+    mvwprintw(exWin, 1, 22, "Execução (EX)");
     // end header
 
     // ula
@@ -810,6 +829,7 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(exWin, 12, 41, ACS_BTEE);
 
     // end ula
+
     // branch address
     mvwaddch(exWin, 14, 0, ACS_LTEE);
     mvwhline(exWin, 14, 1, ACS_HLINE, 54);
@@ -828,15 +848,26 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(exWin, 15, 27, ACS_VLINE);
     mvwprintw(exWin, 15, 37, "%s = %1d", (pipeline.ID.ctrl.regDst ? "$rd" : "$rt"), C.EX_RD);
     // end rd
+
+    // Instrução
+    mvwprintw (exWin, 17, 23, "Instrução");
+    mvwhline (exWin, 18, 1, ACS_HLINE, 54); // linha horizontal abaixo de "instrução"
+    mvwaddch (exWin, 18, 0, ACS_LTEE); // fecha linha à esquerda
+    mvwaddch (exWin, 18, 55, ACS_RTEE); // fecha linha à direita
+    mvwprintw (exWin, 19, 20, "%s", pipeline.EX_MEM.IR.asmInstruction); // assembly
+    // instructionDataUI (exWin, 19, 50, &pipeline.EX_MEM.IR);
+
     // end ex
+    // FIM DO CONTEÚDO DE EXECUÇÃO
 
     // mem
+    // << CONTEÚDO DE ESCRITA/LEITURA DA MEMÓRIA >>
     box(memWin, 0, 0);
     // header
     mvwaddch(memWin, 2, 0, ACS_LTEE);
     mvwhline(memWin, 2, 1, ACS_HLINE, 40);
     mvwaddch(memWin, 2, 41, ACS_RTEE);
-    mvwprintw(memWin, 1, 8, "Escrita/Leitura da Memória");
+    mvwprintw(memWin, 1, 6, "Escrita/Leitura da Memória (MEM)");
     // end header
     mvwaddch(memWin, 4, 0, ACS_LTEE);
     mvwhline(memWin, 4, 1, ACS_HLINE, 40);
@@ -884,16 +915,29 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
         sprintf(readStr, " -  ");
     }
     mvwprintw(memWin, 13, 19, "%s", readStr);
+
+
+// Instrução
+    // mvwhline (memWin, 16, 1, ACS_HLINE, 48); // linha horizontal acima de "instrução"
+    // mvwaddch (memWin, 16, 41, ACS_RTEE); // fecha linha à direita
+    mvwprintw (memWin, 15, 17, "Instrução");
+    mvwhline (memWin, 16, 1, ACS_HLINE, 48); // linha horizontal abaixo de "instrução"
+    mvwaddch (memWin, 16, 0, ACS_LTEE); // fecha linha à esquerda
+    mvwaddch (memWin, 16, 41, ACS_RTEE); // fecha linha à direita
+    mvwprintw (memWin, 17, 14, "%s", pipeline.MEM_WEB.IR.asmInstruction); // assembly
+
     // emd read
     // end mem
+    // FIM DO CONTEÚDO DE ESCRITA NA MEMÓRIA
 
     // wb
+    // << CONTEÚDO DE ESCRITA NO REGISTRADOR >>
     box(wbWin, 0, 0);
     mvwaddch(wbWin, 2, 0, ACS_LTEE);
     mvwhline(wbWin, 2, 1, ACS_HLINE, 40);
     mvwaddch(wbWin, 2, 20, ACS_TTEE);
     mvwaddch(wbWin, 2, 41, ACS_RTEE);
-    mvwprintw(wbWin, 1, 11, "Escrita no Registrador");
+    mvwprintw(wbWin, 1, 8, "Escrita no Registrador (WB)");
     mvwaddch(wbWin, 4, 0, ACS_LTEE);
     mvwhline(wbWin, 4, 1, ACS_HLINE, 40);
 
@@ -947,9 +991,17 @@ void refreshExecution(WINDOW *ifWin, WINDOW *idWin, WINDOW *exWin, WINDOW *memWi
     mvwaddch(wbWin, 10, 20, ACS_BTEE);
     mvwaddch(wbWin, 10, 41, ACS_RTEE);
 
+// Instrução
+    mvwprintw (wbWin, 11, 17, "Instrução");
+    mvwhline (wbWin, 12, 1, ACS_HLINE, 48); // linha horizontal abaixo de "instrução"
+    mvwaddch (wbWin, 12, 0, ACS_LTEE); // fecha linha à esquerda
+    mvwaddch (wbWin, 12, 41, ACS_RTEE); // fecha linha à direita
+    mvwprintw (wbWin, 13, 14, "%s", pipeline.wb.IR.asmInstruction); // assembly
 
     // end wb
+    // FIM DO WB
 
+    
     // registers
     box(regWin, 0, 0);
     mvwprintw(regWin, 1, 9, "Registradores");
